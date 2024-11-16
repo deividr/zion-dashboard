@@ -26,6 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useClerk } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 // Menu items.
 const items = [
@@ -48,11 +50,12 @@ const items = [
 
 export function AppSidebar() {
   const { signOut, user } = useClerk();
+  const pathname = usePathname();
   return (
     <Sidebar>
-      <SidebarHeader>
+      <SidebarHeader className="bg-slate-200">
         <SidebarMenu>
-          <SidebarMenuItem>La Buonapasta</SidebarMenuItem>
+          <SidebarMenuItem className="font-bold">La Buonapasta</SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
@@ -61,7 +64,10 @@ export function AppSidebar() {
           <SidebarMenu>
             {items.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton
+                  asChild
+                  className={cn(pathname === item.url && "bg-green-200")}
+                >
                   <a href={item.url}>
                     <item.icon />
                     <span>{item.title}</span>
