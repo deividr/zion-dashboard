@@ -75,7 +75,9 @@ export default function Login() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Sign in this</Button>
+            <Button onSubmit={() => signOut({ redirectUrl: "/" })}>
+              Sign in this
+            </Button>
             {/* <p className="text-center text-sm text-gray-600"> */}
             {/*   {"Don't have an account? "} */}
             {/*   <Link href="/register" className="font-semibold text-gray-800"> */}
