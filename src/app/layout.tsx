@@ -5,6 +5,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar";
 import { auth } from "@clerk/nextjs/server";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+} from "@/components/ui/breadcrumb";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,16 +40,17 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <main>
-            {sessionId ? (
-              <SidebarProvider>
-                <AppSidebar />
-                <SidebarTrigger>{children}</SidebarTrigger>
-              </SidebarProvider>
-            ) : (
-              <>{children}</>
-            )}
-          </main>
+          {sessionId ? (
+            <SidebarProvider>
+              <AppSidebar />
+              <main>
+                <SidebarTrigger />
+                {children}
+              </main>
+            </SidebarProvider>
+          ) : (
+            <>{children}</>
+          )}
         </body>
       </html>
     </ClerkProvider>
