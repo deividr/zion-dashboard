@@ -30,7 +30,7 @@ async function getData(): Promise<Product[]> {
     {
       id: "728ed52f",
       name: "Conquilha",
-      value: 5200,
+      value: 5232,
       unityType: "kilogram",
     },
   ];
@@ -40,7 +40,7 @@ export default async function Products() {
   const data = await getData();
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto">
       <DataTable columns={columns} data={data} />
     </div>
   );

@@ -18,11 +18,20 @@ export const columns: ColumnDef<Product>[] = [
     header: "Name",
   },
   {
-    accessorKey: "value",
-    header: "Value",
-  },
-  {
     accessorKey: "unityType",
     header: "Unity Type",
+  },
+  {
+    accessorKey: "value",
+    header: "Value",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("value")) / 100;
+      const formatted = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(amount);
+
+      return <div className="text-right font-medium">{formatted}</div>;
+    },
   },
 ];

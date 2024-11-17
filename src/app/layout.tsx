@@ -45,7 +45,7 @@ export default async function RootLayout({
               <AppSidebar />
               <main>
                 <SidebarTrigger />
-                <div className="bg-red-50">{children}</div>
+                <div className="p-10">{children}</div>
               </main>
             </SidebarProvider>
           ) : (
