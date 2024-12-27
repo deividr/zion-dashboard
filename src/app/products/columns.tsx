@@ -7,7 +7,7 @@ export const productSchema = z.object({
   id: z.string().uuid(),
   value: z.number().int(),
   name: z.string(),
-  unityType: z.enum(["unity", "kilogram"]),
+  unityType: z.enum(["UN", "KG"]),
 });
 
 export type Product = z.infer<typeof productSchema>;

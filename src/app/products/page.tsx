@@ -1,46 +1,17 @@
-import { Product, columns } from "./columns";
-import { DataTable } from "../../components/data-table";
+import { Product, columns } from './columns';
+import { DataTable } from '../../components/data-table';
 
-async function getData(): Promise<Product[]> {
-  return [
-    {
-      id: "728ed52f",
-      name: "Coca-Cola",
-      value: 1000,
-      unityType: "unity",
-    },
-    {
-      id: "728ed52f",
-      name: "Rondeli",
-      value: 5600,
-      unityType: "kilogram",
-    },
-    {
-      id: "728ed52f",
-      name: "Lasanha",
-      value: 4500,
-      unityType: "kilogram",
-    },
-    {
-      id: "728ed52f",
-      name: "Nhochi",
-      value: 5400,
-      unityType: "kilogram",
-    },
-    {
-      id: "728ed52f",
-      name: "Conquilha",
-      value: 5232,
-      unityType: "kilogram",
-    },
-  ];
+async function getProducts(): Promise<Product[]> {
+  const data = await fetch('http://192.168.15.34:3000/products');
+  const products = await data.json();
+  return products;
 }
 
 export default async function Products() {
-  const data = await getData();
+  const data = await getProducts();
 
   return (
-    <div className="container mx-auto">
+    <div className='container mx-auto'>
       <DataTable columns={columns} data={data} />
     </div>
   );
