@@ -3,7 +3,6 @@
 import {
   ChevronUp,
   Home,
-  User2,
   LogOut,
   ShoppingCart,
   SquareChartGantt,
@@ -18,6 +17,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -28,6 +28,7 @@ import {
 import { useClerk } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 // Menu items.
 const items = [
@@ -53,12 +54,17 @@ export function AppSidebar() {
   const pathname = usePathname();
   return (
     <Sidebar>
-      <SidebarHeader className="bg-slate-200">
-        <SidebarMenu>
+      <SidebarHeader>
+        <SidebarMenu className="flex flex-row items-center gap-2">
+          <Avatar>
+            <AvatarImage src="/images/logo.png" alt="@shadcn" />
+            <AvatarFallback>La Buonapasta</AvatarFallback>
+          </Avatar>
           <SidebarMenuItem className="font-bold">La Buonapasta</SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarSeparator />
+      <SidebarContent className="p-1">
         <SidebarGroup />
         <SidebarGroupContent>
           <SidebarMenu>
@@ -85,12 +91,19 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> {user?.fullName}
+                  <Avatar className="size-8">
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="@shadcn"
+                    />
+                    <AvatarFallback>Username</AvatarFallback>
+                  </Avatar>
+                  {user?.fullName}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                side="top"
+                side="right"
                 className="w-[--radix-popper-anchor-width]"
               >
                 <DropdownMenuItem onClick={() => signOut({ redirectUrl: "/" })}>
