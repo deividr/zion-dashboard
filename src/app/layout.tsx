@@ -5,17 +5,13 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar";
 import { auth } from "@clerk/nextjs/server";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@/components/ui/breadcrumb";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -43,9 +39,9 @@ export default async function RootLayout({
           {sessionId ? (
             <SidebarProvider>
               <AppSidebar />
-              <main>
+              <main className="w-full flex">
                 <SidebarTrigger />
-                <div className="p-10">{children}</div>
+                <div className="py-2 px-4 w-full">{children}</div>
               </main>
             </SidebarProvider>
           ) : (
