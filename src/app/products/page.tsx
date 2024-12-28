@@ -3,7 +3,9 @@ import { DataTable } from "../../components/data-table";
 import { PaginationDemo } from "@/components/pagination";
 
 async function getProducts(): Promise<Product[]> {
-  const data = await fetch("http://192.168.15.34:3000/products");
+  const data = await fetch(
+    "http://192.168.15.34:3000/products?limit=10&page=1",
+  );
   const products = await data.json();
   return products;
 }

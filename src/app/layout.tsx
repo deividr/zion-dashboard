@@ -41,7 +41,7 @@ export default async function RootLayout({
               <AppSidebar />
               <main className="w-full flex">
                 <SidebarTrigger />
-                <div className="py-2 px-4 w-full">{children}</div>
+                <div className="py-2 pl-4 pr-8 w-full">{children}</div>
               </main>
             </SidebarProvider>
           ) : (

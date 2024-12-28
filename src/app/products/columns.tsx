@@ -15,15 +15,15 @@ export type Product = z.infer<typeof productSchema>;
 export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Nome",
   },
   {
     accessorKey: "unityType",
-    header: "Unity Type",
+    header: "Tipo Unidade",
   },
   {
     accessorKey: "value",
-    header: "Value",
+    header: "Valor",
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("value")) / 100;
       const formatted = new Intl.NumberFormat("pt-BR", {
