@@ -84,7 +84,7 @@ export function FullPagination({
       }
     } else {
       items.push(
-        <PaginationItem key={1}>
+        <PaginationItem key={1} onClick={() => onChangePageAction(1)}>
           <PaginationLink href={buildLink(1)} isActive={page === 1}>
             1
           </PaginationLink>
@@ -104,7 +104,7 @@ export function FullPagination({
 
       for (let i = start; i <= end; i++) {
         items.push(
-          <PaginationItem key={i}>
+          <PaginationItem key={i} onClick={() => onChangePageAction(i)}>
             <PaginationLink href={buildLink(i)} isActive={page === i}>
               {i}
             </PaginationLink>
@@ -121,7 +121,10 @@ export function FullPagination({
       }
 
       items.push(
-        <PaginationItem key={totalPageCount}>
+        <PaginationItem
+          key={totalPageCount}
+          onClick={() => onChangePageAction(totalPageCount)}
+        >
           <PaginationLink
             href={buildLink(totalPageCount)}
             isActive={page === totalPageCount}

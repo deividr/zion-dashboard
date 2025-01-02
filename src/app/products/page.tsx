@@ -24,7 +24,7 @@ export default function Products() {
 
   useEffect(() => {
     getProducts({ page }).then((data) => {
-      setProducts(data.products);
+      setProducts(data.products || []);
       setTotalPage(data.pagination.total);
     });
   }, [page]);
@@ -34,7 +34,7 @@ export default function Products() {
   return (
     <div className="container mx-auto flex flex-col gap-10">
       <h1 className="text-2xl font-bold">Produtos</h1>
-      <DataTable columns={columns} data={products || []} />
+      <DataTable columns={columns} data={products} />
       <FullPagination
         page={page}
         pageSize={10}
