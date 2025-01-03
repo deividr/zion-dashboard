@@ -30,20 +30,19 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-// Menu items.
 const items = [
   {
-    title: "Home",
+    title: "Início",
     url: "/",
     icon: Home,
   },
   {
-    title: "Orders",
+    title: "Pedidos",
     url: "/orders",
     icon: ShoppingCart,
   },
   {
-    title: "Products",
+    title: "Produtos",
     url: "/products",
     icon: SquareChartGantt,
   },
