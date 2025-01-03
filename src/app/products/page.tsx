@@ -7,6 +7,8 @@ import { FullPagination } from "@/components/full-pagination";
 import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 async function getProducts({
   page,
@@ -43,12 +45,19 @@ export default function Products() {
   return (
     <div className="container mx-auto flex flex-col gap-10">
       <h1 className="text-2xl font-bold">Produtos</h1>
-      <Input
-        placeholder="Pesquisar por nome..."
-        icon={Search}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="flex gap-10">
+        <div className="grow">
+          <Input
+            placeholder="Pesquisar por nome..."
+            icon={Search}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <Button>
+          <Plus /> Novo Produto
+        </Button>
+      </div>
       <DataTable columns={columns} data={products} />
       <FullPagination
         page={page}
