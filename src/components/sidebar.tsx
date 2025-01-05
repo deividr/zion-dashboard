@@ -71,7 +71,10 @@ export function AppSidebar() {
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
-                  className={cn(pathname === item.url && "bg-green-200")}
+                  className={cn(
+                    pathname === item.url &&
+                      "bg-orange-200 border-2 border-orange-500 font-bold",
+                  )}
                 >
                   <a href={item.url}>
                     <item.icon />
