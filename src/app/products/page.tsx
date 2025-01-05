@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Product, columns } from "./columns";
 import { DataTable } from "../../components/data-table";
 import { FullPagination } from "@/components/full-pagination";
@@ -22,7 +22,7 @@ async function getProducts({
   pagination: { page: number; limit: number; total: number };
 }> {
   const data = await fetch(
-    `http://192.168.15.34:3000/products?limit=10&page=${page}&name=${search}`,
+    `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`,
   );
   return await data.json();
 }
