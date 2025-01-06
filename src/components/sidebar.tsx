@@ -72,7 +72,8 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   className={cn(
-                    pathname === item.url &&
+                    (pathname === item.url ||
+                      pathname.startsWith(`${item.url}/`)) &&
                       "bg-orange-200 border-2 border-orange-500 font-bold",
                   )}
                 >

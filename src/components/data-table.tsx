@@ -15,13 +15,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { usePathname, useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+interface DataRow {
+  id: string;
+}
+
+export function DataTable<TData extends DataRow, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -30,6 +35,8 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+  const route = useRouter();
+  const pathname = usePathname();
 
   return (
     <div className="rounded-md border">
@@ -58,6 +65,8 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                onClick={() => route.push(`${pathname}/${row.original.id}`)}
+                className="cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
