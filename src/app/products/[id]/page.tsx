@@ -7,9 +7,7 @@ export default async function Product({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const result = await fetch(
-    `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
-  );
+  const result = await fetch(`${process.env.HOST_API}/products/${id}`);
 
   const product = await result.json();
   return (
