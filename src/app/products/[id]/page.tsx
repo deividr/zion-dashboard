@@ -1,5 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Pencil } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 export default async function Product({
   params,
@@ -8,8 +11,8 @@ export default async function Product({
 }) {
   const { id } = await params;
   const result = await fetch(`${process.env.HOST_API}/products/${id}`);
-
   const product = await result.json();
+
   return (
     <div className="container mx-auto flex flex-col gap-10">
       <h1 className="text-2xl font-bold">
@@ -26,6 +29,16 @@ export default async function Product({
       <div className="grid w-full max-w-sm items-center gap-1.5">
         <Label>Valor</Label>
         <Input value={product.value} disabled />
+      </div>
+      <div className="flex gap-10">
+        <Button variant="secondary" size="lg">
+          <Pencil />
+          Editar
+        </Button>
+        <Button variant="destructive" size="lg">
+          <Trash2 />
+          Excluir
+        </Button>
       </div>
     </div>
   );
