@@ -33,7 +33,7 @@ export default function Products() {
   const [page, setPage] = useState(parseInt(params.get("page") || "1"));
   const [totalPage, setTotalPage] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(params.get("search") || "");
 
   useEffect(() => {
     getProducts({ page, search }).then((data) => {
