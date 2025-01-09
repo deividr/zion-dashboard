@@ -1,17 +1,33 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil } from "lucide-react";
 import { Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Product } from "../columns";
 
-export default async function Product({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const result = await fetch(`${process.env.HOST_API}/products/${id}`);
-  const product = await result.json();
+export default function ProductDetail() {
+  const router = useRouter();
+  const { id } = useParams();
+  const [product, setProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const result = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`
+      );
+      const data = await result.json();
+      setProduct(data);
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (!product) return <div>Loading...</div>;
 
   return (
     <div className="container mx-auto flex flex-col gap-10">
@@ -30,7 +46,11 @@ export default async function Product({
         <Label>Valor</Label>
         <Input value={product.value} disabled />
       </div>
-      <div className="flex gap-10">
+      <div className="flex gap-6">
+        <Button variant="outline" size="lg" onClick={() => router.back()}>
+          <ArrowLeft />
+          Voltar
+        </Button>
         <Button variant="secondary" size="lg">
           <Pencil />
           Editar
