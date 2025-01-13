@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar";
 import { auth } from "@clerk/nextjs/server";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -43,6 +44,7 @@ export default async function RootLayout({
                 <SidebarTrigger />
                 <div className="py-10 pl-4 pr-8 w-full">{children}</div>
               </main>
+              <Toaster />
             </SidebarProvider>
           ) : (
             <>{children}</>

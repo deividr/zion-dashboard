@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pencil, Trash2, Loader2 } from "lucide-react";
-import { ArrowLeft } from "lucide-react";
+import { Pencil, Trash2, Loader2, ArrowLeft, Check } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Product } from "../columns";
 import { z } from "zod";
@@ -18,6 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   value: z.string(),
@@ -44,6 +44,7 @@ export default function ProductDetail() {
   const router = useRouter();
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -91,6 +92,10 @@ export default function ProductDetail() {
     }
 
     setProduct(productUpdated);
+    toast({
+      variant: "success",
+      description: "Produto atualizado",
+    });
   };
 
   if (!product) return <div>Loading...</div>;
