@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pencil, Trash2, Loader2, ArrowLeft, Check } from "lucide-react";
+import { Pencil, Trash2, Loader2, ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Product } from "../columns";
 import { z } from "zod";
@@ -92,6 +92,7 @@ export default function ProductDetail() {
     }
 
     setProduct(productUpdated);
+    form.reset({ ...productUpdated, value: productUpdated.value.toString() });
     toast({
       variant: "success",
       description: "Produto atualizado",
@@ -173,7 +174,10 @@ export default function ProductDetail() {
             variant="secondary"
             type="submit"
             size="lg"
-            disabled={form.formState.isSubmitting}
+            disabled={[
+              form.formState.isSubmitting,
+              !form.formState.isDirty,
+            ].includes(true)}
           >
             {form.formState.isSubmitting ? (
               <Loader2 className="animate-spin" />
