@@ -44,6 +44,7 @@ export default function ProductDetail() {
   const router = useRouter();
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -88,7 +89,10 @@ export default function ProductDetail() {
     );
 
     if (result.status !== 200) {
-      console.log("Erro ao atualizar o produto");
+      toast({
+        variant: "destructive",
+        description: "Erro ao atualizar o produto",
+      });
     }
 
     setProduct(productUpdated);
@@ -97,6 +101,30 @@ export default function ProductDetail() {
       variant: "success",
       description: "Produto atualizado",
     });
+  };
+
+  const handleDelete = async () => {
+    setLoading(true);
+    const result = await fetch(
+      `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (result.status !== 200) {
+      toast({
+        variant: "destructive",
+        description: "Erro ao excluir o produto",
+      });
+    }
+
+    toast({
+      variant: "success",
+      description: "Produto excluído com sucesso",
+    });
+
+    router.back();
   };
 
   if (!product) return <div>Loading...</div>;
@@ -186,7 +214,13 @@ export default function ProductDetail() {
             )}
             Savar
           </Button>
-          <Button variant="destructive" type="button" size="lg">
+          <Button
+            variant="destructive"
+            type="button"
+            size="lg"
+            onClick={handleDelete}
+            disabled={loading}
+          >
             <Trash2 />
             Excluir
           </Button>
