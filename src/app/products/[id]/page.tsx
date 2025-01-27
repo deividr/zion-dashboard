@@ -57,6 +57,11 @@ export default function ProductDetail() {
   });
 
   useEffect(() => {
+    if (id === "new") {
+      setProduct({ id: "new", value: 0, unityType: "KG", name: "" });
+      return;
+    }
+
     const fetchProduct = async () => {
       const result = await fetch(
         `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
@@ -80,26 +85,36 @@ export default function ProductDetail() {
       unityType: values.unityType,
     };
 
-    const result = await fetch(
-      `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(productUpdated),
-      },
-    );
+    const url =
+      product?.id === "new"
+        ? `${process.env.NEXT_PUBLIC_HOST_API}/products`
+        : `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`;
+
+    const method = product?.id === "new" ? "POST" : "PUT";
+
+    const result = await fetch(url, {
+      method,
+      body: JSON.stringify(productUpdated),
+    });
 
     if (result.status !== 200) {
       toast({
         variant: "destructive",
-        description: "Erro ao atualizar o produto",
+        description: `Erro ao ${product?.id === "new" ? "inserir" : "atualizar"} o produto`,
       });
     }
 
     setProduct(productUpdated);
-    form.reset({ ...productUpdated, value: productUpdated.value.toString() });
+
+    if (product?.id === "new") {
+      form.reset({ value: "0", name: "", unityType: "KG" });
+    } else {
+      form.reset({ ...productUpdated, value: productUpdated.value.toString() });
+    }
+
     toast({
       variant: "success",
-      description: "Produto atualizado",
+      description: `Produto ${product?.id === "new" ? "inserido" : "atualizado"}`,
     });
   };
 
@@ -136,7 +151,10 @@ export default function ProductDetail() {
         className="container mx-auto flex flex-col gap-5"
       >
         <h1 className="text-2xl font-bold">
-          Produto <span className="text-orange-600">{product.name}</span>
+          Produto{" "}
+          {product?.id !== "new" && (
+            <span className="text-orange-600">{product.name}</span>
+          )}
         </h1>
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <FormField
@@ -212,18 +230,20 @@ export default function ProductDetail() {
             ) : (
               <Pencil />
             )}
-            Savar
+            {product?.id === "new" ? "Adicionar" : "Savar"}
           </Button>
-          <Button
-            variant="destructive"
-            type="button"
-            size="lg"
-            onClick={handleDelete}
-            disabled={loading}
-          >
-            <Trash2 />
-            Excluir
-          </Button>
+          {product.id !== "new" && (
+            <Button
+              variant="destructive"
+              type="button"
+              size="lg"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              <Trash2 />
+              Excluir
+            </Button>
+          )}
         </div>
       </form>
     </Form>
