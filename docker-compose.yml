@@ -12,4 +12,3 @@ services:
 
 networks:
   zion-network:
-    external: true
