@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { useFetchClient } from "@/lib/fetch-client";
 
 const formSchema = z.object({
   value: z.string(),
@@ -41,6 +42,7 @@ function parseCurrency(value: string) {
 }
 
 export default function ProductDetail() {
+  const { fetch } = useFetchClient();
   const router = useRouter();
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
@@ -63,10 +65,9 @@ export default function ProductDetail() {
     }
 
     const fetchProduct = async () => {
-      const result = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
+      const data = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`
       );
-      const data = await result.json();
       form.reset({
         value: String(data.value),
         name: data.name,
@@ -75,7 +76,7 @@ export default function ProductDetail() {
       setProduct(data);
     };
     fetchProduct();
-  }, [id, form]);
+  }, [id, form, fetch]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const productUpdated: Product = {
@@ -100,7 +101,9 @@ export default function ProductDetail() {
     if (result.status !== 200) {
       toast({
         variant: "destructive",
-        description: `Erro ao ${product?.id === "new" ? "inserir" : "atualizar"} o produto`,
+        description: `Erro ao ${
+          product?.id === "new" ? "inserir" : "atualizar"
+        } o produto`,
       });
     }
 
@@ -114,7 +117,9 @@ export default function ProductDetail() {
 
     toast({
       variant: "success",
-      description: `Produto ${product?.id === "new" ? "inserido" : "atualizado"}`,
+      description: `Produto ${
+        product?.id === "new" ? "inserido" : "atualizado"
+      }`,
     });
   };
 
@@ -124,7 +129,7 @@ export default function ProductDetail() {
       `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
       {
         method: "DELETE",
-      },
+      }
     );
 
     if (result.status !== 200) {

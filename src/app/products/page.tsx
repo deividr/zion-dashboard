@@ -10,22 +10,7 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-async function getProducts({
-  page,
-  search,
-}: {
-  page: number;
-  search: string;
-}): Promise<{
-  products: Product[];
-  pagination: { page: number; limit: number; total: number };
-}> {
-  const data = await fetch(
-    `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`,
-  );
-  return await data.json();
-}
+import { useFetchClient } from "@/lib/fetch-client";
 
 export default function Products() {
   const router = useRouter();
@@ -34,13 +19,19 @@ export default function Products() {
   const [totalPage, setTotalPage] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState(params.get("search") || "");
+  const { fetch } = useFetchClient();
 
   useEffect(() => {
-    getProducts({ page, search }).then((data) => {
+    const fetchProducts = async () => {
+      const data = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`
+      );
       setProducts(data.products || []);
       setTotalPage(data.pagination.total);
-    });
-  }, [page, search]);
+    };
+
+    fetchProducts();
+  }, [page, search, fetch]);
 
   const handleChangePage = (newPage: number) => setPage(newPage);
 

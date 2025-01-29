@@ -32,7 +32,7 @@ export default async function RootLayout({
   const { sessionId } = await auth();
 
   return (
-    <ClerkProvider>
+    <ClerkProvider dynamic={true}>
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
