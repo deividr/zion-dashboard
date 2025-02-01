@@ -31,7 +31,7 @@ export default function Products() {
     };
 
     fetchProducts();
-  }, [page, search, fetch]);
+  }, [page, search]);
 
   const handleChangePage = (newPage: number) => setPage(newPage);
 
