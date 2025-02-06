@@ -10,17 +10,22 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, icon, ...props }, ref) => {
     const Icon = icon;
     return (
-      <div className="relative">
+      <div className="relative group">
         {Icon && (
-          <span className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
-            <Icon className="w-5 h-5 text-stone-400" />
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Icon className="w-5 h-5 text-zinc-400 transition-colors group-hover:text-zinc-500" />
           </span>
         )}
         <input
           type={type}
           className={cn(
-            "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-            Icon ? "pl-8" : "",
+            "flex h-11 w-full rounded-lg border border-zinc-200 bg-white px-4 py-2 text-base",
+            "transition-all duration-200 ease-in-out",
+            "placeholder:text-zinc-400",
+            "shadow-sm hover:shadow-md",
+            "focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-zinc-50",
+            Icon ? "pl-10" : "",
             className,
           )}
           ref={ref}
