@@ -62,7 +62,7 @@ export default function Products() {
             }}
           />
         </div>
-        <Button onClick={() => router.push("products/new")}>
+        <Button variant="gradient" onClick={() => router.push("products/new")}>
           <Plus /> Novo Produto
         </Button>
       </div>

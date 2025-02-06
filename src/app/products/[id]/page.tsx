@@ -213,7 +213,7 @@ export default function ProductDetail() {
         </div>
         <div className="flex gap-6 mt-10">
           <Button
-            variant="outline"
+            variant="ghost"
             type="button"
             size="lg"
             onClick={() => router.back()}
