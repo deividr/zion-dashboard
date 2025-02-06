@@ -19,6 +19,17 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
+import {
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
   value: z.string(),
@@ -235,17 +246,44 @@ export default function ProductDetail() {
               {product?.id === "new" ? "Adicionar" : "Savar"}
             </Button>
             {product.id !== "new" && (
-              <Button
-                className="flex-1"
-                variant="destructive"
-                type="button"
-                size="lg"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                <Trash2 />
-                Excluir
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    className="flex-1"
+                    variant="destructive"
+                    type="button"
+                    size="lg"
+                    disabled={loading}
+                  >
+                    <Trash2 />
+                    Excluir
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Tem certeza que quer excluir esse produto?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Essa ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <Button
+                        variant="destructive"
+                        type="button"
+                        size="lg"
+                        onClick={handleDelete}
+                        disabled={loading}
+                      >
+                        Continuar
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </div>
