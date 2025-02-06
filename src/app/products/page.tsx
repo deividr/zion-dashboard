@@ -24,14 +24,14 @@ export default function Products() {
   useEffect(() => {
     const fetchProducts = async () => {
       const data = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`
+        `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`,
       );
       setProducts(data.products || []);
       setTotalPage(data.pagination.total);
     };
 
     fetchProducts();
-  }, [page, search]);
+  }, [page, search, fetch]);
 
   const handleChangePage = (newPage: number) => setPage(newPage);
 

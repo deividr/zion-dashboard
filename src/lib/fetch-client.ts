@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@clerk/nextjs";
 
@@ -5,29 +6,36 @@ export function useFetchClient() {
   const { getToken } = useAuth();
   const { toast } = useToast();
 
-  const fetchClient = async (url: string, options: RequestInit = {}) => {
-    const token = await getToken();
+  const fetchClient = useCallback(
+    async (url: string, options: RequestInit = {}) => {
+      const token = await getToken();
 
-    const defaultOptions: RequestInit = {
-      ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    };
+      if (!token) {
+        return null;
+      }
 
-    const response = await fetch(url, defaultOptions);
+      const defaultOptions: RequestInit = {
+        ...options,
+        headers: {
+          ...options.headers,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
 
-    if (!response.ok) {
-      toast({
-        variant: "destructive",
-        description: response.statusText,
-      });
-    }
+      const response = await fetch(url, defaultOptions);
 
-    return response.json();
-  };
+      if (!response.ok) {
+        toast({
+          variant: "destructive",
+          description: response.statusText,
+        });
+      }
+
+      return response.json();
+    },
+    [getToken, toast],
+  );
 
   return { fetch: fetchClient };
 }

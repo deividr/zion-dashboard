@@ -66,7 +66,7 @@ export default function ProductDetail() {
 
     const fetchProduct = async () => {
       const data = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`
+        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
       );
       form.reset({
         value: String(data.value),
@@ -129,7 +129,7 @@ export default function ProductDetail() {
       `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
       {
         method: "DELETE",
-      }
+      },
     );
 
     if (result.status !== 200) {

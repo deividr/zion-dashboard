@@ -1,5 +1,5 @@
 # Use uma imagem base adequada para seu projeto
-FROM node:22
+FROM node:23-alpine
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -7,7 +7,7 @@ WORKDIR /app
 # Instala o pnpm globalmente
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copia os arquivos de configuração
 COPY pnpm-lock.yaml package.json ./
