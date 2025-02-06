@@ -26,14 +26,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none",
             "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-zinc-50",
             Icon ? "pl-10" : "",
-            className,
+            className
           )}
           ref={ref}
           {...props}
         />
       </div>
     );
-  },
+  }
 );
 Input.displayName = "Input";
 

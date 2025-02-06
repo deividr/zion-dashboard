@@ -161,7 +161,7 @@ export default function ProductDetail() {
             <span className="text-orange-600">{product.name}</span>
           )}
         </h1>
-        <div className="grid w-full max-w-sm items-center gap-1.5">
+        <div className="grid w-full max-w-sm items-center gap-6">
           <FormField
             control={form.control}
             name="name"
@@ -174,8 +174,6 @@ export default function ProductDetail() {
               </FormItem>
             )}
           />
-        </div>
-        <div className="grid w-full max-w-sm items-center gap-1.5">
           <FormField
             control={form.control}
             name="value"
@@ -195,8 +193,6 @@ export default function ProductDetail() {
               </FormItem>
             )}
           />
-        </div>
-        <div className="grid w-full max-w-sm items-center gap-1.5">
           <FormField
             control={form.control}
             name="unityType"
@@ -210,45 +206,48 @@ export default function ProductDetail() {
               </FormItem>
             )}
           />
-        </div>
-        <div className="flex gap-6 mt-10">
-          <Button
-            variant="ghost"
-            type="button"
-            size="lg"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft />
-            Voltar
-          </Button>
-          <Button
-            variant="secondary"
-            type="submit"
-            size="lg"
-            disabled={[
-              form.formState.isSubmitting,
-              !form.formState.isDirty,
-            ].includes(true)}
-          >
-            {form.formState.isSubmitting ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              <Pencil />
-            )}
-            {product?.id === "new" ? "Adicionar" : "Savar"}
-          </Button>
-          {product.id !== "new" && (
+          <div className="flex justify-between gap-4 mt-5">
             <Button
-              variant="destructive"
+              className="flex-1"
+              variant="ghost"
               type="button"
               size="lg"
-              onClick={handleDelete}
-              disabled={loading}
+              onClick={() => router.back()}
             >
-              <Trash2 />
-              Excluir
+              <ArrowLeft />
+              Voltar
             </Button>
-          )}
+            <Button
+              className="flex-1"
+              variant="secondary"
+              type="submit"
+              size="lg"
+              disabled={[
+                form.formState.isSubmitting,
+                !form.formState.isDirty,
+              ].includes(true)}
+            >
+              {form.formState.isSubmitting ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Pencil />
+              )}
+              {product?.id === "new" ? "Adicionar" : "Savar"}
+            </Button>
+            {product.id !== "new" && (
+              <Button
+                className="flex-1"
+                variant="destructive"
+                type="button"
+                size="lg"
+                onClick={handleDelete}
+                disabled={loading}
+              >
+                <Trash2 />
+                Excluir
+              </Button>
+            )}
+          </div>
         </div>
       </form>
     </Form>
