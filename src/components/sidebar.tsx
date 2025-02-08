@@ -6,6 +6,7 @@ import {
   LogOut,
   ShoppingCart,
   SquareChartGantt,
+  Users,
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,11 @@ const items = [
     title: "Pedidos",
     url: "/orders",
     icon: ShoppingCart,
+  },
+  {
+    title: "Clientes",
+    url: "/customers",
+    icon: Users,
   },
   {
     title: "Produtos",
