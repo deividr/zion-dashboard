@@ -30,6 +30,7 @@ export function useFetchClient() {
           variant: "destructive",
           description: response.statusText,
         });
+        throw new Error(response.statusText);
       }
 
       return response.json();

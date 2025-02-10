@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Trash2, Loader2, ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { Product } from "../columns";
+import { Customer } from "../columns";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,127 +20,115 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import {
-  AlertDialogHeader,
-  AlertDialogFooter,
   AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
   AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
-  value: z.string(),
   name: z.string().min(5, { message: "Nome deve ter no mínimo 5 caracteres" }),
-  unityType: z.enum(["UN", "KG"], {
-    message: "Tipo Unidade tem que ser UN ou KG",
-  }),
+  email: z.string().email("Email inválido").or(z.literal("")),
+  phone: z.string().min(10, { message: "Telefone inválido" }).optional(),
+  phone2: z.string(),
 });
 
-function formatCurrency(value: string) {
-  const numbers = value.replace(/\D/g, "");
-  const cents = Number(numbers) / 100;
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(cents);
-}
-
-function parseCurrency(value: string) {
-  return value.replace(/\D/g, "");
-}
-
-export default function ProductDetail() {
+export default function CustomerDetail() {
   const { fetch } = useFetchClient();
   const router = useRouter();
   const { id } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      value: "0.00",
       name: "",
-      unityType: "KG",
+      email: "",
+      phone: "",
+      phone2: "",
     },
   });
 
   useEffect(() => {
     if (id === "new") {
-      setProduct({ id: "new", value: 0, unityType: "KG", name: "" });
+      setCustomer({ id: "new", name: "", email: "", phone: "", phone2: "" });
       return;
     }
 
-    const fetchProduct = async () => {
+    const fetchCustomer = async () => {
       const data = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
+        `${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`,
       );
       form.reset({
-        value: String(data.value),
         name: data.name,
-        unityType: data.unityType,
+        email: data.email || "",
+        phone: data.phone || "",
+        phone2: data.phone2 || "",
       });
-      setProduct(data);
+      setCustomer(data);
     };
-    fetchProduct();
+    fetchCustomer();
   }, [id, form, fetch]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const productUpdated: Product = {
-      id: product?.id || "",
-      value: parseInt(values.value),
+    const customerUpdated: Customer = {
+      id: customer?.id || "",
       name: values.name,
-      unityType: values.unityType,
+      email: values.email,
+      phone: values.phone,
+      phone2: values.phone2,
     };
 
     const url =
-      product?.id === "new"
-        ? `${process.env.NEXT_PUBLIC_HOST_API}/products`
-        : `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`;
+      customer?.id === "new"
+        ? `${process.env.NEXT_PUBLIC_HOST_API}/customers`
+        : `${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`;
 
-    const method = product?.id === "new" ? "POST" : "PUT";
+    const method = customer?.id === "new" ? "POST" : "PUT";
 
     await fetch(url, {
       method,
-      body: JSON.stringify(productUpdated),
+      body: JSON.stringify(customerUpdated),
     });
 
-    setProduct(productUpdated);
+    setCustomer(customerUpdated);
 
-    if (product?.id === "new") {
-      form.reset({ value: "0", name: "", unityType: "KG" });
+    if (customer?.id === "new") {
+      form.reset({ name: "", email: "", phone: "", phone2: "" });
     } else {
-      form.reset({ ...productUpdated, value: productUpdated.value.toString() });
+      form.reset(customerUpdated);
     }
 
     toast({
       variant: "success",
-      description: `Produto ${
-        product?.id === "new" ? "inserido" : "atualizado"
-      }`,
+      description: `Cliente ${
+        customer?.id === "new" ? "inserido" : "atualizado"
+      } com sucesso`,
     });
   };
 
   const handleDelete = async () => {
     setLoading(true);
-
-    await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`, {
+    await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`, {
       method: "DELETE",
     });
 
     toast({
       variant: "success",
-      description: "Produto excluído com sucesso",
+      description: "Cliente excluído com sucesso",
     });
 
     router.back();
   };
 
-  if (!product) return <div>Loading...</div>;
+  if (!customer) return <div>Loading...</div>;
 
   return (
     <Form {...form}>
@@ -149,9 +137,9 @@ export default function ProductDetail() {
         className="container mx-auto flex flex-col gap-5"
       >
         <h1 className="text-2xl font-bold">
-          Produto{" "}
-          {product?.id !== "new" && (
-            <span className="text-orange-600">{product.name}</span>
+          Cliente{" "}
+          {customer?.id !== "new" && (
+            <span className="text-orange-600">{customer.name}</span>
           )}
         </h1>
         <div className="grid w-full max-w-sm items-center gap-6">
@@ -164,34 +152,42 @@ export default function ProductDetail() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="value"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Valor</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={formatCurrency(field.value)}
-                    onChange={(e) => {
-                      const rawValue = parseCurrency(e.target.value);
-                      field.onChange(rawValue);
-                    }}
-                  />
+                  <Input {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="unityType"
+            name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tipo de Unidade</FormLabel>
+                <FormLabel>Telefone</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone2"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Telefone 2</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -225,9 +221,9 @@ export default function ProductDetail() {
               ) : (
                 <Pencil />
               )}
-              {product?.id === "new" ? "Adicionar" : "Savar"}
+              {customer?.id === "new" ? "Adicionar" : "Salvar"}
             </Button>
-            {product.id !== "new" && (
+            {customer.id !== "new" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
@@ -244,7 +240,7 @@ export default function ProductDetail() {
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
-                      Tem certeza que quer excluir esse produto?
+                      Tem certeza que quer excluir esse cliente?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       Essa ação não pode ser desfeita.
