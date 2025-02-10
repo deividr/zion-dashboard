@@ -1,24 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Pencil, Trash2, Loader2, ArrowLeft } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { Customer } from "../columns";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { useFetchClient } from "@/lib/fetch-client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +11,26 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { useFetchClient } from "@/lib/fetch-client";
+import { formatPhone, parseNumber } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Customer } from "../columns";
 
 const phoneSchema = z
   .string()
@@ -181,7 +182,14 @@ export default function CustomerDetail() {
               <FormItem>
                 <FormLabel>Telefone</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    value={formatPhone(field.value)}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value);
+                      field.onChange(rawValue);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -194,7 +202,14 @@ export default function CustomerDetail() {
               <FormItem>
                 <FormLabel>Telefone 2</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    value={formatPhone(field.value)}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value);
+                      field.onChange(rawValue);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

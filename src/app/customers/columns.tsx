@@ -1,13 +1,8 @@
 "use client";
 
+import { formatPhone } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { z } from "zod";
-
-const formatPhone = (phone: string) => {
-  if (!phone) return;
-  const formatted = phone.replace(/\D/g, "");
-  return formatted.replace(/(\d{2})(\d{4,5})(\d{4})/, "($1) $2-$3");
-};
 
 export const customerSchema = z.object({
   id: z.string().uuid(),

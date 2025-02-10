@@ -30,7 +30,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Product } from "../columns";
-import { formatCurrency, parseCurrency } from "@/lib/utils";
+import { formatCurrency, parseNumber } from "@/lib/utils";
 
 const formSchema = z.object({
   value: z.string(),
@@ -166,7 +166,7 @@ export default function ProductDetail() {
                     {...field}
                     value={formatCurrency(field.value)}
                     onChange={(e) => {
-                      const rawValue = parseCurrency(e.target.value);
+                      const rawValue = parseNumber(e.target.value);
                       field.onChange(rawValue);
                     }}
                   />
