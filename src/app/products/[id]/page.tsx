@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Pencil, Trash2, Loader2, ArrowLeft } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { Product } from "../columns";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -17,19 +20,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
-import {
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Product } from "../columns";
+import { formatCurrency, parseCurrency } from "@/lib/utils";
 
 const formSchema = z.object({
   value: z.string(),
@@ -38,19 +39,6 @@ const formSchema = z.object({
     message: "Tipo Unidade tem que ser UN ou KG",
   }),
 });
-
-function formatCurrency(value: string) {
-  const numbers = value.replace(/\D/g, "");
-  const cents = Number(numbers) / 100;
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(cents);
-}
-
-function parseCurrency(value: string) {
-  return value.replace(/\D/g, "");
-}
 
 export default function ProductDetail() {
   const { fetch } = useFetchClient();

@@ -31,11 +31,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+const phoneSchema = z
+  .string()
+  .min(10, { message: "Telefone inválido" })
+  .max(11, { message: "Telefone inválido" });
+
 const formSchema = z.object({
   name: z.string().min(5, { message: "Nome deve ter no mínimo 5 caracteres" }),
   email: z.string().email("Email inválido").or(z.literal("")),
-  phone: z.string().min(10, { message: "Telefone inválido" }).optional(),
-  phone2: z.string(),
+  phone: phoneSchema,
+  phone2: phoneSchema,
 });
 
 export default function CustomerDetail() {
