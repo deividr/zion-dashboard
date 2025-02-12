@@ -23,7 +23,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "value",
-    header: "Valor",
+    header: () => <div className="text-right">Valor</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("value")) / 100;
       const formatted = new Intl.NumberFormat("pt-BR", {
