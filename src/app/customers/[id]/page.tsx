@@ -32,15 +32,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Customer } from "../columns";
 
-const phoneSchema = z
-  .string()
-  .min(10, { message: "Telefone inválido" })
-  .max(11, { message: "Telefone inválido" });
+const phoneSchema = z.string().max(11, { message: "Telefone inválido" });
 
 const formSchema = z.object({
   name: z.string().min(5, { message: "Nome deve ter no mínimo 5 caracteres" }),
   email: z.string().email("Email inválido").or(z.literal("")),
-  phone: phoneSchema,
+  phone: phoneSchema.min(10, { message: "Telefone inválido" }),
   phone2: phoneSchema,
 });
 
