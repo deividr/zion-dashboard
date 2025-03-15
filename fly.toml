@@ -1,6 +1,9 @@
 app = 'zion-dashboard'
 primary_region = 'gig'
 
+[env]
+  NEXT_PUBLIC_HOST_API = "https://zion-api.fly.dev"
+
 [build]
 
 [http_service]
