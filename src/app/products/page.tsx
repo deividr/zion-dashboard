@@ -23,6 +23,7 @@ export default function Products() {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("valor do NEXT_PUBLIC_HOST_API", process.env.NEXT_PUBLIC_HOST_API);
       const data = await fetch(
         `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`,
       );
