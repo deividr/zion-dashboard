@@ -3,6 +3,7 @@ primary_region = 'gig'
 
 [env]
   NEXT_PUBLIC_HOST_API = "https://zion-api.fly.dev"
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_test_YmlnLW1hY2F3LTgyLmNsZXJrLmFjY291bnRzLmRldiQ"
 
 [build]
 
