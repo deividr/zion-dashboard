@@ -26,16 +26,17 @@ export function useFetchClient() {
       const response = await fetch(url, defaultOptions);
 
       if (!response.ok) {
+        const data = await response.json();
         toast({
           variant: "destructive",
-          description: response.statusText,
+          description: response.statusText || data.error,
         });
         throw new Error(response.statusText);
       }
 
       return response.json();
     },
-    [getToken, toast],
+    [getToken, toast]
   );
 
   return { fetch: fetchClient };
