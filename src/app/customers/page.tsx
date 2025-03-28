@@ -15,6 +15,7 @@ import { useFetchClient } from "@/lib/fetch-client";
 export default function Products() {
   const router = useRouter();
   const params = useSearchParams();
+  const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(parseInt(params.get("page") || "1"));
   const [totalPage, setTotalPage] = useState(0);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -22,12 +23,14 @@ export default function Products() {
   const { fetch } = useFetchClient();
 
   useEffect(() => {
+    setLoading(true);
     const fetchCustomers = async () => {
       const data = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST_API}/customers?limit=10&page=${page}&name=${search}`,
+        `${process.env.NEXT_PUBLIC_HOST_API}/customers?limit=10&page=${page}&name=${search}`
       );
       setCustomers(data.customers || []);
       setTotalPage(data.pagination.total);
+      setLoading(false);
     };
 
     fetchCustomers();
@@ -66,7 +69,7 @@ export default function Products() {
           <Plus /> Novo Cliente
         </Button>
       </div>
-      <DataTable columns={columns} data={customers} />
+      <DataTable columns={columns} data={customers} isLoading={isLoading} />
       <FullPagination
         page={page}
         pageSize={10}

@@ -15,6 +15,7 @@ import { useFetchClient } from "@/lib/fetch-client";
 export default function Products() {
   const router = useRouter();
   const params = useSearchParams();
+  const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(parseInt(params.get("page") || "1"));
   const [totalPage, setTotalPage] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,12 +23,14 @@ export default function Products() {
   const { fetch } = useFetchClient();
 
   useEffect(() => {
+    setLoading(true);
     const fetchProducts = async () => {
       const data = await fetch(
         `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`
       );
       setProducts(data.products || []);
       setTotalPage(data.pagination.total);
+      setLoading(false);
     };
 
     fetchProducts();
@@ -66,7 +69,7 @@ export default function Products() {
           <Plus /> Novo Produto
         </Button>
       </div>
-      <DataTable columns={columns} data={products} />
+      <DataTable columns={columns} data={products} isLoading={isLoading} />
       <FullPagination
         page={page}
         pageSize={10}
