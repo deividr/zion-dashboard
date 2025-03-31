@@ -64,9 +64,7 @@ export default function ProductDetail() {
     }
 
     const fetchProduct = async () => {
-      const data = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`,
-      );
+      const data = await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`);
       form.reset({
         value: String(data.value),
         name: data.name,
@@ -107,9 +105,7 @@ export default function ProductDetail() {
 
     toast({
       variant: "success",
-      description: `Produto ${
-        product?.id === "new" ? "inserido" : "atualizado"
-      }`,
+      description: `Produto ${product?.id === "new" ? "inserido" : "atualizado"}`,
     });
   };
 
@@ -137,10 +133,7 @@ export default function ProductDetail() {
         className="container mx-auto flex flex-col gap-5"
       >
         <h1 className="text-2xl font-bold">
-          Produto{" "}
-          {product?.id !== "new" && (
-            <span className="text-orange-600">{product.name}</span>
-          )}
+          {product?.id !== "new" && <span className="text-orange-600">{product.name}</span>}
         </h1>
         <div className="grid w-full max-w-sm items-center gap-6">
           <FormField
@@ -203,16 +196,9 @@ export default function ProductDetail() {
               variant="secondary"
               type="submit"
               size="lg"
-              disabled={[
-                form.formState.isSubmitting,
-                !form.formState.isDirty,
-              ].includes(true)}
+              disabled={[form.formState.isSubmitting, !form.formState.isDirty].includes(true)}
             >
-              {form.formState.isSubmitting ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Pencil />
-              )}
+              {form.formState.isSubmitting ? <Loader2 className="animate-spin" /> : <Pencil />}
               {product?.id === "new" ? "Adicionar" : "Savar"}
             </Button>
             {product.id !== "new" && (
@@ -231,9 +217,7 @@ export default function ProductDetail() {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Tem certeza que quer excluir esse produto?
-                    </AlertDialogTitle>
+                    <AlertDialogTitle>Tem certeza que quer excluir esse produto?</AlertDialogTitle>
                     <AlertDialogDescription>
                       Essa ação não pode ser desfeita.
                     </AlertDialogDescription>

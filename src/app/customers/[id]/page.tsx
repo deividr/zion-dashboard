@@ -30,7 +30,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Customer, addressSchema } from "../columns";
+import { Address, Customer, addressSchema } from "../columns";
 
 const phoneSchema = z.string().max(11, { message: "Telefone inválido" });
 
@@ -42,10 +42,6 @@ const formCustomerSchema = z.object({
   addresses: z.array(addressSchema).default([]),
 });
 
-const formAddressSchema = z.object({
-  addresses: z.array(addressSchema).default([]),
-});
-
 export default function CustomerDetail() {
   const { fetch } = useFetchClient();
   const router = useRouter();
@@ -54,6 +50,7 @@ export default function CustomerDetail() {
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const { toast } = useToast();
 
   const formCustomer = useForm<z.infer<typeof formCustomerSchema>>({
@@ -66,11 +63,8 @@ export default function CustomerDetail() {
     },
   });
 
-  const formAddress = useForm<z.infer<typeof formAddressSchema>>({
-    resolver: zodResolver(formAddressSchema),
-    defaultValues: {
-      addresses: [],
-    },
+  const formEditAddress = useForm<Address>({
+    resolver: zodResolver(addressSchema),
   });
 
   useEffect(() => {
@@ -89,15 +83,13 @@ export default function CustomerDetail() {
         phone: customer.phone || "",
         phone2: customer.phone2 || "",
       });
-      formAddress.reset({
-        addresses,
-      });
       setCustomer(customer);
+      setAddresses(addresses);
     };
     fetchCustomer();
-  }, [id, formCustomer, formAddress, fetch]);
+  }, [id, formCustomer, fetch]);
 
-  const onSubmit = async (values: z.infer<typeof formCustomerSchema>) => {
+  const onSubmitCustomer = async (values: z.infer<typeof formCustomerSchema>) => {
     const customerUpdated: Customer = {
       id: customer?.id || "",
       name: values.name,
@@ -132,6 +124,45 @@ export default function CustomerDetail() {
     });
   };
 
+  const onSubmitAddress = async (data: Address) => {
+    const updatedAddresses = [...addresses];
+
+    if (editingAddressIndex !== null) {
+      updatedAddresses[editingAddressIndex] = data;
+    } else {
+      updatedAddresses.push(data);
+    }
+
+    if (data.isDefault) {
+      updatedAddresses.forEach((addr, index) => {
+        if (index !== editingAddressIndex) {
+          addr.isDefault = false;
+        }
+      });
+    }
+
+    const url =
+      data?.id === "new"
+        ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses`
+        : `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${id}`;
+
+    const method = customer?.id === "new" ? "POST" : "PUT";
+
+    await fetch(url, {
+      method,
+      body: JSON.stringify(data),
+    });
+
+    setAddresses(updatedAddresses);
+    setShowAddressForm(false);
+    setEditingAddressIndex(null);
+    formEditAddress.reset();
+    toast({
+      variant: "success",
+      description: "Endereço atualizado com sucesso!",
+    });
+  };
+
   const handleDelete = async () => {
     setLoading(true);
     await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`, {
@@ -152,11 +183,10 @@ export default function CustomerDetail() {
     <>
       <Form {...formCustomer}>
         <form
-          onSubmit={formCustomer.handleSubmit(onSubmit)}
+          onSubmit={formCustomer.handleSubmit(onSubmitCustomer)}
           className="container mx-auto flex flex-col gap-5"
         >
           <h1 className="text-2xl font-bold">
-            Cliente{" "}
             {customer?.id !== "new" && <span className="text-orange-600">{customer.name}</span>}
           </h1>
           <div className="grid w-full max-w-sm items-center gap-6">
@@ -299,278 +329,263 @@ export default function CustomerDetail() {
         </form>
       </Form>
 
-      <Form {...formAddress}>
-        <form className="container mx-auto flex flex-col gap-5">
-          {/* Seção de Endereços */}
-          <div className="mt-10">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Endereços</h2>
-              <Button
-                type="button"
-                variant="gradient"
-                onClick={() => {
-                  setEditingAddressIndex(null);
-                  setShowAddressForm(true);
-                }}
+      {/* Seção de Endereços */}
+      <div className="container mx-auto flex flex-col gap-5 mt-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Endereços</h2>
+          <Button
+            type="button"
+            variant="gradient"
+            onClick={() => {
+              setEditingAddressIndex(null);
+              formEditAddress.reset({
+                id: "new",
+                street: "",
+                number: "",
+                neighborhood: "",
+                city: "",
+                state: "",
+              });
+              setShowAddressForm(true);
+            }}
+          >
+            Adicionar Endereço
+          </Button>
+        </div>
+
+        {/* Lista de Endereços */}
+        <div className="space-y-4 mb-6">
+          {!addresses?.length ? (
+            <div className="text-center py-8 border border-dashed rounded-md text-muted-foreground">
+              Nenhum endereço cadastrado
+            </div>
+          ) : (
+            addresses?.map((address, index) => (
+              <div
+                key={address.id || index}
+                className="p-4 border rounded-md shadow-sm hover:shadow-md transition-all bg-card"
               >
-                Adicionar Endereço
-              </Button>
-            </div>
-
-            {/* Lista de Endereços */}
-            <div className="space-y-4 mb-6">
-              {!formAddress.watch("addresses")?.length ? (
-                <div className="text-center py-8 border border-dashed rounded-md text-muted-foreground">
-                  Nenhum endereço cadastrado
-                </div>
-              ) : (
-                formAddress.watch("addresses")?.map((address, index) => (
-                  <div
-                    key={address.id || index}
-                    className="p-4 border rounded-md shadow-sm hover:shadow-md transition-all bg-card"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium">
-                            {address.street}, {address.number}
-                          </h3>
-                          {address.isDefault && (
-                            <span className="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full">
-                              Principal
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {address.neighborhood}, {address.city} - {address.state}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          CEP: {address.cep.replace(/(\d{5})(\d{3})/, "$1-$2")}
-                          {address.aditionalDetails && ` - ${address.aditionalDetails}`}
-                        </p>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditingAddressIndex(index);
-                            setShowAddressForm(true);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => {
-                            const addresses = [...formAddress.getValues("addresses")];
-                            addresses.splice(index, 1);
-                            formAddress.setValue("addresses", addresses, { shouldDirty: true });
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                <div className="flex justify-between items-center">
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium">
+                        {address.street}, {address.number}
+                      </h3>
+                      {address.isDefault && (
+                        <span className="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full">
+                          Principal
+                        </span>
+                      )}
                     </div>
+                    <p className="text-sm text-muted-foreground">
+                      {address.neighborhood}, {address.city} - {address.state}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      CEP: {address.cep.replace(/(\d{5})(\d{3})/, "$1-$2")}
+                      {address.aditionalDetails && ` - ${address.aditionalDetails}`}
+                    </p>
                   </div>
-                ))
-              )}
-            </div>
-          </div>
 
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        formEditAddress.reset(address);
+                        setEditingAddressIndex(index);
+                        setShowAddressForm(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => {
+                        addresses.splice(index, 1);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <Form {...formEditAddress}>
+        <form
+          className="container mx-auto flex flex-col gap-5"
+          onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}
+        >
           {/* Modal de Formulário de Endereço */}
           {showAddressForm && (
             <AlertDialog open={showAddressForm} onOpenChange={setShowAddressForm}>
               <AlertDialogContent className="max-w-md">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {editingAddressIndex !== null ? "Editar Endereço" : "Adicionar Endereço"}
-                  </AlertDialogTitle>
-                </AlertDialogHeader>
+                <Form {...formEditAddress}>
+                  <form onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {editingAddressIndex !== null ? "Editar Endereço" : "Adicionar Endereço"}
+                      </AlertDialogTitle>
+                    </AlertDialogHeader>
 
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-2">
-                      <FormLabel htmlFor="street">Rua</FormLabel>
-                      <Input
-                        id="street"
-                        value={
-                          editingAddressIndex !== null
-                            ? formCustomer.getValues(`addresses.${editingAddressIndex}.street`)
-                            : ""
-                        }
-                        onChange={(e) => {
-                          if (editingAddressIndex !== null) {
-                            formCustomer.setValue(
-                              `addresses.${editingAddressIndex}.street`,
-                              e.target.value,
-                              {
-                                shouldDirty: true,
-                              }
-                            );
-                          }
-                        }}
-                        className="w-full"
-                      />
-                    </div>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="col-span-2">
+                          <FormField
+                            control={formEditAddress.control}
+                            name="street"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Rua</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    <div>
-                      <FormLabel htmlFor="number">Número</FormLabel>
-                      <Input
-                        id="number"
-                        value={
-                          editingAddressIndex !== null
-                            ? formCustomer.getValues(`addresses.${editingAddressIndex}.number`)
-                            : ""
-                        }
-                        onChange={(e) => {
-                          if (editingAddressIndex !== null) {
-                            formCustomer.setValue(
-                              `addresses.${editingAddressIndex}.number`,
-                              e.target.value,
-                              {
-                                shouldDirty: true,
-                              }
-                            );
-                          }
-                        }}
-                      />
-                    </div>
+                        <div>
+                          <FormField
+                            control={formEditAddress.control}
+                            name="number"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Número</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    <div>
-                      <FormLabel htmlFor="neighborhood">Bairro</FormLabel>
-                      <Input
-                        id="neighborhood"
-                        value={
-                          editingAddressIndex !== null
-                            ? formCustomer.getValues(
-                                `addresses.${editingAddressIndex}.neighborhood`
-                              )
-                            : ""
-                        }
-                        onChange={(e) => {
-                          if (editingAddressIndex !== null) {
-                            formCustomer.setValue(
-                              `addresses.${editingAddressIndex}.neighborhood`,
-                              e.target.value,
-                              { shouldDirty: true }
-                            );
-                          }
-                        }}
-                      />
-                    </div>
+                        <div>
+                          <FormField
+                            control={formEditAddress.control}
+                            name="neighborhood"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Bairro</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    <div>
-                      <FormLabel htmlFor="city">Cidade</FormLabel>
-                      <Input
-                        id="city"
-                        value={
-                          editingAddressIndex !== null
-                            ? formCustomer.getValues(`addresses.${editingAddressIndex}.city`)
-                            : ""
-                        }
-                        onChange={(e) => {
-                          if (editingAddressIndex !== null) {
-                            formCustomer.setValue(
-                              `addresses.${editingAddressIndex}.city`,
-                              e.target.value,
-                              {
-                                shouldDirty: true,
-                              }
-                            );
-                          }
-                        }}
-                      />
-                    </div>
+                        <div>
+                          <FormField
+                            control={formEditAddress.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Cidade</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    <div>
-                      <FormLabel htmlFor="state">Estado</FormLabel>
-                      <Input
-                        id="state"
-                        maxLength={2}
-                        value={
-                          editingAddressIndex !== null
-                            ? formCustomer.getValues(`addresses.${editingAddressIndex}.state`)
-                            : ""
-                        }
-                        onChange={(e) => {
-                          if (editingAddressIndex !== null) {
-                            formCustomer.setValue(
-                              `addresses.${editingAddressIndex}.state`,
-                              e.target.value.toUpperCase(),
-                              { shouldDirty: true }
-                            );
-                          }
-                        }}
-                      />
-                    </div>
+                        <div>
+                          <FormField
+                            control={formEditAddress.control}
+                            name="state"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Estado</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    maxLength={2}
+                                    value={field.value?.toUpperCase()}
+                                    onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    <div className="col-span-2">
-                      <FormLabel htmlFor="complement">Complemento</FormLabel>
-                      <Input
-                        id="complement"
-                        value={
-                          editingAddressIndex !== null
-                            ? formCustomer.getValues(
-                                `addresses.${editingAddressIndex}.aditionalDetails`
-                              ) || ""
-                            : ""
-                        }
-                        onChange={(e) => {
-                          if (editingAddressIndex !== null) {
-                            formCustomer.setValue(
-                              `addresses.${editingAddressIndex}.aditionalDetails`,
-                              e.target.value,
-                              { shouldDirty: true }
-                            );
-                          }
-                        }}
-                      />
-                    </div>
+                        <div className="col-span-2">
+                          <FormField
+                            control={formEditAddress.control}
+                            name="aditionalDetails"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Complemento</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    <div className="col-span-2">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="isDefault"
-                          checked={
-                            editingAddressIndex !== null
-                              ? formCustomer.getValues(`addresses.${editingAddressIndex}.isDefault`)
-                              : false
-                          }
-                          onChange={(e) => {
-                            if (editingAddressIndex !== null) {
-                              formCustomer.setValue(
-                                `addresses.${editingAddressIndex}.isDefault`,
-                                e.target.checked,
-                                { shouldDirty: true }
-                              );
-                            }
-                          }}
-                          className="h-4 w-4"
-                        />
-                        <label htmlFor="isDefault" className="text-sm font-medium">
-                          Definir como endereço principal
-                        </label>
+                        <div className="col-span-2">
+                          <FormField
+                            control={formEditAddress.control}
+                            name="isDefault"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <input
+                                    type="checkbox"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    className="h-4 w-4"
+                                  />
+                                </FormControl>
+                                <FormLabel className="text-sm font-medium">
+                                  Definir como endereço principal
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setShowAddressForm(false);
-                    }}
-                  >
-                    Salvar
-                  </Button>
-                </AlertDialogFooter>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel
+                        onClick={() => {
+                          setShowAddressForm(false);
+                          setEditingAddressIndex(null);
+                          formEditAddress.reset();
+                        }}
+                      >
+                        Cancelar
+                      </AlertDialogCancel>
+                      <Button
+                        variant="secondary"
+                        type="submit"
+                        disabled={[
+                          formEditAddress.formState.isSubmitting,
+                          !formEditAddress.formState.isDirty,
+                        ].includes(true)}
+                      >
+                        {formEditAddress.formState.isSubmitting && (
+                          <Loader2 className="animate-spin mr-2" />
+                        )}
+                        Salvar
+                      </Button>
+                    </AlertDialogFooter>
+                  </form>
+                </Form>
               </AlertDialogContent>
             </AlertDialog>
           )}
