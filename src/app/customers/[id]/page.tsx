@@ -47,7 +47,9 @@ export default function CustomerDetail() {
   const router = useRouter();
   const { id } = useParams();
   const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
-  const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
+  const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(
+    null
+  );
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -89,7 +91,9 @@ export default function CustomerDetail() {
     fetchCustomer();
   }, [id, formCustomer, fetch]);
 
-  const onSubmitCustomer = async (values: z.infer<typeof formCustomerSchema>) => {
+  const onSubmitCustomer = async (
+    values: z.infer<typeof formCustomerSchema>
+  ) => {
     const customerUpdated: Customer = {
       id: customer?.id || "",
       name: values.name,
@@ -187,7 +191,9 @@ export default function CustomerDetail() {
           className="container mx-auto flex flex-col gap-5"
         >
           <h1 className="text-2xl font-bold">
-            {customer?.id !== "new" && <span className="text-orange-600">{customer.name}</span>}
+            {customer?.id !== "new" && (
+              <span className="text-orange-600">{customer.name}</span>
+            )}
           </h1>
           <div className="grid w-full max-w-sm items-center gap-6">
             <FormField
@@ -261,7 +267,6 @@ export default function CustomerDetail() {
                 className="flex-1"
                 variant="ghost"
                 type="button"
-                size="lg"
                 onClick={() => router.back()}
               >
                 <ArrowLeft />
@@ -271,7 +276,6 @@ export default function CustomerDetail() {
                 className="flex-1"
                 variant="secondary"
                 type="submit"
-                size="lg"
                 disabled={[
                   formCustomer.formState.isSubmitting,
                   !formCustomer.formState.isDirty,
@@ -291,7 +295,6 @@ export default function CustomerDetail() {
                       className="flex-1"
                       variant="destructive"
                       type="button"
-                      size="lg"
                       disabled={loading}
                     >
                       <Trash2 />
@@ -313,7 +316,6 @@ export default function CustomerDetail() {
                         <Button
                           variant="destructive"
                           type="button"
-                          size="lg"
                           onClick={handleDelete}
                           disabled={loading}
                         >
@@ -335,7 +337,6 @@ export default function CustomerDetail() {
           <h2 className="text-xl font-semibold">Endereços</h2>
           <Button
             type="button"
-            variant="gradient"
             onClick={() => {
               setEditingAddressIndex(null);
               formEditAddress.reset({
@@ -382,7 +383,8 @@ export default function CustomerDetail() {
                     </p>
                     <p className="text-sm text-muted-foreground">
                       CEP: {address.cep.replace(/(\d{5})(\d{3})/, "$1-$2")}
-                      {address.aditionalDetails && ` - ${address.aditionalDetails}`}
+                      {address.aditionalDetails &&
+                        ` - ${address.aditionalDetails}`}
                     </p>
                   </div>
 
@@ -423,13 +425,20 @@ export default function CustomerDetail() {
         >
           {/* Modal de Formulário de Endereço */}
           {showAddressForm && (
-            <AlertDialog open={showAddressForm} onOpenChange={setShowAddressForm}>
+            <AlertDialog
+              open={showAddressForm}
+              onOpenChange={setShowAddressForm}
+            >
               <AlertDialogContent className="max-w-md">
                 <Form {...formEditAddress}>
-                  <form onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}>
+                  <form
+                    onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}
+                  >
                     <AlertDialogHeader>
                       <AlertDialogTitle>
-                        {editingAddressIndex !== null ? "Editar Endereço" : "Adicionar Endereço"}
+                        {editingAddressIndex !== null
+                          ? "Editar Endereço"
+                          : "Adicionar Endereço"}
                       </AlertDialogTitle>
                     </AlertDialogHeader>
 
@@ -511,7 +520,11 @@ export default function CustomerDetail() {
                                     {...field}
                                     maxLength={2}
                                     value={field.value?.toUpperCase()}
-                                    onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                                    onChange={(e) =>
+                                      field.onChange(
+                                        e.target.value.toUpperCase()
+                                      )
+                                    }
                                   />
                                 </FormControl>
                                 <FormMessage />
