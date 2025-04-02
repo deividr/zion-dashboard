@@ -1,11 +1,12 @@
+import { AppSidebar } from "@/components/sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/toaster";
+import { ClerkProvider } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/sidebar";
-import { auth } from "@clerk/nextjs/server";
-import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,9 +41,9 @@ export default async function RootLayout({
           {sessionId ? (
             <SidebarProvider>
               <AppSidebar />
-              <main className="w-full flex">
-                <SidebarTrigger />
-                <div className="py-10 pl-4 pr-8 w-full">{children}</div>
+              <main className="w-full">
+                <SiteHeader />
+                <div className="container m-10">{children}</div>
               </main>
               <Toaster />
             </SidebarProvider>

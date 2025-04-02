@@ -50,8 +50,7 @@ export default function Products() {
   };
 
   return (
-    <div className="container mx-auto flex flex-col gap-10">
-      <h1 className="text-2xl font-bold">Produtos</h1>
+    <div className="flex flex-col gap-10">
       <div className="flex gap-10">
         <div className="grow">
           <Input
