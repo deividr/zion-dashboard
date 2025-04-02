@@ -31,6 +31,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Address, Customer, addressSchema } from "../columns";
+import { useHeaderStore } from "@/stores/header-store";
 
 const phoneSchema = z.string().max(11, { message: "Telefone inválido" });
 
@@ -54,6 +55,11 @@ export default function CustomerDetail() {
   const [loading, setLoading] = useState<boolean>(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const { toast } = useToast();
+  const setTitle = useHeaderStore((state) => state.setTitle);
+
+  useEffect(() => {
+    setTitle(["Clientes", id !== "new" ? "Atualizar Cliente" : "Novo Cliente"]);
+  }, [setTitle, id]);
 
   const formCustomer = useForm<z.infer<typeof formCustomerSchema>>({
     resolver: zodResolver(formCustomerSchema),

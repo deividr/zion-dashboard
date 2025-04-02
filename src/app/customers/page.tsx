@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Customer, columns } from "./columns";
 import { DataTable } from "@/components/data-table";
 import { FullPagination } from "@/components/full-pagination";
-import { useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 import { useFetchClient } from "@/lib/fetch-client";
+import { useHeaderStore } from "@/stores/header-store";
+import { Plus, Search } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Customer, columns } from "./columns";
 
 export default function Products() {
   const router = useRouter();
@@ -21,6 +20,11 @@ export default function Products() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState(params.get("search") || "");
   const { fetch } = useFetchClient();
+  const setTitle = useHeaderStore((state) => state.setTitle);
+
+  useEffect(() => {
+    setTitle(["Clientes"]);
+  }, [setTitle]);
 
   useEffect(() => {
     setLoading(true);
@@ -54,7 +58,7 @@ export default function Products() {
       <div className="flex gap-10">
         <div className="grow">
           <Input
-            placeholder="Pesquisar por nome..."
+            placeholder="Pesquisar por cliente..."
             icon={Search}
             value={search}
             onChange={(e) => {

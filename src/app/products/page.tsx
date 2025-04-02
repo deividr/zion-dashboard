@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useFetchClient } from "@/lib/fetch-client";
+import { useHeaderStore } from "@/stores/header-store";
 
 export default function Products() {
   const router = useRouter();
@@ -21,6 +22,11 @@ export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState(params.get("search") || "");
   const { fetch } = useFetchClient();
+  const setTitle = useHeaderStore((state) => state.setTitle);
+
+  useEffect(() => {
+    setTitle(["Produtos"]);
+  }, [setTitle]);
 
   useEffect(() => {
     setLoading(true);
@@ -54,7 +60,7 @@ export default function Products() {
       <div className="flex gap-10">
         <div className="grow">
           <Input
-            placeholder="Pesquisar por nome..."
+            placeholder="Pesquisar por produto..."
             icon={Search}
             value={search}
             onChange={(e) => {
