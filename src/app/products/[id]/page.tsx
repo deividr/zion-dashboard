@@ -135,9 +135,7 @@ export default function ProductDetail() {
         className="container mx-auto flex flex-col gap-5"
       >
         <h1 className="text-2xl font-bold">
-          {product?.id !== "new" && (
-            <span className="text-orange-600">{product.name}</span>
-          )}
+          {product?.id !== "new" && <span>{product.name}</span>}
         </h1>
         <div className="grid w-full max-w-sm items-center gap-6">
           <FormField

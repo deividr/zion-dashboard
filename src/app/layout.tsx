@@ -43,7 +43,7 @@ export default async function RootLayout({
               <AppSidebar />
               <main className="w-full">
                 <SiteHeader />
-                <div className="container m-10">{children}</div>
+                <div className="container p-10">{children}</div>
               </main>
               <Toaster />
             </SidebarProvider>

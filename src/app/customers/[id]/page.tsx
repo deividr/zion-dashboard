@@ -194,14 +194,12 @@ export default function CustomerDetail() {
       <Form {...formCustomer}>
         <form
           onSubmit={formCustomer.handleSubmit(onSubmitCustomer)}
-          className="container mx-auto flex flex-col gap-5"
+          className="grid gap-5"
         >
           <h1 className="text-2xl font-bold">
-            {customer?.id !== "new" && (
-              <span className="text-orange-600">{customer.name}</span>
-            )}
+            {customer?.id !== "new" && <span>{customer.name}</span>}
           </h1>
-          <div className="grid w-full max-w-sm items-center gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <FormField
               control={formCustomer.control}
               name="name"
@@ -338,7 +336,7 @@ export default function CustomerDetail() {
       </Form>
 
       {/* Seção de Endereços */}
-      <div className="container mx-auto flex flex-col gap-5 mt-5">
+      <div className="grid gap-5 mt-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Endereços</h2>
           <Button
@@ -425,10 +423,7 @@ export default function CustomerDetail() {
       </div>
 
       <Form {...formEditAddress}>
-        <form
-          className="container mx-auto flex flex-col gap-5"
-          onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}
-        >
+        <form onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}>
           {/* Modal de Formulário de Endereço */}
           {showAddressForm && (
             <AlertDialog
@@ -590,7 +585,6 @@ export default function CustomerDetail() {
                         Cancelar
                       </AlertDialogCancel>
                       <Button
-                        variant="secondary"
                         type="submit"
                         disabled={[
                           formEditAddress.formState.isSubmitting,
