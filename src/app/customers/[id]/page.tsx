@@ -130,7 +130,9 @@ export default function CustomerDetail() {
 
     toast({
       variant: "success",
-      description: `Cliente ${customer?.id === "new" ? "inserido" : "atualizado"} com sucesso`,
+      description: `Cliente ${
+        customer?.id === "new" ? "inserido" : "atualizado"
+      } com sucesso`,
     });
   };
 
@@ -266,77 +268,70 @@ export default function CustomerDetail() {
                 </FormItem>
               )}
             />
-            <div className="flex justify-between gap-4 mt-5">
-              <Button
-                className="flex-1"
-                variant="ghost"
-                type="button"
-                onClick={() => router.back()}
-              >
-                <ArrowLeft />
-                Voltar
-              </Button>
-              <Button
-                className="flex-1"
-                variant="secondary"
-                type="submit"
-                disabled={[
-                  formCustomer.formState.isSubmitting,
-                  !formCustomer.formState.isDirty,
-                ].includes(true)}
-              >
-                {formCustomer.formState.isSubmitting ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <Pencil />
-                )}
-                {customer?.id === "new" ? "Adicionar" : "Salvar"}
-              </Button>
-              {customer.id !== "new" && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      className="flex-1"
-                      variant="destructive"
-                      type="button"
-                      disabled={loading}
-                    >
-                      <Trash2 />
-                      Excluir
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Tem certeza que quer excluir esse cliente?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Essa ação não pode ser desfeita.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction asChild>
-                        <Button
-                          variant="destructive"
-                          type="button"
-                          onClick={handleDelete}
-                          disabled={loading}
-                        >
-                          Continuar
-                        </Button>
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+          </div>
+          <div className="flex justify-end gap-4">
+            <Button variant="ghost" type="button" onClick={() => router.back()}>
+              <ArrowLeft />
+              Voltar
+            </Button>
+            <Button
+              variant="secondary"
+              type="submit"
+              disabled={[
+                formCustomer.formState.isSubmitting,
+                !formCustomer.formState.isDirty,
+              ].includes(true)}
+            >
+              {formCustomer.formState.isSubmitting ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Pencil />
               )}
-            </div>
+              {customer?.id === "new" ? "Adicionar" : "Salvar"}
+            </Button>
+            {customer.id !== "new" && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    type="button"
+                    disabled={loading}
+                  >
+                    <Trash2 />
+                    Excluir
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Tem certeza que quer excluir esse cliente?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Essa ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <Button
+                        variant="destructive"
+                        type="button"
+                        onClick={handleDelete}
+                        disabled={loading}
+                      >
+                        Continuar
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         </form>
       </Form>
 
       {/* Seção de Endereços */}
-      <div className="grid gap-5 mt-10">
+      <div className="grid gap-5 mt-20">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Endereços</h2>
           <Button
