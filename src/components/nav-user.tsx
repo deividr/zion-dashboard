@@ -21,7 +21,6 @@ import { ChevronsUpDown, LogOut } from "lucide-react";
 export function NavUser() {
   const { signOut, user } = useClerk();
   const { isMobile } = useSidebar();
-  console.log(user);
 
   return (
     <SidebarMenu>
