@@ -21,27 +21,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Address, addressSchema, Customer, customerSchema } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { formatPhone, parseNumber } from "@/lib/utils";
+import { useHeaderStore } from "@/stores/header-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Address, Customer, addressSchema } from "../columns";
-import { useHeaderStore } from "@/stores/header-store";
-
-const phoneSchema = z.string().max(11, { message: "Telefone inválido" });
-
-const formCustomerSchema = z.object({
-  name: z.string().min(5, { message: "Nome deve ter no mínimo 5 caracteres" }),
-  email: z.string().email("Email inválido").or(z.literal("")),
-  phone: phoneSchema.min(10, { message: "Telefone inválido" }),
-  phone2: phoneSchema,
-  addresses: z.array(addressSchema).default([]),
-});
 
 export default function CustomerDetail() {
   const { fetch } = useFetchClient();
@@ -61,8 +51,8 @@ export default function CustomerDetail() {
     setTitle(["Clientes", id !== "new" ? "Atualizar Cliente" : "Novo Cliente"]);
   }, [setTitle, id]);
 
-  const formCustomer = useForm<z.infer<typeof formCustomerSchema>>({
-    resolver: zodResolver(formCustomerSchema),
+  const formCustomer = useForm<z.infer<typeof customerSchema>>({
+    resolver: zodResolver(customerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -73,6 +63,17 @@ export default function CustomerDetail() {
 
   const formEditAddress = useForm<Address>({
     resolver: zodResolver(addressSchema),
+    defaultValues: {
+      cep: "",
+      street: "",
+      number: "",
+      neighborhood: "",
+      city: "",
+      state: "",
+      aditionalDetails: "",
+      isDefault: false,
+      distance: 0,
+    },
   });
 
   useEffect(() => {
@@ -97,9 +98,7 @@ export default function CustomerDetail() {
     fetchCustomer();
   }, [id, formCustomer, fetch]);
 
-  const onSubmitCustomer = async (
-    values: z.infer<typeof formCustomerSchema>
-  ) => {
+  const onSubmitCustomer = async (values: z.infer<typeof customerSchema>) => {
     const customerUpdated: Customer = {
       id: customer?.id || "",
       name: values.name,
@@ -120,10 +119,13 @@ export default function CustomerDetail() {
       body: JSON.stringify(customerUpdated),
     });
 
-    setCustomer(customerUpdated);
-
     if (customer?.id === "new") {
-      formCustomer.reset({ name: "", email: "", phone: "", phone2: "" });
+      formCustomer.reset({
+        name: "",
+        email: "",
+        phone: "",
+        phone2: "",
+      });
     } else {
       formCustomer.reset(customerUpdated);
     }
@@ -338,14 +340,7 @@ export default function CustomerDetail() {
             type="button"
             onClick={() => {
               setEditingAddressIndex(null);
-              formEditAddress.reset({
-                id: "new",
-                street: "",
-                number: "",
-                neighborhood: "",
-                city: "",
-                state: "",
-              });
+              formEditAddress.reset();
               setShowAddressForm(true);
             }}
           >
@@ -417,188 +412,206 @@ export default function CustomerDetail() {
         </div>
       </div>
 
-      <Form {...formEditAddress}>
-        <form onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}>
-          {/* Modal de Formulário de Endereço */}
-          {showAddressForm && (
-            <AlertDialog
-              open={showAddressForm}
-              onOpenChange={setShowAddressForm}
-            >
-              <AlertDialogContent className="max-w-md">
-                <Form {...formEditAddress}>
-                  <form
-                    onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}
-                  >
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        {editingAddressIndex !== null
-                          ? "Editar Endereço"
-                          : "Adicionar Endereço"}
-                      </AlertDialogTitle>
-                    </AlertDialogHeader>
+      <AlertDialog open={showAddressForm} onOpenChange={setShowAddressForm}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {editingAddressIndex !== null
+                ? "Editar Endereço"
+                : "Adicionar Endereço"}
+            </AlertDialogTitle>
+          </AlertDialogHeader>
 
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="col-span-2">
-                          <FormField
-                            control={formEditAddress.control}
-                            name="street"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Rua</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+          <Form {...formEditAddress}>
+            <form onSubmit={formEditAddress.handleSubmit(onSubmitAddress)}>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <FormField
+                      control={formEditAddress.control}
+                      name="cep"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>CEP</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value || ""} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                        <div>
-                          <FormField
-                            control={formEditAddress.control}
-                            name="number"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Número</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                  <div className="col-span-2">
+                    <FormField
+                      control={formEditAddress.control}
+                      name="street"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Rua</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                        <div>
-                          <FormField
-                            control={formEditAddress.control}
-                            name="neighborhood"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Bairro</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                  <div>
+                    <FormField
+                      control={formEditAddress.control}
+                      name="number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                        <div>
-                          <FormField
-                            control={formEditAddress.control}
-                            name="city"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Cidade</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                  <div>
+                    <FormField
+                      control={formEditAddress.control}
+                      name="neighborhood"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bairro</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                        <div>
-                          <FormField
-                            control={formEditAddress.control}
-                            name="state"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Estado</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    maxLength={2}
-                                    value={field.value?.toUpperCase()}
-                                    onChange={(e) =>
-                                      field.onChange(
-                                        e.target.value.toUpperCase()
-                                      )
-                                    }
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                  <div>
+                    <FormField
+                      control={formEditAddress.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cidade</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                        <div className="col-span-2">
-                          <FormField
-                            control={formEditAddress.control}
-                            name="aditionalDetails"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Complemento</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                  <div>
+                    <FormField
+                      control={formEditAddress.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Estado</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              maxLength={2}
+                              value={field.value?.toUpperCase() ?? ""}
+                              onChange={(e) =>
+                                field.onChange(e.target.value.toUpperCase())
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                        <div className="col-span-2">
-                          <FormField
-                            control={formEditAddress.control}
-                            name="isDefault"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <input
-                                    type="checkbox"
-                                    checked={field.value}
-                                    onChange={field.onChange}
-                                    className="h-4 w-4"
-                                  />
-                                </FormControl>
-                                <FormLabel className="text-sm font-medium">
-                                  Definir como endereço principal
-                                </FormLabel>
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                  <div className="col-span-2">
+                    <FormField
+                      control={formEditAddress.control}
+                      name="aditionalDetails"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Complemento</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                    <AlertDialogFooter>
-                      <AlertDialogCancel
-                        onClick={() => {
-                          setShowAddressForm(false);
-                          setEditingAddressIndex(null);
-                          formEditAddress.reset();
-                        }}
-                      >
-                        Cancelar
-                      </AlertDialogCancel>
-                      <Button
-                        type="submit"
-                        disabled={[
-                          formEditAddress.formState.isSubmitting,
-                          !formEditAddress.formState.isDirty,
-                        ].includes(true)}
-                      >
-                        {formEditAddress.formState.isSubmitting && (
-                          <Loader2 className="animate-spin mr-2" />
-                        )}
-                        Salvar
-                      </Button>
-                    </AlertDialogFooter>
-                  </form>
-                </Form>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
-        </form>
-      </Form>
+                  <div className="col-span-2">
+                    <FormField
+                      control={formEditAddress.control}
+                      name="distance"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Distância</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <FormField
+                      control={formEditAddress.control}
+                      name="isDefault"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <input
+                              type="checkbox"
+                              checked={field.value ?? false}
+                              onChange={field.onChange}
+                              className="h-4 w-4"
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-medium">
+                            Definir como endereço principal
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel
+                  onClick={() => {
+                    setShowAddressForm(false);
+                    setEditingAddressIndex(null);
+                    formEditAddress.reset();
+                  }}
+                >
+                  Cancelar
+                </AlertDialogCancel>
+                <Button
+                  type="submit"
+                  disabled={[
+                    formEditAddress.formState.isSubmitting,
+                    !formEditAddress.formState.isDirty,
+                  ].includes(true)}
+                >
+                  {formEditAddress.formState.isSubmitting && (
+                    <Loader2 className="animate-spin mr-2" />
+                  )}
+                  Salvar
+                </Button>
+              </AlertDialogFooter>
+            </form>
+          </Form>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

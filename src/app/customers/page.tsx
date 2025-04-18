@@ -4,12 +4,13 @@ import { DataTable } from "@/components/data-table";
 import { FullPagination } from "@/components/full-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Customer } from "@/domains/customer";
 import { useFetchClient } from "@/lib/fetch-client";
 import { useHeaderStore } from "@/stores/header-store";
 import { Plus, Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Customer, columns } from "./columns";
+import { columns } from "./columns";
 
 export default function Products() {
   const router = useRouter();

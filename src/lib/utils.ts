@@ -19,7 +19,7 @@ export function parseNumber(value: string) {
 }
 
 export const formatPhone = (phone: string) => {
-  if (!phone) return;
+  if (!phone) return "";
   const formatted = phone.replace(/\D/g, "");
   return formatted.replace(/(\d{2})(\d{4,5})(\d{4})/, "($1) $2-$3");
 };
