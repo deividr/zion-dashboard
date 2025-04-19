@@ -2,14 +2,11 @@
 
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,45 +18,32 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Address, addressSchema, Customer, customerSchema } from "@/domains";
+import { Address, addressSchema, Customer } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
-import { formatPhone, parseNumber } from "@/lib/utils";
 import { useHeaderStore } from "@/stores/header-store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { CustomerForm } from "./customer-form";
 
 export default function CustomerDetail() {
   const { fetch } = useFetchClient();
-  const router = useRouter();
   const { id } = useParams();
   const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(
     null
   );
   const [customer, setCustomer] = useState<Customer | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const { toast } = useToast();
   const setTitle = useHeaderStore((state) => state.setTitle);
+  const { toast } = useToast();
 
   useEffect(() => {
     setTitle(["Clientes", id !== "new" ? "Atualizar Cliente" : "Novo Cliente"]);
   }, [setTitle, id]);
-
-  const formCustomer = useForm<z.infer<typeof customerSchema>>({
-    resolver: zodResolver(customerSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      phone2: "",
-    },
-  });
 
   const formEditAddress = useForm<Address>({
     resolver: zodResolver(addressSchema),
@@ -86,57 +70,11 @@ export default function CustomerDetail() {
       const { customer, addresses } = await fetch(
         `${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`
       );
-      formCustomer.reset({
-        name: customer.name,
-        email: customer.email || "",
-        phone: customer.phone || "",
-        phone2: customer.phone2 || "",
-      });
       setCustomer(customer);
       setAddresses(addresses);
     };
     fetchCustomer();
-  }, [id, formCustomer, fetch]);
-
-  const onSubmitCustomer = async (values: z.infer<typeof customerSchema>) => {
-    const customerUpdated: Customer = {
-      id: customer?.id || "",
-      name: values.name,
-      email: values.email,
-      phone: values.phone,
-      phone2: values.phone2,
-    };
-
-    const url =
-      customer?.id === "new"
-        ? `${process.env.NEXT_PUBLIC_HOST_API}/customers`
-        : `${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`;
-
-    const method = customer?.id === "new" ? "POST" : "PUT";
-
-    await fetch(url, {
-      method,
-      body: JSON.stringify(customerUpdated),
-    });
-
-    if (customer?.id === "new") {
-      formCustomer.reset({
-        name: "",
-        email: "",
-        phone: "",
-        phone2: "",
-      });
-    } else {
-      formCustomer.reset(customerUpdated);
-    }
-
-    toast({
-      variant: "success",
-      description: `Cliente ${
-        customer?.id === "new" ? "inserido" : "atualizado"
-      } com sucesso`,
-    });
-  };
+  }, [id, fetch]);
 
   const onSubmitAddress = async (data: Address) => {
     const updatedAddresses = [...addresses];
@@ -177,160 +115,11 @@ export default function CustomerDetail() {
     });
   };
 
-  const handleDelete = async () => {
-    setLoading(true);
-    await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`, {
-      method: "DELETE",
-    });
-
-    toast({
-      variant: "success",
-      description: "Cliente excluído com sucesso",
-    });
-
-    router.back();
-  };
-
   if (!customer) return <div>Loading...</div>;
 
   return (
     <>
-      <Form {...formCustomer}>
-        <form
-          onSubmit={formCustomer.handleSubmit(onSubmitCustomer)}
-          className="grid gap-5"
-        >
-          <h1 className="text-2xl font-bold">
-            {customer?.id !== "new" && <span>{customer.name}</span>}
-          </h1>
-          <div className="grid md:grid-cols-2 gap-6">
-            <FormField
-              control={formCustomer.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={formCustomer.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={formCustomer.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Telefone</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={formatPhone(field.value)}
-                      onChange={(e) => {
-                        const rawValue = parseNumber(e.target.value);
-                        field.onChange(rawValue);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={formCustomer.control}
-              name="phone2"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Telefone 2</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={formatPhone(field.value)}
-                      onChange={(e) => {
-                        const rawValue = parseNumber(e.target.value);
-                        field.onChange(rawValue);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="flex justify-end gap-4">
-            <Button variant="ghost" type="button" onClick={() => router.back()}>
-              <ArrowLeft />
-              Voltar
-            </Button>
-            <Button
-              variant="secondary"
-              type="submit"
-              disabled={[
-                formCustomer.formState.isSubmitting,
-                !formCustomer.formState.isDirty,
-              ].includes(true)}
-            >
-              {formCustomer.formState.isSubmitting ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Pencil />
-              )}
-              {customer?.id === "new" ? "Adicionar" : "Salvar"}
-            </Button>
-            {customer.id !== "new" && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    type="button"
-                    disabled={loading}
-                  >
-                    <Trash2 />
-                    Excluir
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Tem certeza que quer excluir esse cliente?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Essa ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                      <Button
-                        variant="destructive"
-                        type="button"
-                        onClick={handleDelete}
-                        disabled={loading}
-                      >
-                        Continuar
-                      </Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-          </div>
-        </form>
-      </Form>
+      <CustomerForm customer={customer} />
 
       {/* Seção de Endereços */}
       <div className="grid gap-5 mt-20">
