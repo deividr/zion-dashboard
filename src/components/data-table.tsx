@@ -24,7 +24,7 @@ interface DataTableProps<TData, TValue> {
 }
 
 interface DataRow {
-  id: string;
+  id?: string;
 }
 
 export function DataTable<TData extends DataRow, TValue>({
