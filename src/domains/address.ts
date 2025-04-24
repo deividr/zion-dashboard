@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const addressSchema = z.object({
-  id: z.string().optional(),
+  id: z.string().uuid().optional(),
   street: z.string().min(3, { message: "Rua deve ter no mínimo 3 caracteres" }),
   number: z.string(),
   neighborhood: z
@@ -15,7 +15,7 @@ export const addressSchema = z.object({
   aditionalDetails: z.string().default(""),
   distance: z.number().default(0),
   isDefault: z.boolean().default(false),
-  customerId: z.string(),
+  customerId: z.string().uuid().optional(),
 });
 
 export type Address = z.infer<typeof addressSchema>;

@@ -16,12 +16,17 @@ export default function CustomerDetail() {
   const setTitle = useHeaderStore((state) => state.setTitle);
 
   useEffect(() => {
-    setTitle(["Clientes", id !== "new" ? "Atualizar Cliente" : "Novo Cliente"]);
+    setTitle(["Clientes", id === "new" ? "Novo Cliente" : "Atualizar Cliente"]);
   }, [setTitle, id]);
 
   useEffect(() => {
     if (id === "new") {
-      setCustomer({ id: "new", name: "", email: "", phone: "", phone2: "" });
+      setCustomer({
+        name: "",
+        email: "",
+        phone: "",
+        phone2: "",
+      });
       return;
     }
 
@@ -40,7 +45,7 @@ export default function CustomerDetail() {
   return (
     <>
       <CustomerForm customer={customer} />
-      <AddressSection customer={customer} initialAddresses={addresses} />
+      {customer.id && <AddressSection initialAddresses={addresses} />}
     </>
   );
 }

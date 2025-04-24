@@ -3,6 +3,13 @@
 import {
   AlertDialogHeader,
   AlertDialogFooter,
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,20 +26,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { formatPhone, parseNumber } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@radix-ui/react-alert-dialog";
 import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+const defaultValues: Customer = {
+  name: "",
+  email: "",
+  phone: "",
+  phone2: "",
+};
 
 export function CustomerForm({ customer }: { customer: Customer }) {
   const { fetch } = useFetchClient();
@@ -42,29 +47,20 @@ export function CustomerForm({ customer }: { customer: Customer }) {
 
   const formCustomer = useForm<z.infer<typeof customerSchema>>({
     resolver: zodResolver(customerSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      phone2: "",
-    },
+    defaultValues,
   });
 
   useEffect(() => {
-    if (customer?.id === "new") {
+    if (customer?.id) {
       formCustomer.reset({
-        name: "",
-        email: "",
-        phone: "",
-        phone2: "",
-      });
-    } else {
-      formCustomer.reset({
+        id: customer.id,
         name: customer.name,
         email: customer.email || "",
         phone: customer.phone || "",
         phone2: customer.phone2 || "",
       });
+    } else {
+      formCustomer.reset(defaultValues);
     }
   }, [customer, formCustomer]);
 
@@ -77,33 +73,27 @@ export function CustomerForm({ customer }: { customer: Customer }) {
       phone2: values.phone2,
     };
 
-    const url =
-      customer?.id === "new"
-        ? `${process.env.NEXT_PUBLIC_HOST_API}/customers`
-        : `${process.env.NEXT_PUBLIC_HOST_API}/customers/${customer.id}`;
+    const url = customer?.id
+      ? `${process.env.NEXT_PUBLIC_HOST_API}/customers/${customer.id}`
+      : `${process.env.NEXT_PUBLIC_HOST_API}/customers`;
 
-    const method = customer?.id === "new" ? "POST" : "PUT";
+    const method = customer?.id ? "PUT" : "POST";
 
     await fetch(url, {
       method,
       body: JSON.stringify(customerUpdated),
     });
 
-    if (customer?.id === "new") {
-      formCustomer.reset({
-        name: "",
-        email: "",
-        phone: "",
-        phone2: "",
-      });
-    } else {
+    if (customer?.id) {
       formCustomer.reset(customerUpdated);
+    } else {
+      formCustomer.reset(defaultValues);
     }
 
     toast({
       variant: "success",
       description: `Cliente ${
-        customer?.id === "new" ? "inserido" : "atualizado"
+        customer?.id ? "atualizado" : "inserido"
       } com sucesso`,
     });
   };
@@ -132,7 +122,7 @@ export function CustomerForm({ customer }: { customer: Customer }) {
         className="grid gap-5"
       >
         <h1 className="text-2xl font-bold">
-          {customer?.id !== "new" && <span>{customer.name}</span>}
+          {customer?.id && <span>{customer.name}</span>}
         </h1>
         <div className="grid md:grid-cols-2 gap-6">
           <FormField
@@ -172,6 +162,7 @@ export function CustomerForm({ customer }: { customer: Customer }) {
                     {...field}
                     value={formatPhone(field.value)}
                     onChange={(e) => {
+                      console.log(formCustomer.formState.errors);
                       const rawValue = parseNumber(e.target.value);
                       field.onChange(rawValue);
                     }}
@@ -220,9 +211,9 @@ export function CustomerForm({ customer }: { customer: Customer }) {
             ) : (
               <Pencil />
             )}
-            {customer?.id === "new" ? "Adicionar" : "Salvar"}
+            {customer.id ? "Salvar" : "Adicionar"}
           </Button>
-          {customer.id !== "new" && (
+          {customer.id && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" type="button" disabled={loading}>

@@ -1,23 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Address, Customer } from "@/domains";
+import { Address } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
-import { useFetchClient } from "@/lib/fetch-client";
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { AddressForm } from "./address-form";
 
 interface AddressSectionProps {
-  customer: Customer;
   initialAddresses: Address[];
 }
 
-export function AddressSection({
-  customer,
-  initialAddresses,
-}: AddressSectionProps) {
-  const { fetch } = useFetchClient();
+export function AddressSection({ initialAddresses }: AddressSectionProps) {
   const { toast } = useToast();
   const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(
@@ -61,26 +55,16 @@ export function AddressSection({
       });
     }
 
-    const url =
-      data.id === "new"
-        ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses`
-        : `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${data.id}`;
-
-    const method = data?.id === "new" ? "POST" : "PUT";
-    data.customerId = customer.id;
-
-    await fetch(url, {
-      method,
-      body: JSON.stringify(data),
-    });
-
     setAddresses(updatedAddresses);
     setShowAddressForm(false);
     setEditingAddressIndex(null);
     setCurrentAddress(undefined);
+
     toast({
       variant: "success",
-      description: "Endereço atualizado com sucesso!",
+      description: `Endereço ${
+        editingAddressIndex ? "atualizado" : "adicionado"
+      } com sucesso!`,
     });
   };
 

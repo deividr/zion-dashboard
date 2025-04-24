@@ -17,6 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useFetchClient } from "@/lib/fetch-client";
 import { Input } from "@/components/ui/input";
 import { Address, addressSchema } from "@/domains";
 import { Loader2 } from "lucide-react";
@@ -32,9 +33,8 @@ interface AddressFormProps {
   isEditing: boolean;
 }
 const defaultValues: Address = {
-  id: "new",
-  cep: "é nóis",
-  street: "qualquer cosia...",
+  cep: "",
+  street: "",
   number: "",
   neighborhood: "",
   city: "",
@@ -42,7 +42,6 @@ const defaultValues: Address = {
   aditionalDetails: "",
   isDefault: false,
   distance: 0,
-  customerId: "new",
 };
 
 export function AddressForm({
@@ -52,6 +51,7 @@ export function AddressForm({
   address,
   isEditing,
 }: AddressFormProps) {
+  const { fetch } = useFetchClient();
   const formEditAddress = useForm<Address>({
     resolver: zodResolver(addressSchema),
     defaultValues,
@@ -59,13 +59,11 @@ export function AddressForm({
 
   useEffect(() => {
     if (address) {
-      console.log("com address: ", address);
       formEditAddress.reset({
         ...address,
         distance: Number(address.distance) || 0,
       });
     } else {
-      console.log("sem address: ", address);
       formEditAddress.reset(defaultValues);
     }
   }, [address, formEditAddress]);
@@ -81,6 +79,20 @@ export function AddressForm({
         ...data,
         distance: Number(data.distance) || 0,
       };
+
+      if (data.customerId) {
+        const url = data?.id
+          ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${data.id}`
+          : `${process.env.NEXT_PUBLIC_HOST_API}/addresses`;
+
+        const method = data?.id ? "PUT" : "POST";
+
+        await fetch(url, {
+          method,
+          body: JSON.stringify(data),
+        });
+      }
+
       await onSubmit(formData);
       handleCloseForm();
     } catch (error) {
