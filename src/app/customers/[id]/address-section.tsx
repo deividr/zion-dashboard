@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { AddressForm } from "./address-form";
+import { useFetchClient } from "@/lib/fetch-client";
 
 interface AddressSectionProps {
   initialAddresses: Address[];
@@ -17,6 +18,7 @@ export function AddressSection({
   customer,
 }: AddressSectionProps) {
   const { toast } = useToast();
+  const { fetch } = useFetchClient();
   const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(
     null
@@ -36,10 +38,23 @@ export function AddressSection({
     setShowAddressForm(true);
   };
 
-  const handleDeleteAddress = (index: number) => {
+  const handleDeleteAddress = async (index: number) => {
     const newAddresses = [...addresses];
     newAddresses.splice(index, 1);
+
+    await fetch(
+      `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${addresses[index].id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
     setAddresses(newAddresses);
+
+    toast({
+      variant: "success",
+      description: `Endereço excluído com sucesso!`,
+    });
   };
 
   const onSubmitAddress = async (data: Address) => {
