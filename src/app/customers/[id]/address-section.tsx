@@ -42,19 +42,21 @@ export function AddressSection({
     const newAddresses = [...addresses];
     newAddresses.splice(index, 1);
 
-    await fetch(
-      `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${addresses[index].id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    if (addresses[index].id) {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${addresses[index].id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      toast({
+        variant: "success",
+        description: `Endereço excluído com sucesso!`,
+      });
+    }
 
     setAddresses(newAddresses);
-
-    toast({
-      variant: "success",
-      description: `Endereço excluído com sucesso!`,
-    });
   };
 
   const onSubmitAddress = async (data: Address) => {
@@ -78,13 +80,6 @@ export function AddressSection({
     setShowAddressForm(false);
     setEditingAddressIndex(null);
     setCurrentAddress(undefined);
-
-    toast({
-      variant: "success",
-      description: `Endereço ${
-        editingAddressIndex !== null ? "atualizado" : "adicionado"
-      } com sucesso!`,
-    });
   };
 
   return (
@@ -158,8 +153,8 @@ export function AddressSection({
 
       <AddressForm
         isOpen={showAddressForm}
-        onOpenChange={setShowAddressForm}
-        onSubmit={onSubmitAddress}
+        onOpenChangeAction={setShowAddressForm}
+        onSubmitAction={onSubmitAddress}
         address={currentAddress}
         isEditing={editingAddressIndex !== null}
         customer={customer}

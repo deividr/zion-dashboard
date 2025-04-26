@@ -24,11 +24,12 @@ import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@/hooks/use-toast";
 
 interface AddressFormProps {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Address) => Promise<void>;
+  onOpenChangeAction: (open: boolean) => void;
+  onSubmitAction: (data: Address) => Promise<void>;
   address?: Address;
   isEditing: boolean;
   customer: Customer;
@@ -48,8 +49,8 @@ const defaultValues: Address = {
 
 export function AddressForm({
   isOpen,
-  onOpenChange,
-  onSubmit,
+  onOpenChangeAction,
+  onSubmitAction,
   address,
   isEditing,
   customer,
@@ -73,7 +74,7 @@ export function AddressForm({
 
   const handleCloseForm = () => {
     formEditAddress.reset();
-    onOpenChange(false);
+    onOpenChangeAction(false);
   };
 
   const handleSubmit = async (data: Address) => {
@@ -93,14 +94,21 @@ export function AddressForm({
         method,
         body: JSON.stringify({ ...data, customerId: customer.id }),
       });
+
+      toast({
+        variant: "success",
+        description: `Endereço ${
+          data?.id ? "atualizado" : "adicionado"
+        } com sucesso!`,
+      });
     }
 
-    await onSubmit(formData);
+    await onSubmitAction(formData);
     handleCloseForm();
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChangeAction}>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle>
