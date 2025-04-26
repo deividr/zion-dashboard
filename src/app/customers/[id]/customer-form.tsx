@@ -122,7 +122,7 @@ export function CustomerForm({
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-10">
       <Form {...formCustomer}>
         <form
           onSubmit={formCustomer.handleSubmit(handleSubmit)}
@@ -202,7 +202,7 @@ export function CustomerForm({
         </form>
       </Form>
 
-      {children}
+      {customer.id && children}
 
       <div className="flex justify-end gap-4">
         <Button variant="ghost" type="button" onClick={() => router.back()}>
@@ -260,6 +260,6 @@ export function CustomerForm({
           </AlertDialog>
         )}
       </div>
-    </>
+    </div>
   );
 }
