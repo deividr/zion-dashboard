@@ -15,7 +15,6 @@ export const addressSchema = z.object({
   aditionalDetails: z.string().default(""),
   distance: z.number().default(0),
   isDefault: z.boolean().default(false),
-  customerId: z.string().uuid().optional(),
 });
 
 export type Address = z.infer<typeof addressSchema>;

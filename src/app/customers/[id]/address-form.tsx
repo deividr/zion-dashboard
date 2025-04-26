@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { useFetchClient } from "@/lib/fetch-client";
 import { Input } from "@/components/ui/input";
-import { Address, addressSchema } from "@/domains";
+import { Address, addressSchema, Customer } from "@/domains";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -31,7 +31,9 @@ interface AddressFormProps {
   onSubmit: (data: Address) => Promise<void>;
   address?: Address;
   isEditing: boolean;
+  customer: Customer;
 }
+
 const defaultValues: Address = {
   cep: "",
   street: "",
@@ -50,6 +52,7 @@ export function AddressForm({
   onSubmit,
   address,
   isEditing,
+  customer,
 }: AddressFormProps) {
   const { fetch } = useFetchClient();
   const formEditAddress = useForm<Address>({
@@ -74,30 +77,26 @@ export function AddressForm({
   };
 
   const handleSubmit = async (data: Address) => {
-    try {
-      const formData = {
-        ...data,
-        distance: Number(data.distance) || 0,
-      };
+    const formData = {
+      ...data,
+      distance: Number(data.distance) || 0,
+    };
 
-      if (data.customerId) {
-        const url = data?.id
-          ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${data.id}`
-          : `${process.env.NEXT_PUBLIC_HOST_API}/addresses`;
+    if (customer.id) {
+      const url = data?.id
+        ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${data.id}`
+        : `${process.env.NEXT_PUBLIC_HOST_API}/addresses`;
 
-        const method = data?.id ? "PUT" : "POST";
+      const method = data?.id ? "PUT" : "POST";
 
-        await fetch(url, {
-          method,
-          body: JSON.stringify(data),
-        });
-      }
-
-      await onSubmit(formData);
-      handleCloseForm();
-    } catch (error) {
-      console.error("Error submitting form:", error);
+      await fetch(url, {
+        method,
+        body: JSON.stringify({ ...data, customerId: customer.id }),
+      });
     }
+
+    await onSubmit(formData);
+    handleCloseForm();
   };
 
   return (
@@ -206,7 +205,6 @@ export function AddressForm({
                             maxLength={2}
                             value={field.value?.toUpperCase() ?? ""}
                             onChange={(e) => {
-                              console.log(formEditAddress.formState.errors);
                               field.onChange(e.target.value.toUpperCase());
                             }}
                           />

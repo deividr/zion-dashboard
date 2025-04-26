@@ -37,6 +37,7 @@ export default function CustomerDetail() {
       setCustomer(customer);
       setAddresses(addresses);
     };
+
     fetchCustomer();
   }, [id, fetch]);
 
@@ -44,8 +45,9 @@ export default function CustomerDetail() {
 
   return (
     <>
-      <CustomerForm customer={customer} />
-      {customer.id && <AddressSection initialAddresses={addresses} />}
+      <CustomerForm customer={customer}>
+        <AddressSection initialAddresses={addresses} customer={customer} />
+      </CustomerForm>
     </>
   );
 }

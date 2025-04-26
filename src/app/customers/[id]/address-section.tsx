@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Address } from "@/domains";
+import { Address, Customer } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -9,15 +9,19 @@ import { AddressForm } from "./address-form";
 
 interface AddressSectionProps {
   initialAddresses: Address[];
+  customer: Customer;
 }
 
-export function AddressSection({ initialAddresses }: AddressSectionProps) {
+export function AddressSection({
+  initialAddresses,
+  customer,
+}: AddressSectionProps) {
   const { toast } = useToast();
   const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(
     null
   );
-  const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
+  const [addresses, setAddresses] = useState<Address[]>(initialAddresses ?? []);
   const [currentAddress, setCurrentAddress] = useState<Address | undefined>();
 
   const handleAddAddress = () => {
@@ -63,7 +67,7 @@ export function AddressSection({ initialAddresses }: AddressSectionProps) {
     toast({
       variant: "success",
       description: `Endereço ${
-        editingAddressIndex ? "atualizado" : "adicionado"
+        editingAddressIndex !== null ? "atualizado" : "adicionado"
       } com sucesso!`,
     });
   };
@@ -71,7 +75,7 @@ export function AddressSection({ initialAddresses }: AddressSectionProps) {
   return (
     <>
       {/* Seção de Endereços */}
-      <div className="grid gap-5 mt-20">
+      <div className="grid gap-5 mt-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Endereços</h2>
           <Button type="button" onClick={handleAddAddress}>
@@ -143,6 +147,7 @@ export function AddressSection({ initialAddresses }: AddressSectionProps) {
         onSubmit={onSubmitAddress}
         address={currentAddress}
         isEditing={editingAddressIndex !== null}
+        customer={customer}
       />
     </>
   );
