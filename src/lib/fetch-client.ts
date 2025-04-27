@@ -29,7 +29,7 @@ export function useFetchClient() {
         const data = await response.json();
         toast({
           variant: "destructive",
-          description: response.statusText || data.error,
+          description: data.message || response.statusText,
         });
         throw new Error(response.statusText);
       }
