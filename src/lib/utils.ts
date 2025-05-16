@@ -23,3 +23,9 @@ export const formatPhone = (phone: string) => {
   const formatted = phone.replace(/\D/g, "");
   return formatted.replace(/(\d{2})(\d{4,5})(\d{4})/, "($1) $2-$3");
 };
+
+export const formatCep = (cep: string) => {
+  if (!cep) return "";
+  const formatted = cep.replace(/\D/g, "");
+  return formatted.replace(/(\d{5})(\d{3})/, "$1-$2");
+};

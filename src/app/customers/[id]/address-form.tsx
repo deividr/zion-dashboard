@@ -25,6 +25,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
+import { formatCep, parseNumber } from "@/lib/utils";
 
 interface AddressFormProps {
   isOpen: boolean;
@@ -128,7 +129,16 @@ export function AddressForm({
                       <FormItem>
                         <FormLabel>CEP</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ""} />
+                          <Input
+                            {...field}
+                            value={formatCep(field.value || "")}
+                            onChange={(e) => {
+                              const rawValue = parseNumber(e.target.value);
+                              if (rawValue.length < 9) {
+                                field.onChange(rawValue);
+                              }
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
