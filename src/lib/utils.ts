@@ -29,3 +29,27 @@ export const formatCep = (cep: string) => {
   const formatted = cep.replace(/\D/g, "");
   return formatted.replace(/(\d{5})(\d{3})/, "$1-$2");
 };
+
+/**
+ * Consulta a API ViaCEP e retorna os dados do endereço para o CEP informado.
+ * @param cep string (apenas números)
+ * @returns Promise<{ street: string; neighborhood: string; city: string; state: string; }>
+ * @throws Error se o CEP não for encontrado ou houver erro na consulta
+ */
+export async function fetchCepData(cep: string) {
+  const cleanCep = cep.replace(/\D/g, "");
+  if (cleanCep.length !== 8) {
+    throw new Error("CEP deve conter 8 dígitos.");
+  }
+  const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+  const data = await res.json();
+  if (data.erro) {
+    throw new Error("CEP não encontrado.");
+  }
+  return {
+    street: data.logradouro || "",
+    neighborhood: data.bairro || "",
+    city: data.localidade || "",
+    state: data.uf || "",
+  };
+}

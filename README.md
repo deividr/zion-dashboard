@@ -38,5 +38,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## TODO
 
 [X] - Máscara para CEP
-[] - Ao digitar o CEP buscar o endereço automáticamente;
-[] - Ao digitar o Endereço buscar o CEP automaticamente;
+[X] - Ao digitar o CEP buscar o endereço automáticamente;
+[] - Colocar um loading quando estiver pesquisando um endereço;

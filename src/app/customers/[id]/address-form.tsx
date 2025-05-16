@@ -21,11 +21,11 @@ import { useFetchClient } from "@/lib/fetch-client";
 import { Input } from "@/components/ui/input";
 import { Address, addressSchema, Customer } from "@/domains";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
-import { formatCep, parseNumber } from "@/lib/utils";
+import { formatCep, parseNumber, fetchCepData } from "@/lib/utils";
 
 interface AddressFormProps {
   isOpen: boolean;
@@ -108,6 +108,28 @@ export function AddressForm({
     handleCloseForm();
   };
 
+  const handleCepBlur = useCallback(
+    async (e: React.FocusEvent<HTMLInputElement>) => {
+      const cep = e.target.value.replace(/\D/g, "");
+      if (cep.length === 8) {
+        try {
+          const data = await fetchCepData(cep);
+          formEditAddress.setValue("street", data.street);
+          formEditAddress.setValue("neighborhood", data.neighborhood);
+          formEditAddress.setValue("city", data.city);
+          formEditAddress.setValue("state", data.state);
+          formEditAddress.clearErrors("cep");
+        } catch {
+          formEditAddress.setError("cep", {
+            type: "manual",
+            message: "CEP inválido ou não encontrado",
+          });
+        }
+      }
+    },
+    [formEditAddress]
+  );
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChangeAction}>
       <AlertDialogContent className="max-w-md">
@@ -136,6 +158,11 @@ export function AddressForm({
                               const rawValue = parseNumber(e.target.value);
                               if (rawValue.length < 9) {
                                 field.onChange(rawValue);
+                              }
+                            }}
+                            onBlur={(e) => {
+                              if (e.target.value.length === 9) {
+                                handleCepBlur(e);
                               }
                             }}
                           />
