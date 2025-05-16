@@ -40,3 +40,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 [X] - Máscara para CEP
 [X] - Ao digitar o CEP buscar o endereço automáticamente;
 [] - Colocar um loading quando estiver pesquisando um endereço;
+[] - Não permitir mais de um endereço no mesmo cep para o mesmo cliente;
+[] - Não permitir mais de um endereço default para o mesmo cliente;

@@ -85,11 +85,11 @@ export function AddressForm({
     };
 
     if (customer.id) {
-      const url = data?.id
-        ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${data.id}`
+      const url = address?.id
+        ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${address.id}`
         : `${process.env.NEXT_PUBLIC_HOST_API}/addresses`;
 
-      const method = data?.id ? "PUT" : "POST";
+      const method = address?.id ? "PUT" : "POST";
 
       await fetch(url, {
         method,

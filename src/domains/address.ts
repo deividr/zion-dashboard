@@ -11,7 +11,7 @@ export const addressSchema = z.object({
     .string()
     .min(2, { message: "Cidade deve ter no mínimo 2 caracteres" }),
   state: z.string().length(2, { message: "Estado deve ter 2 caracteres" }),
-  cep: z.string().length(9, { message: "CEP deve ter 9 dígitos" }),
+  cep: z.string().length(8, { message: "CEP deve ter 8 dígitos" }),
   aditionalDetails: z.string().default(""),
   distance: z.number().default(0),
   isDefault: z.boolean().default(false),
