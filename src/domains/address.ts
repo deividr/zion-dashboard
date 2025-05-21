@@ -14,7 +14,7 @@ export const addressSchema = z.object({
   cep: z.string().length(8, { message: "CEP deve ter 8 dígitos" }),
   aditionalDetails: z.string().default(""),
   distance: z.number().default(0),
-  isDefault: z.boolean().default(false),
+  isDefault: z.boolean(),
 });
 
 export type Address = z.infer<typeof addressSchema>;

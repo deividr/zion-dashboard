@@ -7,7 +7,7 @@ export function useFetchClient() {
   const { toast } = useToast();
 
   const fetchClient = useCallback(
-    async (url: string, options: RequestInit = {}) => {
+    async <T>(url: string, options: RequestInit = {}) => {
       const token = await getToken();
 
       if (!token) {
@@ -34,7 +34,7 @@ export function useFetchClient() {
         throw new Error(response.statusText);
       }
 
-      return response.json();
+      return response.json() as T;
     },
     [getToken, toast]
   );

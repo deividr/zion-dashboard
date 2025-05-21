@@ -17,15 +17,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useFetchClient } from "@/lib/fetch-client";
 import { Input } from "@/components/ui/input";
 import { Address, addressSchema, Customer } from "@/domains";
-import { Loader2 } from "lucide-react";
-import { useEffect, useCallback } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
-import { formatCep, parseNumber, fetchCepData } from "@/lib/utils";
+import { useFetchClient } from "@/lib/fetch-client";
+import { fetchCepData, formatCep, parseNumber } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useCallback, useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 interface AddressFormProps {
   isOpen: boolean;
@@ -79,11 +79,6 @@ export function AddressForm({
   };
 
   const handleSubmit = async (data: Address) => {
-    const formData = {
-      ...data,
-      distance: Number(data.distance) || 0,
-    };
-
     if (customer.id) {
       const url = address?.id
         ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${address.id}`
@@ -91,20 +86,25 @@ export function AddressForm({
 
       const method = address?.id ? "PUT" : "POST";
 
-      await fetch(url, {
+      const result = await fetch<Address>(url, {
         method,
-        body: JSON.stringify({ ...data, customerId: customer.id }),
+        body: JSON.stringify({
+          ...data,
+          customerId: customer.id,
+        }),
       });
+
+      data.id = result?.id;
 
       toast({
         variant: "success",
         description: `Endereço ${
-          data?.id ? "atualizado" : "adicionado"
+          isEditing ? "atualizado" : "adicionado"
         } com sucesso!`,
       });
     }
 
-    await onSubmitAction(formData);
+    await onSubmitAction(data);
     handleCloseForm();
   };
 

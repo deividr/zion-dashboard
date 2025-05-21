@@ -42,3 +42,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 [] - Colocar um loading quando estiver pesquisando um endereço;
 [] - Não permitir mais de um endereço no mesmo cep para o mesmo cliente;
 [] - Não permitir mais de um endereço default para o mesmo cliente;
+[] - Criar categoria de produtos;
+[] - Fazer um select field para unidade de produto e para a categoria do produto;

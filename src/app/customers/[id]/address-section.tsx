@@ -39,7 +39,7 @@ export function AddressSection({
   };
 
   const handleDeleteAddress = async (index: number) => {
-    const newAddresses = [...addresses];
+    let newAddresses = [...addresses];
     newAddresses.splice(index, 1);
 
     if (addresses[index].id) {
@@ -49,6 +49,13 @@ export function AddressSection({
           method: "DELETE",
         }
       );
+
+      if (addresses[index].id) {
+        const result = await fetch<{ addresses: Address[] }>(
+          `${process.env.NEXT_PUBLIC_HOST_API}/customers/${customer.id}`
+        );
+        newAddresses = result?.addresses ?? [];
+      }
 
       toast({
         variant: "success",
@@ -62,18 +69,18 @@ export function AddressSection({
   const onSubmitAddress = async (data: Address) => {
     const updatedAddresses = [...addresses];
 
-    if (editingAddressIndex !== null) {
-      updatedAddresses[editingAddressIndex] = data;
-    } else {
-      updatedAddresses.push(data);
-    }
-
     if (data.isDefault) {
       updatedAddresses.forEach((addr, index) => {
         if (index !== editingAddressIndex) {
           addr.isDefault = false;
         }
       });
+    }
+
+    if (editingAddressIndex !== null) {
+      updatedAddresses[editingAddressIndex] = data;
+    } else {
+      updatedAddresses.push(data);
     }
 
     setAddresses(updatedAddresses);
