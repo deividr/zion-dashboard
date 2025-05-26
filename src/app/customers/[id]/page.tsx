@@ -1,6 +1,6 @@
 "use client";
 
-import { Customer } from "@/domains";
+import { Address, Customer } from "@/domains";
 import { useHeaderStore } from "@/stores/header-store";
 import { useFetchClient } from "@/lib/fetch-client";
 import { useParams } from "next/navigation";
@@ -12,7 +12,7 @@ export default function CustomerDetail() {
   const { fetch } = useFetchClient();
   const { id } = useParams();
   const [customer, setCustomer] = useState<Customer | null>(null);
-  const [addresses, setAddresses] = useState<[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const setTitle = useHeaderStore((state) => state.setTitle);
 
   useEffect(() => {
@@ -31,11 +31,12 @@ export default function CustomerDetail() {
     }
 
     const fetchCustomer = async () => {
-      const { customer, addresses } = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`
-      );
-      setCustomer(customer);
-      setAddresses(addresses);
+      const result = await fetch<{
+        customer: Customer;
+        addresses: Address[];
+      }>(`${process.env.NEXT_PUBLIC_HOST_API}/customers/${id}`);
+      setCustomer(result?.customer ?? null);
+      setAddresses(result?.addresses ?? []);
     };
 
     fetchCustomer();

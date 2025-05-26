@@ -64,13 +64,13 @@ export default function ProductDetail() {
     }
 
     const fetchProduct = async () => {
-      const data = await fetch(
+      const data = await fetch<Product>(
         `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`
       );
       form.reset({
-        value: String(data.value),
-        name: data.name,
-        unityType: data.unityType,
+        value: String(data?.value),
+        name: data?.name,
+        unityType: data?.unityType,
       });
       setProduct(data);
     };

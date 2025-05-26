@@ -169,6 +169,7 @@ export function CustomerForm({
                       {...field}
                       value={formatPhone(field.value)}
                       onChange={(e) => {
+                        console.log(formCustomer.formState);
                         const rawValue = parseNumber(e.target.value);
                         field.onChange(rawValue);
                       }}

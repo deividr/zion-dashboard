@@ -31,11 +31,14 @@ export default function Products() {
   useEffect(() => {
     setLoading(true);
     const fetchProducts = async () => {
-      const data = await fetch(
+      const data = await fetch<{
+        products: Product[];
+        pagination: { total: number };
+      }>(
         `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`
       );
-      setProducts(data.products || []);
-      setTotalPage(data.pagination.total);
+      setProducts(data?.products || []);
+      setTotalPage(data?.pagination.total || 0);
       setLoading(false);
     };
 
