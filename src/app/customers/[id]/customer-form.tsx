@@ -125,6 +125,7 @@ export function CustomerForm({
     <div className="flex flex-col gap-10">
       <Form {...formCustomer}>
         <form
+          id="customer-form"
           onSubmit={formCustomer.handleSubmit(handleSubmit)}
           className="grid gap-5"
         >
@@ -169,7 +170,6 @@ export function CustomerForm({
                       {...field}
                       value={formatPhone(field.value)}
                       onChange={(e) => {
-                        console.log(formCustomer.formState);
                         const rawValue = parseNumber(e.target.value);
                         field.onChange(rawValue);
                       }}
@@ -213,6 +213,7 @@ export function CustomerForm({
         <Button
           variant="secondary"
           type="submit"
+          form="customer-form"
           disabled={[
             formCustomer.formState.isSubmitting,
             !formCustomer.formState.isDirty,
