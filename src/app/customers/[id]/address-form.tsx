@@ -21,7 +21,12 @@ import { Input } from "@/components/ui/input";
 import { Address, addressSchema, Customer } from "@/domains";
 import { toast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
-import { fetchCepData, formatCep, parseNumber } from "@/lib/utils";
+import {
+  fetchCepData,
+  formatCep,
+  parseNumber,
+  calculateDistanceFromStore,
+} from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect } from "react";
@@ -79,6 +84,18 @@ export function AddressForm({
   };
 
   const handleSubmit = async (data: Address) => {
+    if (data.distance === 0) {
+      try {
+        const fullAddress = `${data.street}, ${data.number}, ${data.neighborhood}, ${data.city}, ${data.state}`;
+        data.distance = await calculateDistanceFromStore(fullAddress);
+      } catch (error: unknown) {
+        toast({
+          variant: "destructive",
+          description: (error as Error).message || "Erro ao calcular distância",
+        });
+      }
+    }
+
     if (customer.id) {
       const url = address?.id
         ? `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${address.id}`
@@ -282,7 +299,7 @@ export function AddressForm({
                     name="distance"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Distância</FormLabel>
+                        <FormLabel>Distância (km)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
