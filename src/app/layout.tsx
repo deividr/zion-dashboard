@@ -44,8 +44,8 @@ export default async function RootLayout({
               <main className="w-full">
                 <SiteHeader />
                 <div className="container p-10">{children}</div>
+                <Toaster />
               </main>
-              <Toaster />
             </SidebarProvider>
           ) : (
             <>{children}</>
