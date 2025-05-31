@@ -12,7 +12,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { Home, ShoppingCart, SquareChartGantt, Users } from "lucide-react";
+import { Home, ShoppingCart, ChefHat, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { NavUser } from "./nav-user";
 import Image from "next/image";
@@ -36,7 +36,7 @@ const items = [
   {
     title: "Produtos",
     url: "/products",
-    icon: SquareChartGantt,
+    icon: ChefHat,
   },
 ];
 
