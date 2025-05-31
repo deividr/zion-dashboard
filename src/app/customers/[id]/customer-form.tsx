@@ -85,7 +85,7 @@ export function CustomerForm({
 
     const method = customer?.id ? "PUT" : "POST";
 
-    await fetch(url, {
+    const newCustomer = await fetch<Customer>(url, {
       method,
       body: JSON.stringify(customerUpdated),
     });
@@ -93,7 +93,7 @@ export function CustomerForm({
     if (customer?.id) {
       formCustomer.reset(customerUpdated);
     } else {
-      formCustomer.reset(defaultValues);
+      router.replace(`/customers/${newCustomer?.id}`);
     }
 
     toast({
