@@ -15,7 +15,7 @@ import {
 import { Home, ShoppingCart, SquareChartGantt, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { NavUser } from "./nav-user";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import Image from "next/image";
 
 const items = [
   {
@@ -48,15 +48,14 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <div>
-                <Avatar>
-                  <AvatarImage src="/images/logo.png" alt="La Buonapasta" />
-                  <AvatarFallback>LB</AvatarFallback>
-                </Avatar>
+            <SidebarMenuButton size="lg">
+              <Image
+                src="/images/logo.png"
+                alt="La Buonapasta"
+                width={48}
+                height={48}
+              />
+              <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="text-base font-semibold">LaBuonapasta</span>
               </div>
             </SidebarMenuButton>

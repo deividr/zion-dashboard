@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { cookies } from "next/headers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,13 +34,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { sessionId } = await auth();
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
   return (
     <ClerkProvider dynamic={true}>
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
         <body className="font-sans antialiased">
           {sessionId ? (
-            <SidebarProvider>
+            <SidebarProvider defaultOpen={defaultOpen}>
               <AppSidebar />
               <main className="w-full">
                 <SiteHeader />
