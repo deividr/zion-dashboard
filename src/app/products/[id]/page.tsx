@@ -21,24 +21,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Product, productSchema } from "@/domains/product";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
+import { formatCurrency, parseNumber } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Product } from "../columns";
-import { formatCurrency, parseNumber } from "@/lib/utils";
-
-const formSchema = z.object({
-  value: z.string(),
-  name: z.string().min(5, { message: "Nome deve ter no mínimo 5 caracteres" }),
-  unityType: z.enum(["UN", "KG"], {
-    message: "Tipo Unidade tem que ser UN ou KG",
-  }),
-});
 
 export default function ProductDetail() {
   const { fetch } = useFetchClient();
@@ -48,10 +39,11 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<Product>({
+    resolver: zodResolver(productSchema),
     defaultValues: {
-      value: "0.00",
+      id: undefined,
+      value: 0,
       name: "",
       unityType: "KG",
     },
@@ -68,7 +60,8 @@ export default function ProductDetail() {
         `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`
       );
       form.reset({
-        value: String(data?.value),
+        id: data?.id,
+        value: data?.value,
         name: data?.name,
         unityType: data?.unityType,
       });
@@ -77,10 +70,10 @@ export default function ProductDetail() {
     fetchProduct();
   }, [id, form, fetch]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: Product) => {
     const productUpdated: Product = {
       id: product?.id || "",
-      value: parseInt(values.value),
+      value: values.value,
       name: values.name,
       unityType: values.unityType,
     };
@@ -100,14 +93,16 @@ export default function ProductDetail() {
     setProduct(productUpdated);
 
     if (product?.id === "new") {
-      form.reset({ value: "0", name: "", unityType: "KG" });
+      form.reset({ value: 0, name: "", unityType: "KG" });
     } else {
-      form.reset({ ...productUpdated, value: productUpdated.value.toString() });
+      form.reset({ ...productUpdated, value: productUpdated.value });
     }
 
     toast({
       variant: "success",
-      description: `Produto ${product?.id === "new" ? "inserido" : "atualizado"}`,
+      description: `Produto ${
+        product?.id === "new" ? "inserido" : "atualizado"
+      }`,
     });
   };
 
@@ -158,14 +153,16 @@ export default function ProductDetail() {
                 <FormLabel>Valor</FormLabel>
                 <FormControl>
                   <Input
+                    inputMode="numeric"
                     {...field}
-                    value={formatCurrency(field.value)}
+                    value={formatCurrency(field.value.toString())}
                     onChange={(e) => {
-                      const rawValue = parseNumber(e.target.value);
+                      const rawValue = parseInt(parseNumber(e.target.value));
                       field.onChange(rawValue);
                     }}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />

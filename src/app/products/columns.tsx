@@ -1,16 +1,7 @@
 "use client";
 
+import { Product } from "@/domains/product";
 import { ColumnDef } from "@tanstack/react-table";
-import { z } from "zod";
-
-export const productSchema = z.object({
-  id: z.string().uuid(),
-  value: z.number().int(),
-  name: z.string(),
-  unityType: z.enum(["UN", "KG"]),
-});
-
-export type Product = z.infer<typeof productSchema>;
 
 export const columns: ColumnDef<Product>[] = [
   {
