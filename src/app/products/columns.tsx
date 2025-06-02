@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/domains/product";
+import { Product, UnityType } from "@/domains/product";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const columns: ColumnDef<Product>[] = [
@@ -11,6 +11,14 @@ export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "unityType",
     header: "Tipo Unidade",
+    cell: ({ row }) => {
+      const unityType = row.getValue("unityType");
+      return (
+        <div className="text-left">
+          {UnityType[unityType as keyof typeof UnityType]}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "value",

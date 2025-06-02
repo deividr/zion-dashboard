@@ -21,7 +21,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Product, productSchema } from "@/domains/product";
+import {
+  Select,
+  SelectContent,
+  SelectValue,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { Product, productSchema, UnityType } from "@/domains/product";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { formatCurrency, parseNumber } from "@/lib/utils";
@@ -157,6 +164,7 @@ export default function ProductDetail() {
                     {...field}
                     value={formatCurrency(field.value.toString())}
                     onChange={(e) => {
+                      console.log(form.getValues());
                       const rawValue = parseInt(parseNumber(e.target.value));
                       field.onChange(rawValue);
                     }}
@@ -172,9 +180,23 @@ export default function ProductDetail() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Tipo de Unidade</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo de unidade do produto" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.keys(UnityType).map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {UnityType[key as keyof typeof UnityType]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

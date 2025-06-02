@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Product, columns } from "./columns";
+import { columns } from "./columns";
 import { DataTable } from "../../components/data-table";
 import { FullPagination } from "@/components/full-pagination";
 import { useSearchParams } from "next/navigation";
@@ -12,6 +12,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useFetchClient } from "@/lib/fetch-client";
 import { useHeaderStore } from "@/stores/header-store";
+import { Product } from "@/domains/product";
 
 export default function Products() {
   const router = useRouter();

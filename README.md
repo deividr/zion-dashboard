@@ -40,7 +40,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 [] - Colocar um loading quando estiver pesquisando um endereço;
 [] - Não permitir mais de um endereço no mesmo cep para o mesmo cliente;
 [] - Criar categoria de produtos;
-[] - Fazer um select field para unidade de produto e para a categoria do produto;
+[] - Fazer um select field a categoria do produto;
+[X] - Fazer um select field para unidade de produto e para a categoria do produto;
 [X] - Máscara para CEP
 [X] - Ao digitar o CEP buscar o endereço automáticamente;
 [X] - Não permitir mais de um endereço default para o mesmo cliente;
