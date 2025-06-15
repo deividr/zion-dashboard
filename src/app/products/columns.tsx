@@ -1,9 +1,10 @@
 "use client";
 
+import { Category } from "@/domains";
 import { Product, UnityType } from "@/domains/product";
 import { ColumnDef } from "@tanstack/react-table";
 
-export const columns: ColumnDef<Product>[] = [
+export const columns = (categories: Category[]): ColumnDef<Product>[] => [
   {
     accessorKey: "name",
     header: "Nome",
@@ -18,6 +19,15 @@ export const columns: ColumnDef<Product>[] = [
           {UnityType[unityType as keyof typeof UnityType]}
         </div>
       );
+    },
+  },
+  {
+    accessorKey: "category",
+    header: "Categoria",
+    cell: ({ row }) => {
+      const category = categories.find((c) => c.id === row.original.categoryId);
+      if (!category) return null;
+      return <div className="text-left">{category.name}</div>;
     },
   },
   {

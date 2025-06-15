@@ -32,6 +32,7 @@ import { Product, productSchema, UnityType } from "@/domains/product";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { formatCurrency, parseNumber } from "@/lib/utils";
+import { productEndpoints } from "@/repository/productRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -58,14 +59,18 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (id === "new") {
-      setProduct({ id: "new", value: 0, unityType: "KG", name: "" });
+      setProduct({
+        id: "new",
+        value: 0,
+        unityType: "KG",
+        name: "",
+        categoryId: "",
+      });
       return;
     }
 
     const fetchProduct = async () => {
-      const data = await fetch<Product>(
-        `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`
-      );
+      const data = await fetch<Product>(productEndpoints.get(id as string));
       form.reset({
         id: data?.id,
         value: data?.value,
@@ -83,12 +88,13 @@ export default function ProductDetail() {
       value: values.value,
       name: values.name,
       unityType: values.unityType,
+      categoryId: values.categoryId,
     };
 
     const url =
       product?.id === "new"
-        ? `${process.env.NEXT_PUBLIC_HOST_API}/products`
-        : `${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`;
+        ? productEndpoints.create()
+        : productEndpoints.update(id as string);
 
     const method = product?.id === "new" ? "POST" : "PUT";
 
@@ -116,7 +122,7 @@ export default function ProductDetail() {
   const handleDelete = async () => {
     setLoading(true);
 
-    await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/products/${id}`, {
+    await fetch(productEndpoints.delete(id as string), {
       method: "DELETE",
     });
 

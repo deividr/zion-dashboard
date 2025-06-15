@@ -13,6 +13,7 @@ export const productSchema = z.object({
   unityType: z.enum(Object.keys(UnityType) as [string, string], {
     message: "Tipo de unidade inválido",
   }),
+  categoryId: z.string().uuid(),
 });
 
 export type Product = z.infer<typeof productSchema>;

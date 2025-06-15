@@ -13,6 +13,9 @@ import { useRouter } from "next/navigation";
 import { useFetchClient } from "@/lib/fetch-client";
 import { useHeaderStore } from "@/stores/header-store";
 import { Product } from "@/domains/product";
+import { productEndpoints } from "@/repository/productRepository";
+import { Category } from "@/domains";
+import { categoryEndpoints } from "@/repository/categoryRepository";
 
 export default function Products() {
   const router = useRouter();
@@ -21,6 +24,7 @@ export default function Products() {
   const [page, setPage] = useState(parseInt(params.get("page") || "1"));
   const [totalPage, setTotalPage] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [search, setSearch] = useState(params.get("search") || "");
   const { fetch } = useFetchClient();
   const setTitle = useHeaderStore((state) => state.setTitle);
@@ -32,14 +36,16 @@ export default function Products() {
   useEffect(() => {
     setLoading(true);
     const fetchProducts = async () => {
-      const data = await fetch<{
+      const dataProducts = await fetch<{
         products: Product[];
         pagination: { total: number };
-      }>(
-        `${process.env.NEXT_PUBLIC_HOST_API}/products?limit=10&page=${page}&name=${search}`
-      );
-      setProducts(data?.products || []);
-      setTotalPage(data?.pagination.total || 0);
+      }>(productEndpoints.list(page, search));
+      const dataCategories = await fetch<{
+        categories: Category[];
+      }>(categoryEndpoints.list());
+      setProducts(dataProducts?.products || []);
+      setTotalPage(dataProducts?.pagination.total || 0);
+      setCategories(dataCategories?.categories || []);
       setLoading(false);
     };
 
@@ -78,7 +84,11 @@ export default function Products() {
           <Plus /> Novo Produto
         </Button>
       </div>
-      <DataTable columns={columns} data={products} isLoading={isLoading} />
+      <DataTable
+        columns={columns(categories)}
+        data={products}
+        isLoading={isLoading}
+      />
       <FullPagination
         page={page}
         pageSize={10}
