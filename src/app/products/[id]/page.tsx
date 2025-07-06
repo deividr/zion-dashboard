@@ -24,14 +24,16 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
-  SelectValue,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
+import { Category } from "@/domains";
 import { Product, productSchema, UnityType } from "@/domains/product";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { formatCurrency, parseNumber } from "@/lib/utils";
+import { categoryEndpoints } from "@/repository/categoryRepository";
 import { productEndpoints } from "@/repository/productRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
@@ -44,6 +46,7 @@ export default function ProductDetail() {
   const router = useRouter();
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
@@ -54,6 +57,7 @@ export default function ProductDetail() {
       value: 0,
       name: "",
       unityType: "KG",
+      categoryId: "",
     },
   });
 
@@ -76,11 +80,20 @@ export default function ProductDetail() {
         value: data?.value,
         name: data?.name,
         unityType: data?.unityType,
+        categoryId: data?.categoryId,
       });
       setProduct(data);
     };
     fetchProduct();
   }, [id, form, fetch]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const dataCategories = await fetch<Category[]>(categoryEndpoints.list());
+      setCategories(dataCategories || []);
+    };
+    fetchCategories();
+  }, [fetch, setCategories]);
 
   const onSubmit = async (values: Product) => {
     const productUpdated: Product = {
@@ -145,7 +158,7 @@ export default function ProductDetail() {
         <h1 className="text-2xl font-bold">
           {product?.id !== "new" && <span>{product.name}</span>}
         </h1>
-        <div className="grid w-full max-w-sm items-center gap-6">
+        <div className="grid md:grid-cols-2 w-full items-center gap-6">
           <FormField
             control={form.control}
             name="name"
@@ -207,71 +220,93 @@ export default function ProductDetail() {
               </FormItem>
             )}
           />
-          <div className="flex justify-between gap-4 mt-5">
-            <Button
-              className="flex-1"
-              variant="ghost"
-              type="button"
-              onClick={() => router.back()}
-            >
-              <ArrowLeft />
-              Voltar
-            </Button>
-            <Button
-              className="flex-1"
-              variant="secondary"
-              type="submit"
-              disabled={[
-                form.formState.isSubmitting,
-                !form.formState.isDirty,
-              ].includes(true)}
-            >
-              {form.formState.isSubmitting ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Pencil />
-              )}
-              {product?.id === "new" ? "Adicionar" : "Savar"}
-            </Button>
-            {product.id !== "new" && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="flex-1"
-                    variant="destructive"
-                    type="button"
-                    disabled={loading}
-                  >
-                    <Trash2 />
-                    Excluir
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Tem certeza que quer excluir esse produto?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Essa ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                      <Button
-                        variant="destructive"
-                        type="button"
-                        onClick={handleDelete}
-                        disabled={loading}
-                      >
-                        Continuar
-                      </Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoria</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a categoria do produto" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.length === 0 ? (
+                      <SelectItem value="no-category" disabled>
+                        Não há categorias
+                      </SelectItem>
+                    ) : (
+                      categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
             )}
-          </div>
+          />
+        </div>
+        <div className="flex justify-end gap-4 mt-5">
+          <Button variant="ghost" type="button" onClick={() => router.back()}>
+            <ArrowLeft />
+            Voltar
+          </Button>
+          <Button
+            variant="secondary"
+            type="submit"
+            disabled={[
+              form.formState.isSubmitting,
+              !form.formState.isDirty,
+            ].includes(true)}
+          >
+            {form.formState.isSubmitting ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Pencil />
+            )}
+            {product?.id === "new" ? "Adicionar" : "Savar"}
+          </Button>
+          {product.id !== "new" && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" type="button" disabled={loading}>
+                  <Trash2 />
+                  Excluir
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Tem certeza que quer excluir esse produto?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Essa ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction asChild>
+                    <Button
+                      variant="destructive"
+                      type="button"
+                      onClick={handleDelete}
+                      disabled={loading}
+                    >
+                      Continuar
+                    </Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </form>
     </Form>

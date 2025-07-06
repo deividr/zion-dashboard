@@ -1,20 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { columns } from "./columns";
-import { DataTable } from "../../components/data-table";
 import { FullPagination } from "@/components/full-pagination";
-import { useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Category, Product } from "@/domains";
 import { useFetchClient } from "@/lib/fetch-client";
-import { useHeaderStore } from "@/stores/header-store";
-import { Product } from "@/domains/product";
 import { productEndpoints } from "@/repository/productRepository";
-import { Category } from "@/domains";
+import { useHeaderStore } from "@/stores/header-store";
+import { Plus, Search } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { DataTable } from "../../components/data-table";
+import { columns } from "./columns";
 import { categoryEndpoints } from "@/repository/categoryRepository";
 
 export default function Products() {
@@ -34,18 +31,22 @@ export default function Products() {
   }, [setTitle]);
 
   useEffect(() => {
+    const fetchCategories = async () => {
+      const dataCategories = await fetch<Category[]>(categoryEndpoints.list());
+      setCategories(dataCategories || []);
+    };
+    fetchCategories();
+  }, [setCategories, fetch]);
+
+  useEffect(() => {
     setLoading(true);
     const fetchProducts = async () => {
       const dataProducts = await fetch<{
         products: Product[];
         pagination: { total: number };
       }>(productEndpoints.list(page, search));
-      const dataCategories = await fetch<{
-        categories: Category[];
-      }>(categoryEndpoints.list());
       setProducts(dataProducts?.products || []);
       setTotalPage(dataProducts?.pagination.total || 0);
-      setCategories(dataCategories?.categories || []);
       setLoading(false);
     };
 
