@@ -27,11 +27,9 @@ export function useFetchClient() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.log(response);
-        console.log(data);
         toast({
           variant: "destructive",
-          description: data.message || response.statusText,
+          description: data.message || data.error || response.statusText,
         });
         throw new Error(response.statusText);
       }
