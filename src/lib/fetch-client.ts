@@ -24,9 +24,11 @@ export function useFetchClient() {
       };
 
       const response = await fetch(url, defaultOptions);
+      const data = await response.json();
 
       if (!response.ok) {
-        const data = await response.json();
+        console.log(response);
+        console.log(data);
         toast({
           variant: "destructive",
           description: data.message || response.statusText,
@@ -34,7 +36,7 @@ export function useFetchClient() {
         throw new Error(response.statusText);
       }
 
-      return response.json() as T;
+      return data as T;
     },
     [getToken, toast]
   );
