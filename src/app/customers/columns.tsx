@@ -1,6 +1,6 @@
 "use client";
 
-import { Customer } from "@/domains/customer";
+import { Customer } from "@/domains";
 import { formatPhone } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
