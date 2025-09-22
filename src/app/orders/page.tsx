@@ -11,11 +11,11 @@ import { useHeaderStore } from "@/stores/header-store";
 import { addDays } from "date-fns";
 import { Plus, Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { columns } from "./columns";
 import { DateRange } from "react-day-picker";
 
-export default function Products() {
+export default function Orders() {
     const router = useRouter();
     const params = useSearchParams();
     const pickupStartParam = params.get("pickupStart");
@@ -23,54 +23,77 @@ export default function Products() {
     const [isLoading, setLoading] = useState(true);
     const [page, setPage] = useState(parseInt(params.get("page") || "1"));
     const [search, setSearch] = useState(params.get("search") || "");
-    const [pickupStart, setPickupStart] = useState<Date>(
-        pickupStartParam ? new Date(pickupStartParam) : new Date()
+    const [pickupStart, setPickupStart] = useState<Date | undefined>(
+        pickupStartParam ? new Date(pickupStartParam) : undefined
     );
-    const [pickupEnd, setPickupEnd] = useState<Date>(
-        pickupEndParam ? new Date(pickupEndParam) : addDays(new Date(), 10)
+    const [pickupEnd, setPickupEnd] = useState<Date | undefined>(
+        pickupEndParam ? new Date(pickupEndParam) : undefined
     );
     const [totalPage, setTotalPage] = useState(0);
     const [orders, setOrders] = useState<Order[]>([]);
     const { fetch } = useFetchClient();
     const setTitle = useHeaderStore((state) => state.setTitle);
 
+    const buildLink = useCallback(
+        (newPage: number, newSearch: string) => {
+            const query = new URLSearchParams();
+            query.set("page", newPage.toString());
+
+            if (pickupStart) {
+                query.set("pickupStart", pickupStart.toISOString());
+            }
+
+            if (pickupEnd) {
+                query.set("pickupEnd", pickupEnd.toISOString());
+            }
+
+            if (newSearch?.length) {
+                query.set("search", newSearch);
+            }
+
+            router.replace(`?${query.toString()}`);
+        },
+        [pickupStart, pickupEnd, router]
+    );
+
     useEffect(() => {
         setTitle(["Pedidos"]);
     }, [setTitle]);
 
     useEffect(() => {
+        if (!pickupStartParam) {
+            setPickupStart(new Date());
+        }
+        if (!pickupEndParam) {
+            setPickupEnd(addDays(new Date(), 10));
+        }
+    }, [pickupStartParam, pickupEndParam]);
+
+    useEffect(() => {
+        if (!pickupStart || !pickupEnd) {
+            return;
+        }
         setLoading(true);
         const fetchOrders = async () => {
             const data = await fetch<{
                 orders: Order[];
                 pagination: { total: number };
             }>(
-                `${process.env.NEXT_PUBLIC_HOST_API}/orders?pickupDateStart=${pickupStart.toISOString()}&pickupDateEnd=${pickupEnd.toISOString()}&limit=10&page=${page}&search=${search}`
+                `${process.env.NEXT_PUBLIC_HOST_API}/orders?pickupDateStart=${pickupStart?.toISOString()}&pickupDateEnd=${pickupEnd?.toISOString()}&limit=10&page=${page}&search=${search}`
             );
             setOrders(data?.orders || []);
             setTotalPage(data?.pagination.total || 0);
             setLoading(false);
+            buildLink(page, search);
         };
 
         fetchOrders();
-    }, [page, search, pickupStart, pickupEnd, fetch]);
+    }, [page, search, pickupStart, pickupEnd, fetch, buildLink]);
 
     const handleChangePage = (newPage: number) => setPage(newPage);
     const handleChangePickup = (range?: DateRange) => {
         setPickupStart(range?.from ?? new Date());
         setPickupEnd(range?.to ?? new Date());
-    };
-
-    const buildLink = (newPage: number, newSearch: string) => {
-        const query = new URLSearchParams();
-        query.set("page", newPage.toString());
-        query.set("pickupStart", newPage.toString());
-
-        if (newSearch?.length) {
-            query.set("search", newSearch);
-        }
-
-        router.replace(`?${query.toString()}`);
     };
 
     return (
@@ -90,7 +113,6 @@ export default function Products() {
                         onChange={(e) => {
                             setPage(1);
                             setSearch(e.target.value);
-                            buildLink(1, e.target.value);
                         }}
                     />
                 </div>
