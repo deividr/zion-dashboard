@@ -1,0 +1,296 @@
+# Cursor Rules para Zion Dashboard
+
+## Visão Geral do Projeto
+
+Este é um dashboard empresarial desenvolvido com Next.js 15, TypeScript, Tailwind CSS e shadcn/ui, focado em gestão de pedidos, clientes e produtos.
+
+## Stack Tecnológica Principal
+
+-   **Framework**: Next.js 15 (App Router)
+-   **Linguagem**: TypeScript
+-   **Styling**: Tailwind CSS + shadcn/ui
+-   **Autenticação**: Clerk
+-   **Validação**: Zod schemas
+-   **Estado**: Zustand para gerenciamento global
+-   **Formulários**: React Hook Form + Zod resolvers
+-   **Tabelas**: TanStack Table
+-   **Ícones**: Lucide React
+-   **Datas**: date-fns
+-   **HTTP**: Custom fetch client hook
+
+## Arquitetura e Estrutura
+
+### Organização de Diretórios
+
+```
+src/
+├── app/                  # App Router (páginas e layouts)
+├── components/           # Componentes reutilizáveis
+│   └── ui/               # Componentes base do shadcn/ui
+├── domains/              # Schemas e tipos de domínio (Zod + TypeScript)
+├── hooks/                # Custom hooks
+├── lib/                  # Utilitários e configurações
+├── repository/           # Camada de dados/API
+└── stores/               # Estado global (Zustand)
+```
+
+### Padrões de Nomenclatura
+
+-   **Arquivos**: kebab-case (ex: `customer-form.tsx`)
+-   **Componentes**: PascalCase (ex: `CustomerForm`)
+-   **Hooks**: camelCase iniciando com "use" (ex: `useFetchClient`)
+-   **Stores**: camelCase terminando com "Store" (ex: `headerStore`)
+-   **Tipos/Interfaces**: PascalCase (ex: `Order`, `Customer`)
+
+## Padrões de Código
+
+### Componentes React
+
+-   Use `"use client"` apenas quando necessário (state, events, browser APIs)
+-   Prefira Server Components quando possível
+-   Exporte como default para componentes de página
+-   Use interface props quando o componente tem propriedades complexas
+
+```typescript
+// Exemplo de componente com client-side logic
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface CustomerFormProps {
+    customerId?: string;
+    onSubmit: (data: Customer) => void;
+}
+
+export function CustomerForm({ customerId, onSubmit }: CustomerFormProps) {
+    // Implementation
+}
+```
+
+### Schemas de Domínio
+
+-   Use Zod para validação e tipagem
+-   Crie schemas centralizados em `/domains`
+-   Exporte tanto o schema quanto o tipo inferido
+
+```typescript
+// domains/order.ts
+import { z } from "zod";
+
+export const orderSchema = z.object({
+    id: z.string().uuid().optional(),
+    number: z.number().int(),
+    pickupDate: z.date(),
+    // ... outros campos
+});
+
+export type Order = z.infer<typeof orderSchema>;
+```
+
+### API e Fetch
+
+-   Use o hook `useFetchClient` para chamadas autenticadas
+-   Implemente error handling via toast notifications
+-   Tipagem explícita nas respostas da API
+
+```typescript
+const { fetch } = useFetchClient();
+
+const data = await fetch<{
+    orders: Order[];
+    pagination: { total: number };
+}>(`${process.env.NEXT_PUBLIC_HOST_API}/orders?${params}`);
+```
+
+### Estado Global (Zustand)
+
+-   Use Zustand para estado que precisa ser compartilhado
+-   Mantenha stores focados e específicos
+-   Prefira estado local quando possível
+
+```typescript
+// stores/header-store.ts
+interface HeaderState {
+    title: string[];
+    setTitle: (title: string[]) => void;
+}
+
+export const useHeaderStore = create<HeaderState>((set) => ({
+    title: [],
+    setTitle: (title) => set({ title }),
+}));
+```
+
+### Formulários
+
+-   Use React Hook Form + Zod resolver
+-   Validação client-side com schemas de domínio
+-   Componentes form consistentes do shadcn/ui
+
+### Tabelas de Dados
+
+-   Use TanStack Table com componente `DataTable` reutilizável
+-   Defina colunas em arquivos separados (`columns.tsx`)
+-   Implemente paginação com componente `FullPagination`
+
+### Styling
+
+-   Use Tailwind CSS com design system do shadcn/ui
+-   Prefira utility classes a CSS customizado
+-   Use `cn()` utility para conditional classes
+-   Mantenha responsividade (mobile-first)
+
+```typescript
+import { cn } from "@/lib/utils";
+
+<Button
+  className={cn(
+    "md:order-3",
+    isLoading && "opacity-50"
+  )}
+>
+```
+
+### Componentes shadcn/ui
+
+-   **SEMPRE** use o CLI oficial do shadcn para instalar novos componentes
+-   **NUNCA** crie componentes UI manualmente quando existem no shadcn
+-   Use `pnpm dlx shadcn@latest add [component-name]` para instalar componentes
+-   Todos os componentes ficam em `src/components/ui/`
+-   **Use imports centralizados** via `@/components/ui` (arquivo index.ts)
+
+```bash
+# Exemplos de instalação de componentes:
+pnpm dlx shadcn@latest add badge
+pnpm dlx shadcn@latest add card
+pnpm dlx shadcn@latest add dialog
+pnpm dlx shadcn@latest add sheet
+pnpm dlx shadcn@latest add tabs
+
+# Para instalar múltiplos componentes:
+pnpm dlx shadcn@latest add badge card dialog sheet
+```
+
+```typescript
+// ✅ Correto - Import centralizado via index.ts
+import { Button, Badge, Card, CardContent, Avatar } from "@/components/ui";
+
+// ❌ Evitar - Imports individuais
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+```
+
+**Componentes já instalados no projeto:**
+
+-   `alert-dialog`
+-   `avatar`
+-   `badge`
+-   `breadcrumb`
+-   `button`
+-   `calendar`
+-   `card`
+-   `dropdown-menu`
+-   `form`
+-   `input`
+-   `label`
+-   `pagination`
+-   `popover`
+-   `select`
+-   `separator`
+-   `sheet`
+-   `sidebar`
+-   `skeleton`
+-   `table`
+-   `toast`
+-   `toaster`
+-   `tooltip`
+
+## Boas Práticas
+
+### Performance
+
+-   Use Server Components sempre que possível
+-   Implemente loading states para operações assíncronas
+-   Otimize imagens com next/image
+-   Use dynamic imports para code splitting quando necessário
+
+### UX/UI
+
+-   Sempre forneça feedback visual (loading, success, error states)
+-   Use toast notifications para feedback de ações
+-   Implemente skeleton loading para melhor percepção de performance
+-   Mantenha consistência com design system do shadcn/ui
+
+### Navegação e URLs
+
+-   Use URL params para estados que devem ser shareable/bookmarkable
+-   Implemente navegação programática com useRouter
+-   Mantenha query strings sincronizados com estado local
+
+```typescript
+const buildLink = useCallback(
+    (newPage: number, newSearch: string) => {
+        const query = new URLSearchParams();
+        query.set("page", newPage.toString());
+        if (newSearch?.length) {
+            query.set("search", newSearch);
+        }
+        router.replace(`?${query.toString()}`);
+    },
+    [router]
+);
+```
+
+### Tratamento de Erros
+
+-   Use try/catch com toast notifications
+-   Implemente fallbacks adequados
+-   Log erros importantes no console para debugging
+
+### Acessibilidade
+
+-   Use componentes semânticos do shadcn/ui
+-   Implemente navegação por teclado
+-   Mantenha contraste adequado
+-   Use labels descritivos
+
+## Convenções Específicas do Projeto
+
+### Páginas
+
+-   Páginas de listagem: implementar busca, filtros e paginação
+-   Páginas de detalhes: usar dynamic routes `[id]`
+-   Formulários: separar em componentes reutilizáveis
+
+### Dados
+
+-   URLs da API via `process.env.NEXT_PUBLIC_HOST_API`
+-   Autenticação automática via `useFetchClient`
+-   Paginação padrão: 10 items por página
+
+### Layout
+
+-   Sidebar colapsível com estado persistido
+-   Header dinâmico controlado por Zustand
+-   Container padrão com padding de 10
+
+## Comandos e Scripts
+
+-   `pnpm dev`: desenvolvimento local
+-   `pnpm build`: build de produção
+-   `pnpm lint`: linting
+-   `pnpm commit`: commit com conventional commits
+-   `dev:docker`: desenvolvimento com Docker
+
+## Considerações de Deploy
+
+-   Use variáveis de ambiente para configurações
+-   Configure Clerk para produção
+-   Otimize assets e imagens
+-   Configure CSP adequado para segurança
+
+---
+
+**Lembre-se**: Mantenha consistência com os padrões existentes, use TypeScript de forma rigorosa, e sempre teste as funcionalidades em diferentes breakpoints responsivos.
