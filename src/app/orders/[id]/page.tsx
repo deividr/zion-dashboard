@@ -435,6 +435,60 @@ export default function OrderDetail() {
                             </div>
                         </div>
 
+                        {/* Address Information */}
+                        {order.address && (
+                            <>
+                                <Separator />
+
+                                <div>
+                                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                                        <MapPin className="h-4 w-4" />
+                                        Endereço de Entrega
+                                    </h3>
+                                    <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
+                                        <div className="flex items-start gap-3">
+                                            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                            <div className="space-y-1 flex-1">
+                                                <p className="font-medium">
+                                                    {order.address.street},{" "}
+                                                    {order.address.number}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {order.address.neighborhood}{" "}
+                                                    - {order.address.city}/
+                                                    {order.address.state}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    CEP:{" "}
+                                                    {order.address.cep.replace(
+                                                        /(\d{5})(\d{3})/,
+                                                        "$1-$2"
+                                                    )}
+                                                </p>
+                                                {order.address
+                                                    .aditionalDetails && (
+                                                    <p className="text-sm text-muted-foreground italic">
+                                                        {
+                                                            order.address
+                                                                .aditionalDetails
+                                                        }
+                                                    </p>
+                                                )}
+                                                {order.address.distance > 0 && (
+                                                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                                        <MapPin className="h-3 w-3" />
+                                                        Distância:{" "}
+                                                        {order.address.distance}{" "}
+                                                        km
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
                         <Separator />
 
                         {/* Order Details */}

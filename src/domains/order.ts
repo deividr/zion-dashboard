@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { customerSchema } from "./customer";
 import { UnityType } from "./product";
+import { addressSchema } from "./address";
 
 export const orderSubproductSchema = z.object({
     id: z.string().uuid().optional(),
@@ -47,7 +48,7 @@ export const orderSchema = z.object({
         .transform((val) => {
             return typeof val === "string" ? new Date(val) : val;
         }),
-    customerId: z.string().uuid(),
+    address: addressSchema.optional(),
     customer: customerSchema.optional(),
     employeeId: z.string().uuid(),
     orderLocal: z.string(),
