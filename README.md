@@ -1,47 +1,260 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍝 Zion Dashboard - LaBuonapasta
 
-## Getting Started
+Sistema completo de gestão comercial desenvolvido para a LaBuonapasta, uma empresa de alimentação especializada em massas e pratos italianos. O dashboard oferece controle total sobre clientes, produtos, pedidos e logística de entrega.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-15.0.3-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![React](https://img.shields.io/badge/React-18.3.1-blue)
+![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06B6D4)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🎯 Visão Geral
+
+O Zion Dashboard é uma solução completa de ERP/CRM focada no ramo alimentício, oferecendo:
+
+-   **Gestão de Clientes**: Cadastro completo com múltiplos endereços e validação de CEP
+-   **Catálogo de Produtos**: Controle de produtos, categorias e unidades de medida
+-   **Sistema de Pedidos**: Gerenciamento completo do ciclo de pedidos com tracking
+-   **Logística**: Cálculo automático de distância e controle de entrega
+-   **Dashboard Analítico**: Métricas e relatórios em tempo real
+-   **Autenticação Segura**: Sistema de login integrado com Clerk
+
+## 🏗️ Arquitetura Técnica
+
+### Stack Principal
+
+-   **Frontend**: Next.js 15 com App Router
+-   **UI Framework**: React 18 + TypeScript
+-   **Styling**: Tailwind CSS + shadcn/ui components
+-   **State Management**: Zustand para estado global
+-   **Formulários**: React Hook Form + Zod para validação
+-   **Autenticação**: Clerk (OAuth, JWT)
+-   **Tabelas**: TanStack Table com paginação
+-   **Containerização**: Docker + Docker Compose
+
+### Estrutura de Domínios
+
+```
+src/domains/
+├── customer.ts     # Clientes e validações
+├── address.ts      # Endereços com validação CEP
+├── product.ts      # Produtos e categorias
+├── order.ts        # Pedidos e sub-produtos
+└── category.ts     # Categorias de produtos
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Componentes Principais
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+-   **DataTable**: Tabelas reutilizáveis com filtros
+-   **Forms**: Formulários inteligentes com validação
+-   **Sidebar**: Navegação responsiva
+-   **AddressForm**: Formulário com busca automática por CEP
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Setup e Desenvolvimento
 
-## Learn More
+### Pré-requisitos
 
-To learn more about Next.js, take a look at the following resources:
+-   Node.js 18+
+-   pnpm (recomendado)
+-   Docker (opcional)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Instalação Local
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Clonar o repositório
+git clone <repository-url>
+cd zion-dashboard
 
-## Deploy on Vercel
+# Instalar dependências
+pnpm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Configurar variáveis de ambiente
+cp .env.example .env.local
+# Configurar NEXT_PUBLIC_HOST_API e chaves do Clerk
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Iniciar em modo desenvolvimento
+pnpm dev
+```
+
+### Docker Development
+
+```bash
+# Iniciar com Docker
+pnpm run dev:docker
+
+# Acessar em http://localhost:3001
+```
+
+### Build para Produção
+
+```bash
+pnpm build
+pnpm start
+```
+
+## 📱 Funcionalidades Implementadas
+
+### ✅ Sistema de Clientes
+
+-   [x] CRUD completo de clientes
+-   [x] Gestão de múltiplos endereços por cliente
+-   [x] Validação automática de CEP via API
+-   [x] Cálculo de distância da loja
+-   [x] Máscara para telefones e CEP
+-   [x] Validação de endereço padrão único
+
+### ✅ Gestão de Produtos
+
+-   [x] Cadastro de produtos com categorias
+-   [x] Controle de unidades (UN, KG, LT)
+-   [x] Sistema de categorias
+-   [x] Validação de preços e quantidades
+-   [x] Interface responsiva
+
+### ✅ Sistema de Pedidos
+
+-   [x] Listagem com filtros avançados
+-   [x] Filtro por data de pickup
+-   [x] Busca por cliente/produto
+-   [x] Visualização detalhada de pedidos
+-   [x] Controle de status (entregue/pendente)
+
+### ✅ Interface e UX
+
+-   [x] Design system com shadcn/ui
+-   [x] Sidebar responsiva e colapsível
+-   [x] Tema consistente e moderno
+-   [x] Toasts para feedback
+-   [x] Loading states
+-   [x] Navegação breadcrumb dinâmica
+
+### ✅ Autenticação e Segurança
+
+-   [x] Login seguro com Clerk
+-   [x] Proteção de rotas
+-   [x] Gerenciamento de sessão
+-   [x] Validação de formulários
+
+## 🎨 Screenshots
+
+### Dashboard Principal
+
+_Interface clean e moderna com navegação intuitiva_
+
+### Gestão de Clientes
+
+_Listagem com busca e filtros + Formulário de edição com endereços_
+
+### Sistema de Pedidos
+
+_Controle completo do ciclo de pedidos com filtros por data_
+
+## 🔧 Configuração de Ambiente
+
+### Variáveis Obrigatórias
+
+```env
+NEXT_PUBLIC_HOST_API=http://localhost:8000/api
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+```
+
+## 📦 Scripts Disponíveis
+
+```bash
+pnpm dev           # Desenvolvimento local
+pnpm dev:docker    # Desenvolvimento com Docker
+pnpm build         # Build para produção
+pnpm start         # Iniciar produção
+pnpm lint          # Linting
+pnpm commit        # Commit com Conventional Commits
+```
+
+## 🌐 Deploy
+
+### Vercel (Recomendado)
+
+1. Conectar repositório no Vercel
+2. Configurar variáveis de ambiente
+3. Deploy automático
+
+### Docker Production
+
+```bash
+docker build -t zion-dashboard .
+docker run -p 3000:3000 zion-dashboard
+```
 
 ## TODO
 
-[] - Colocar um loading quando estiver pesquisando um endereço;
-[] - Não permitir mais de um endereço no mesmo cep para o mesmo cliente;
-[X] - Criar categoria de produtos;
-[X] - Fazer um select field a categoria do produto;
-[X] - Fazer um select field para unidade de produto e para a categoria do produto;
-[X] - Máscara para CEP
-[X] - Ao digitar o CEP buscar o endereço automáticamente;
-[X] - Não permitir mais de um endereço default para o mesmo cliente;
+### 🔥 Urgente
+
+-   [ ] **Os endereços não estão sendo salvos** - Investigar problema na função `onSubmitAddress` no `address-section.tsx`
+-   [ ] Validar se o customer.id está sendo passado corretamente para a API
+
+### 🎯 Funcionalidades Core
+
+-   [ ] **Melhorar UX de Endereços**
+    -   [ ] Loading indicator ao pesquisar endereço por CEP
+    -   [ ] Validação: impedir endereços duplicados no mesmo CEP para o mesmo cliente
+    -   [ ] Confirmação visual quando endereço for salvo com sucesso
+-   [ ] **Sistema de Pedidos**
+    -   [ ] Implementar criação de novos pedidos (página `/orders/new`)
+    -   [ ] Melhorar filtros e busca na listagem de pedidos
+    -   [ ] Adicionar status de entrega/pickup nos pedidos
+-   [ ] **Dashboard Principal**
+    -   [ ] Implementar homepage com métricas e widgets
+    -   [ ] Gráficos de vendas por período
+    -   [ ] Resumo de pedidos pendentes
+
+### 🔧 Melhorias Técnicas
+
+-   [ ] **Performance**
+    -   [ ] Implementar paginação server-side nas listagens
+    -   [ ] Otimizar queries e carregamento de dados
+    -   [ ] Adicionar cache para dados estáticos (categorias, etc.)
+-   [ ] **UX/UI**
+
+    -   [ ] Implementar skeleton loading em todas as páginas
+    -   [ ] Melhorar responsividade mobile
+    -   [ ] Adicionar dark mode
+    -   [ ] Implementar breadcrumbs dinâmicos
+
+-   [ ] **Validações e Segurança**
+    -   [ ] Validação de formulários mais robusta
+    -   [ ] Tratamento de erro global
+    -   [ ] Logs de auditoria para ações críticas
+
+### 📱 Funcionalidades Futuras
+
+-   [ ] **Relatórios**
+    -   [ ] Relatório de vendas por período
+    -   [ ] Relatório de clientes mais ativos
+    -   [ ] Análise de produtos mais vendidos
+-   [ ] **Integração**
+    -   [ ] API de correios para frete automático
+    -   [ ] Integração com WhatsApp para notificações
+    -   [ ] Sistema de backup automático
+
+### ✅ Concluído
+
+-   [x] Criar categoria de produtos
+-   [x] Select field para categoria do produto
+-   [x] Select field para unidade de produto
+-   [x] Máscara para CEP
+-   [x] Busca automática de endereço por CEP
+-   [x] Validação: apenas um endereço default por cliente
+-   [x] Sistema de autenticação com Clerk
+-   [x] CRUD completo de clientes
+-   [x] CRUD completo de produtos
+-   [x] Listagem e detalhes de pedidos
+
+---
+
+**Legenda:**
+
+-   🔥 Urgente: Bugs críticos que afetam funcionalidade principal
+-   🎯 Core: Funcionalidades essenciais para o negócio
+-   🔧 Melhorias: Otimizações e melhorias de experiência
+-   📱 Futuras: Funcionalidades planejadas para próximas versões
