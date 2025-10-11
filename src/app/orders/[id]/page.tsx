@@ -24,6 +24,10 @@ import {
     TableHead,
     TableHeader,
     TableRow,
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
 } from "@/components/ui";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -231,329 +235,421 @@ export default function OrderDetail() {
             .toUpperCase() || "?";
 
     return (
-        <div className="space-y-6">
-            {/* Header Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
-                <Button
-                    onClick={() => router.back()}
-                    variant="outline"
-                    className="w-fit"
-                >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Voltar
-                </Button>
+        <TooltipProvider>
+            <div className="space-y-6">
+                {/* Header Actions */}
+                <div className="flex justify-between items-center gap-4">
+                    {/* Botão Voltar */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                onClick={() => router.back()}
+                                variant="outline"
+                                size="icon"
+                                className="sm:hidden"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Voltar</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    {!order.isPickedUp && (
-                        <Button
-                            onClick={handleMarkAsPickedUp}
-                            disabled={isUpdating}
-                            variant="default"
-                        >
-                            {isUpdating ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                            ) : (
-                                <CheckCircle className="mr-2 h-4 w-4" />
+                    <Button
+                        onClick={() => router.back()}
+                        variant="outline"
+                        className="hidden sm:flex"
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Voltar
+                    </Button>
+
+                    {/* Botões de Ação */}
+                    <div className="flex gap-2">
+                        {/* Mobile: apenas ícones */}
+                        <div className="flex gap-2 sm:hidden">
+                            {!order.isPickedUp && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={handleMarkAsPickedUp}
+                                            disabled={isUpdating}
+                                            variant="default"
+                                            size="icon"
+                                        >
+                                            {isUpdating ? (
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                                            ) : (
+                                                <CheckCircle className="h-4 w-4" />
+                                            )}
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Marcar como Retirado</p>
+                                    </TooltipContent>
+                                </Tooltip>
                             )}
-                            Marcar como Retirado
-                        </Button>
-                    )}
 
-                    <Button onClick={handleEdit} variant="outline">
-                        <Edit className="mr-2 h-4 w-4" />
-                        Editar
-                    </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={handleEdit}
+                                        variant="outline"
+                                        size="icon"
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Editar</p>
+                                </TooltipContent>
+                            </Tooltip>
 
-                    <Button onClick={handleDelete} variant="destructive">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Excluir
-                    </Button>
-                </div>
-            </div>
-
-            {/* Order Status Card */}
-            <Card>
-                <CardHeader>
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                        <div>
-                            <CardTitle className="flex items-center gap-2">
-                                <Package className="h-5 w-5" />
-                                Pedido #{order.number}
-                            </CardTitle>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                Criado em{" "}
-                                {formatDate(
-                                    order.createdAt,
-                                    "dd 'de' MMMM 'de' yyyy 'às' HH:mm"
-                                )}
-                            </p>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={handleDelete}
+                                        variant="destructive"
+                                        size="icon"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Excluir</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
-                        <Badge
-                            variant={order.isPickedUp ? "default" : "secondary"}
-                            className={
-                                order.isPickedUp
-                                    ? "bg-green-100 text-green-800 hover:bg-green-200"
-                                    : ""
-                            }
-                        >
-                            {order.isPickedUp ? "Retirado" : "Pendente"}
-                        </Badge>
+
+                        {/* Desktop: botões com texto */}
+                        <div className="hidden sm:flex gap-2">
+                            {!order.isPickedUp && (
+                                <Button
+                                    onClick={handleMarkAsPickedUp}
+                                    disabled={isUpdating}
+                                    variant="default"
+                                >
+                                    {isUpdating ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                                    ) : (
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                    )}
+                                    Marcar como Retirado
+                                </Button>
+                            )}
+
+                            <Button onClick={handleEdit} variant="outline">
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                            </Button>
+
+                            <Button
+                                onClick={handleDelete}
+                                variant="destructive"
+                            >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Excluir
+                            </Button>
+                        </div>
                     </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    {/* Customer Information */}
-                    <div>
-                        <h3 className="font-semibold mb-3 flex items-center gap-2">
-                            <User className="h-4 w-4" />
-                            Informações do Cliente
-                        </h3>
-                        <div className="flex items-start gap-4 p-4 border rounded-lg bg-muted/50">
-                            <Avatar className="h-12 w-12">
-                                <AvatarImage src="" />
-                                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                                    {customerInitials}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-                                <div>
-                                    <p className="font-medium">
-                                        {order.customer?.name}
-                                    </p>
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                        <Phone className="h-3 w-3" />
-                                        {formatPhone(
-                                            order.customer?.phone || ""
+                </div>
+
+                {/* Order Status Card */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Package className="h-5 w-5" />
+                                    Pedido #{order.number}
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    Criado em{" "}
+                                    {formatDate(
+                                        order.createdAt,
+                                        "dd 'de' MMMM 'de' yyyy 'às' HH:mm"
+                                    )}
+                                </p>
+                            </div>
+                            <Badge
+                                variant={
+                                    order.isPickedUp ? "default" : "secondary"
+                                }
+                                className={
+                                    order.isPickedUp
+                                        ? "bg-green-100 text-green-800 hover:bg-green-200"
+                                        : ""
+                                }
+                            >
+                                {order.isPickedUp ? "Retirado" : "Pendente"}
+                            </Badge>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {/* Customer Information */}
+                        <div>
+                            <h3 className="font-semibold mb-3 flex items-center gap-2">
+                                <User className="h-4 w-4" />
+                                Informações do Cliente
+                            </h3>
+                            <div className="flex items-start gap-4 p-4 border rounded-lg bg-muted/50">
+                                <Avatar className="h-12 w-12">
+                                    <AvatarImage src="" />
+                                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                                        {customerInitials}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                                    <div>
+                                        <p className="font-medium">
+                                            {order.customer?.name}
+                                        </p>
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                            <Phone className="h-3 w-3" />
+                                            {formatPhone(
+                                                order.customer?.phone || ""
+                                            )}
+                                        </div>
+                                        {order.customer?.email && (
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                                <Mail className="h-3 w-3" />
+                                                {order.customer.email}
+                                            </div>
                                         )}
                                     </div>
-                                    {order.customer?.email && (
-                                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                            <Mail className="h-3 w-3" />
-                                            {order.customer.email}
+                                    {order.customer?.phone2 && (
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                Telefone 2:
+                                            </p>
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <Phone className="h-3 w-3" />
+                                                {formatPhone(
+                                                    order.customer.phone2
+                                                )}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
-                                {order.customer?.phone2 && (
-                                    <div>
-                                        <p className="text-sm font-medium">
-                                            Telefone 2:
-                                        </p>
-                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                            <Phone className="h-3 w-3" />
-                                            {formatPhone(order.customer.phone2)}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Order Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
-                        <div className="space-y-4">
-                            <h3 className="font-semibold flex items-center gap-2">
-                                <Calendar className="h-4 w-4" />
-                                Detalhes do Pedido
-                            </h3>
-
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3 p-3 border rounded-lg">
-                                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                                    <div>
-                                        <p className="text-sm font-medium">
-                                            Data de Retirada
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {formatDate(
-                                                order.pickupDate,
-                                                "dd 'de' MMMM 'de' yyyy"
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 p-3 border rounded-lg">
-                                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                                    <div>
-                                        <p className="text-sm font-medium">
-                                            Local/Geladeira
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {order.orderLocal}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 p-3 border rounded-lg">
-                                    <Clock className="h-4 w-4 text-muted-foreground" />
-                                    <div>
-                                        <p className="text-sm font-medium">
-                                            Última Atualização
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {formatDate(
-                                                order.updatedAt,
-                                                "dd/MM/yyyy 'às' HH:mm"
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
-                        {/* Observations */}
-                        <div className="space-y-4 flex flex-col h-full">
-                            <h3 className="font-semibold">Observações</h3>
-                            <div className="p-4 border rounded-lg bg-muted/50 flex-1 flex items-start">
-                                {order.observations ? (
-                                    <p className="text-sm whitespace-pre-wrap">
-                                        {order.observations}
-                                    </p>
-                                ) : (
-                                    <p className="text-sm text-muted-foreground italic">
-                                        Nenhuma observação adicionada a este
-                                        pedido.
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                        <Separator />
 
-            {/* Products Section */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5" />
-                        Produtos do Pedido
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {Array.isArray(order.products) &&
-                    order.products.length > 0 ? (
-                        <div className="space-y-6">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Produto</TableHead>
-                                        <TableHead className="text-right">
-                                            Qtd
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Preço Unit.
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Subtotal
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {order.products.map((product, index) => (
-                                        <React.Fragment
-                                            key={product.id || index}
-                                        >
-                                            {/* Produto Principal */}
-                                            <TableRow>
-                                                <TableCell className="font-medium">
-                                                    <div className="flex items-center gap-2">
-                                                        <Package className="h-4 w-4 text-primary" />
-                                                        {product.name}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {`${
-                                                        product.unityType ===
-                                                        "UN"
-                                                            ? product.quantity
-                                                            : product.quantity /
-                                                              1000
-                                                    } ${product.unityType}`}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {formatCurrency(
-                                                        product.price
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right font-medium">
-                                                    {formatCurrency(
-                                                        calculateProductSubtotal(
-                                                            product.unityType,
-                                                            product.quantity,
-                                                            product.price
-                                                        )
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
+                        {/* Order Details */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
+                            <div className="space-y-4">
+                                <h3 className="font-semibold flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    Detalhes do Pedido
+                                </h3>
 
-                                            {/* Subprodutos */}
-                                            {product.subProducts &&
-                                                product.subProducts.map(
-                                                    (subProduct, subIndex) => (
-                                                        <TableRow
-                                                            key={
-                                                                subProduct.id ||
-                                                                `${index}-${subIndex}`
-                                                            }
-                                                            className="bg-muted/30"
-                                                        >
-                                                            <TableCell className="pl-8">
-                                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                                    <div className="w-2 h-2 bg-primary/50 rounded-full" />
-                                                                    {
-                                                                        subProduct.name
-                                                                    }
-                                                                </div>
-                                                            </TableCell>
-                                                            <TableCell className="text-right text-sm text-muted-foreground">
-                                                                -
-                                                            </TableCell>
-                                                            <TableCell className="text-right text-sm text-muted-foreground">
-                                                                -
-                                                            </TableCell>
-                                                            <TableCell className="text-right text-sm text-muted-foreground">
-                                                                -
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )
-                                                )}
-                                        </React.Fragment>
-                                    ))}
-                                </TableBody>
-                            </Table>
-
-                            <Separator />
-
-                            {/* Total do Pedido */}
-                            <div className="flex justify-end">
-                                <div className="bg-primary/10 p-4 rounded-lg border">
-                                    <div className="flex items-center gap-3">
-                                        <DollarSign className="h-5 w-5 text-primary" />
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-3 p-3 border rounded-lg">
+                                        <Calendar className="h-4 w-4 text-muted-foreground" />
                                         <div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                Total do Pedido
+                                            <p className="text-sm font-medium">
+                                                Data de Retirada
                                             </p>
-                                            <p className="text-2xl font-bold text-primary">
-                                                {formatCurrency(
-                                                    calculateOrderTotal()
+                                            <p className="text-sm text-muted-foreground">
+                                                {formatDate(
+                                                    order.pickupDate,
+                                                    "dd 'de' MMMM 'de' yyyy"
+                                                )}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 p-3 border rounded-lg">
+                                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                Local/Geladeira
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {order.orderLocal}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 p-3 border rounded-lg">
+                                        <Clock className="h-4 w-4 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                Última Atualização
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {formatDate(
+                                                    order.updatedAt,
+                                                    "dd/MM/yyyy 'às' HH:mm"
                                                 )}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Observations */}
+                            <div className="space-y-4 flex flex-col h-full">
+                                <h3 className="font-semibold">Observações</h3>
+                                <div className="p-4 border rounded-lg bg-muted/50 flex-1 flex items-start">
+                                    {order.observations ? (
+                                        <p className="text-sm whitespace-pre-wrap">
+                                            {order.observations}
+                                        </p>
+                                    ) : (
+                                        <p className="text-sm text-muted-foreground italic">
+                                            Nenhuma observação adicionada a este
+                                            pedido.
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="text-center py-8">
-                            <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                            <p className="text-muted-foreground">
-                                Nenhum produto adicionado a este pedido.
-                            </p>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Products Section */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <ShoppingCart className="h-5 w-5" />
+                            Produtos do Pedido
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {Array.isArray(order.products) &&
+                        order.products.length > 0 ? (
+                            <div className="space-y-6">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Produto</TableHead>
+                                            <TableHead className="text-right">
+                                                Qtd
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Preço Unit.
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Subtotal
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {order.products.map(
+                                            (product, index) => (
+                                                <React.Fragment
+                                                    key={product.id || index}
+                                                >
+                                                    {/* Produto Principal */}
+                                                    <TableRow>
+                                                        <TableCell className="font-medium">
+                                                            <div className="flex items-center gap-2">
+                                                                <Package className="h-4 w-4 text-primary" />
+                                                                {product.name}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {`${
+                                                                product.unityType ===
+                                                                "UN"
+                                                                    ? product.quantity
+                                                                    : product.quantity /
+                                                                      1000
+                                                            } ${
+                                                                product.unityType
+                                                            }`}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {formatCurrency(
+                                                                product.price
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-right font-medium">
+                                                            {formatCurrency(
+                                                                calculateProductSubtotal(
+                                                                    product.unityType,
+                                                                    product.quantity,
+                                                                    product.price
+                                                                )
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+
+                                                    {/* Subprodutos */}
+                                                    {product.subProducts &&
+                                                        product.subProducts.map(
+                                                            (
+                                                                subProduct,
+                                                                subIndex
+                                                            ) => (
+                                                                <TableRow
+                                                                    key={
+                                                                        subProduct.id ||
+                                                                        `${index}-${subIndex}`
+                                                                    }
+                                                                    className="bg-muted/30"
+                                                                >
+                                                                    <TableCell className="pl-8">
+                                                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                                            <div className="w-2 h-2 bg-primary/50 rounded-full" />
+                                                                            {
+                                                                                subProduct.name
+                                                                            }
+                                                                        </div>
+                                                                    </TableCell>
+                                                                    <TableCell className="text-right text-sm text-muted-foreground">
+                                                                        -
+                                                                    </TableCell>
+                                                                    <TableCell className="text-right text-sm text-muted-foreground">
+                                                                        -
+                                                                    </TableCell>
+                                                                    <TableCell className="text-right text-sm text-muted-foreground">
+                                                                        -
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        )}
+                                                </React.Fragment>
+                                            )
+                                        )}
+                                    </TableBody>
+                                </Table>
+
+                                <Separator />
+
+                                {/* Total do Pedido */}
+                                <div className="flex justify-end">
+                                    <div className="bg-primary/10 p-4 rounded-lg border">
+                                        <div className="flex items-center gap-3">
+                                            <DollarSign className="h-5 w-5 text-primary" />
+                                            <div>
+                                                <p className="text-sm font-medium text-muted-foreground">
+                                                    Total do Pedido
+                                                </p>
+                                                <p className="text-2xl font-bold text-primary">
+                                                    {formatCurrency(
+                                                        calculateOrderTotal()
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                <p className="text-muted-foreground">
+                                    Nenhum produto adicionado a este pedido.
+                                </p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        </TooltipProvider>
     );
 }
