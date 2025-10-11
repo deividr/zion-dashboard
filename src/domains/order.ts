@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { customerSchema } from "./customer";
+import { UnityType } from "./product";
 
 export const orderSubproductSchema = z.object({
     id: z.string().uuid().optional(),
     orderId: z.string().uuid(),
     productId: z.string().uuid(),
-    quantity: z.number().int(),
-    price: z.number().int(),
+    name: z.string(),
 });
 
 export type OrderSubproduct = z.infer<typeof orderSubproductSchema>;
@@ -15,8 +15,12 @@ export const orderProductsSchema = z.object({
     id: z.string().uuid().optional(),
     orderId: z.string().uuid(),
     productId: z.string().uuid(),
+    unityType: z.enum(Object.keys(UnityType) as [string, string], {
+        message: "Tipo de unidade inválido",
+    }),
     quantity: z.number().int(),
     price: z.number().int(),
+    name: z.string(),
     subProducts: z.array(orderSubproductSchema).optional(),
 });
 

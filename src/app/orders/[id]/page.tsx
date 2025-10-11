@@ -86,32 +86,24 @@ export default function OrderDetail() {
         }).format(value / 100); // Assumindo que os valores estão em centavos
     };
 
-    // Função para calcular subtotal de um produto
-    const calculateProductSubtotal = (quantity: number, price: number) => {
-        return quantity * price;
+    const calculateProductSubtotal = (
+        unityType: string,
+        quantity: number,
+        price: number
+    ) => {
+        return (unityType === "UN" ? quantity : quantity / 1000) * price;
     };
 
-    // Função para calcular total do pedido
     const calculateOrderTotal = () => {
         if (!order?.products) return 0;
 
         return order.products.reduce((total, product) => {
             const productTotal = calculateProductSubtotal(
+                product.unityType,
                 product.quantity,
                 product.price
             );
-            const subproductsTotal =
-                product.subProducts?.reduce((subTotal, subProduct) => {
-                    return (
-                        subTotal +
-                        calculateProductSubtotal(
-                            subProduct.quantity,
-                            subProduct.price
-                        )
-                    );
-                }, 0) || 0;
-
-            return total + productTotal + subproductsTotal;
+            return total + productTotal;
         }, 0);
     };
 
@@ -192,7 +184,7 @@ export default function OrderDetail() {
                 variant: "success",
                 description: "Pedido excluído com sucesso!",
             });
-            router.push("/orders");
+            router.back();
         } catch (error) {
             console.error("Erro ao excluir pedido:", error);
         }
@@ -223,10 +215,7 @@ export default function OrderDetail() {
                         O pedido solicitado não existe ou foi removido.
                     </p>
                 </div>
-                <Button
-                    onClick={() => router.push("/orders")}
-                    variant="outline"
-                >
+                <Button onClick={() => router.back()} variant="outline">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Voltar para Pedidos
                 </Button>
@@ -246,7 +235,7 @@ export default function OrderDetail() {
             {/* Header Actions */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
                 <Button
-                    onClick={() => router.push("/orders")}
+                    onClick={() => router.back()}
                     variant="outline"
                     className="w-fit"
                 >
@@ -361,7 +350,7 @@ export default function OrderDetail() {
                     <Separator />
 
                     {/* Order Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
                         <div className="space-y-4">
                             <h3 className="font-semibold flex items-center gap-2">
                                 <Calendar className="h-4 w-4" />
@@ -414,9 +403,9 @@ export default function OrderDetail() {
                         </div>
 
                         {/* Observations */}
-                        <div className="space-y-4">
+                        <div className="space-y-4 flex flex-col h-full">
                             <h3 className="font-semibold">Observações</h3>
-                            <div className="p-4 border rounded-lg bg-muted/50 min-h-[120px]">
+                            <div className="p-4 border rounded-lg bg-muted/50 flex-1 flex items-start">
                                 {order.observations ? (
                                     <p className="text-sm whitespace-pre-wrap">
                                         {order.observations}
@@ -470,14 +459,17 @@ export default function OrderDetail() {
                                                 <TableCell className="font-medium">
                                                     <div className="flex items-center gap-2">
                                                         <Package className="h-4 w-4 text-primary" />
-                                                        Produto #
-                                                        {product.productId.slice(
-                                                            -8
-                                                        )}
+                                                        {product.name}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    {product.quantity}
+                                                    {`${
+                                                        product.unityType ===
+                                                        "UN"
+                                                            ? product.quantity
+                                                            : product.quantity /
+                                                              1000
+                                                    } ${product.unityType}`}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     {formatCurrency(
@@ -487,6 +479,7 @@ export default function OrderDetail() {
                                                 <TableCell className="text-right font-medium">
                                                     {formatCurrency(
                                                         calculateProductSubtotal(
+                                                            product.unityType,
                                                             product.quantity,
                                                             product.price
                                                         )
@@ -508,29 +501,19 @@ export default function OrderDetail() {
                                                             <TableCell className="pl-8">
                                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                                     <div className="w-2 h-2 bg-primary/50 rounded-full" />
-                                                                    Subproduto #
-                                                                    {subProduct.productId.slice(
-                                                                        -8
-                                                                    )}
+                                                                    {
+                                                                        subProduct.name
+                                                                    }
                                                                 </div>
                                                             </TableCell>
-                                                            <TableCell className="text-right text-sm">
-                                                                {
-                                                                    subProduct.quantity
-                                                                }
+                                                            <TableCell className="text-right text-sm text-muted-foreground">
+                                                                -
                                                             </TableCell>
-                                                            <TableCell className="text-right text-sm">
-                                                                {formatCurrency(
-                                                                    subProduct.price
-                                                                )}
+                                                            <TableCell className="text-right text-sm text-muted-foreground">
+                                                                -
                                                             </TableCell>
-                                                            <TableCell className="text-right text-sm">
-                                                                {formatCurrency(
-                                                                    calculateProductSubtotal(
-                                                                        subProduct.quantity,
-                                                                        subProduct.price
-                                                                    )
-                                                                )}
+                                                            <TableCell className="text-right text-sm text-muted-foreground">
+                                                                -
                                                             </TableCell>
                                                         </TableRow>
                                                     )
