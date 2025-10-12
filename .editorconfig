@@ -8,7 +8,7 @@ end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
-column_limit = 80
+column_limit = 120
 
 # Adicione configurações específicas para arquivos JavaScript/TypeScript
 [*.{js,ts,jsx,tsx}]

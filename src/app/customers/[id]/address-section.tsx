@@ -1,6 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Address, Customer } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Pencil, Trash2, Plus } from "lucide-react";
@@ -13,20 +23,15 @@ interface AddressSectionProps {
     customer: Customer;
 }
 
-export function AddressSection({
-    initialAddresses,
-    customer,
-}: AddressSectionProps) {
+export function AddressSection({ initialAddresses, customer }: AddressSectionProps) {
     const { toast } = useToast();
     const { fetch } = useFetchClient();
     const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
-    const [editingAddressIndex, setEditingAddressIndex] = useState<
-        number | null
-    >(null);
-    const [addresses, setAddresses] = useState<Address[]>(
-        initialAddresses ?? []
-    );
+    const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
+    const [addresses, setAddresses] = useState<Address[]>(initialAddresses ?? []);
     const [currentAddress, setCurrentAddress] = useState<Address | undefined>();
+    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+    const [addressToDelete, setAddressToDelete] = useState<number | null>(null);
 
     // Escuta o evento personalizado para adicionar endereço
     useEffect(() => {
@@ -53,27 +58,28 @@ export function AddressSection({
     };
 
     const handleDeleteAddress = async (index: number) => {
-        if (!confirm("Tem certeza que deseja excluir este endereço?")) {
-            return;
-        }
+        setAddressToDelete(index);
+        setShowDeleteDialog(true);
+    };
+
+    const confirmDeleteAddress = async () => {
+        if (addressToDelete === null) return;
 
         let newAddresses = [...addresses];
-        newAddresses.splice(index, 1);
+        newAddresses.splice(addressToDelete, 1);
 
-        if (addresses[index].id) {
+        if (addresses[addressToDelete].id) {
             await fetch(
-                `${process.env.NEXT_PUBLIC_HOST_API}/addresses/${addresses[index].id}`,
+                `${process.env.NEXT_PUBLIC_HOST_API}/customers/${customer.id}/addresses/${addresses[addressToDelete].id}`,
                 {
                     method: "DELETE",
                 }
             );
 
-            if (addresses[index].id) {
-                const result = await fetch<{ addresses: Address[] }>(
-                    `${process.env.NEXT_PUBLIC_HOST_API}/customers/${customer.id}`
-                );
-                newAddresses = result?.addresses ?? [];
-            }
+            const result = await fetch<{ addresses: Address[] }>(
+                `${process.env.NEXT_PUBLIC_HOST_API}/customers/${customer.id}`
+            );
+            newAddresses = result?.addresses ?? [];
 
             toast({
                 variant: "success",
@@ -82,6 +88,8 @@ export function AddressSection({
         }
 
         setAddresses(newAddresses);
+        setShowDeleteDialog(false);
+        setAddressToDelete(null);
     };
 
     const onSubmitAddress = async (data: Address) => {
@@ -113,12 +121,8 @@ export function AddressSection({
             {!addresses?.length ? (
                 <div className="text-center py-12 border-2 border-dashed rounded-lg">
                     <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">
-                        Nenhum endereço cadastrado
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                        Adicione o primeiro endereço para este cliente.
-                    </p>
+                    <h3 className="text-lg font-semibold mb-2">Nenhum endereço cadastrado</h3>
+                    <p className="text-muted-foreground mb-4">Adicione o primeiro endereço para este cliente.</p>
                     <Button onClick={handleAddAddress} variant="outline">
                         <Plus className="mr-2 h-4 w-4" />
                         Adicionar Primeiro Endereço
@@ -137,8 +141,7 @@ export function AddressSection({
                                     <div className="space-y-2 flex-1">
                                         <div className="flex items-center gap-2">
                                             <h3 className="font-semibold">
-                                                {address.street},{" "}
-                                                {address.number}
+                                                {address.street}, {address.number}
                                             </h3>
                                             {address.isDefault && (
                                                 <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
@@ -148,19 +151,13 @@ export function AddressSection({
                                         </div>
 
                                         <p className="text-sm text-muted-foreground">
-                                            <span className="font-medium">
-                                                {address.neighborhood}
-                                            </span>
+                                            <span className="font-medium">{address.neighborhood}</span>
                                             {" • "}
                                             {address.city} - {address.state}
                                         </p>
 
                                         <p className="text-sm text-muted-foreground">
-                                            CEP:{" "}
-                                            {address.cep.replace(
-                                                /(\d{5})(\d{3})/,
-                                                "$1-$2"
-                                            )}
+                                            CEP: {address.cep.replace(/(\d{5})(\d{3})/, "$1-$2")}
                                         </p>
 
                                         {address.aditionalDetails && (
@@ -175,9 +172,7 @@ export function AddressSection({
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        onClick={() =>
-                                            handleEditAddress(address, index)
-                                        }
+                                        onClick={() => handleEditAddress(address, index)}
                                     >
                                         <Pencil className="h-4 w-4" />
                                     </Button>
@@ -186,9 +181,7 @@ export function AddressSection({
                                         type="button"
                                         variant="ghost"
                                         className="text-destructive hover:text-destructive"
-                                        onClick={() =>
-                                            handleDeleteAddress(index)
-                                        }
+                                        onClick={() => handleDeleteAddress(index)}
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -207,6 +200,33 @@ export function AddressSection({
                 isEditing={editingAddressIndex !== null}
                 customer={customer}
             />
+
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir Endereço</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tem certeza que deseja excluir este endereço? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() => {
+                                setShowDeleteDialog(false);
+                                setAddressToDelete(null);
+                            }}
+                        >
+                            Cancelar
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDeleteAddress}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Excluir
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
