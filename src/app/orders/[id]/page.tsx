@@ -12,8 +12,6 @@ import {
     Badge,
     Card,
     CardContent,
-    CardHeader,
-    CardTitle,
     Separator,
     Avatar,
     AvatarFallback,
@@ -29,6 +27,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui";
+import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
 import { useToast } from "@/hooks/use-toast";
 import {
     ArrowLeft,
@@ -59,17 +58,13 @@ export default function OrderDetail() {
     const setTitle = useHeaderStore((state) => state.setTitle);
 
     // Função para formatar datas de forma segura
-    const formatDate = (
-        dateValue: string | Date | null | undefined,
-        formatString: string
-    ) => {
+    const formatDate = (dateValue: string | Date | null | undefined, formatString: string) => {
         try {
             if (!dateValue) {
                 return "Data não informada";
             }
 
-            const date =
-                typeof dateValue === "string" ? new Date(dateValue) : dateValue;
+            const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
 
             if (!date || isNaN(date.getTime())) {
                 return "Data inválida";
@@ -90,11 +85,7 @@ export default function OrderDetail() {
         }).format(value / 100); // Assumindo que os valores estão em centavos
     };
 
-    const calculateProductSubtotal = (
-        unityType: string,
-        quantity: number,
-        price: number
-    ) => {
+    const calculateProductSubtotal = (unityType: string, quantity: number, price: number) => {
         return (unityType === "UN" ? quantity : quantity / 1000) * price;
     };
 
@@ -102,29 +93,20 @@ export default function OrderDetail() {
         if (!order?.products) return 0;
 
         return order.products.reduce((total, product) => {
-            const productTotal = calculateProductSubtotal(
-                product.unityType,
-                product.quantity,
-                product.price
-            );
+            const productTotal = calculateProductSubtotal(product.unityType, product.quantity, product.price);
             return total + productTotal;
         }, 0);
     };
 
     useEffect(() => {
-        setTitle([
-            "Pedidos",
-            order ? `Pedido #${order.number}` : "Carregando...",
-        ]);
+        setTitle(["Pedidos", order ? `Pedido #${order.number}` : "Carregando..."]);
     }, [setTitle, order]);
 
     useEffect(() => {
         const fetchOrder = async () => {
             try {
                 setIsLoading(true);
-                const result = await fetch<Order | null>(
-                    `${process.env.NEXT_PUBLIC_HOST_API}/orders/${id}`
-                );
+                const result = await fetch<Order | null>(`${process.env.NEXT_PUBLIC_HOST_API}/orders/${id}`);
 
                 setOrder(result);
             } catch (error) {
@@ -148,13 +130,10 @@ export default function OrderDetail() {
 
         try {
             setIsUpdating(true);
-            await fetch(
-                `${process.env.NEXT_PUBLIC_HOST_API}/orders/${id}/pickup`,
-                {
-                    method: "PATCH",
-                    body: JSON.stringify({ isPickedUp: true }),
-                }
-            );
+            await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/orders/${id}/pickup`, {
+                method: "PATCH",
+                body: JSON.stringify({ isPickedUp: true }),
+            });
 
             setOrder({ ...order, isPickedUp: true });
             toast({
@@ -199,9 +178,7 @@ export default function OrderDetail() {
             <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">
-                        Carregando detalhes do pedido...
-                    </p>
+                    <p className="text-muted-foreground">Carregando detalhes do pedido...</p>
                 </div>
             </div>
         );
@@ -212,12 +189,8 @@ export default function OrderDetail() {
             <div className="flex flex-col items-center justify-center h-64 gap-4">
                 <Package className="h-12 w-12 text-muted-foreground" />
                 <div className="text-center">
-                    <h3 className="text-lg font-semibold">
-                        Pedido não encontrado
-                    </h3>
-                    <p className="text-muted-foreground">
-                        O pedido solicitado não existe ou foi removido.
-                    </p>
+                    <h3 className="text-lg font-semibold">Pedido não encontrado</h3>
+                    <p className="text-muted-foreground">O pedido solicitado não existe ou foi removido.</p>
                 </div>
                 <Button onClick={() => router.back()} variant="outline">
                     <ArrowLeft className="mr-2 h-4 w-4" />
@@ -242,12 +215,7 @@ export default function OrderDetail() {
                     {/* Botão Voltar */}
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
-                                onClick={() => router.back()}
-                                variant="outline"
-                                size="icon"
-                                className="sm:hidden"
-                            >
+                            <Button onClick={() => router.back()} variant="outline" size="icon" className="sm:hidden">
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
@@ -256,11 +224,7 @@ export default function OrderDetail() {
                         </TooltipContent>
                     </Tooltip>
 
-                    <Button
-                        onClick={() => router.back()}
-                        variant="outline"
-                        className="hidden sm:flex"
-                    >
+                    <Button onClick={() => router.back()} variant="outline" className="hidden sm:flex">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Voltar
                     </Button>
@@ -293,11 +257,7 @@ export default function OrderDetail() {
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        onClick={handleEdit}
-                                        variant="outline"
-                                        size="icon"
-                                    >
+                                    <Button onClick={handleEdit} variant="outline" size="icon">
                                         <Edit className="h-4 w-4" />
                                     </Button>
                                 </TooltipTrigger>
@@ -308,11 +268,7 @@ export default function OrderDetail() {
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        onClick={handleDelete}
-                                        variant="destructive"
-                                        size="icon"
-                                    >
+                                    <Button onClick={handleDelete} variant="destructive" size="icon">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </TooltipTrigger>
@@ -325,11 +281,7 @@ export default function OrderDetail() {
                         {/* Desktop: botões com texto */}
                         <div className="hidden sm:flex gap-2">
                             {!order.isPickedUp && (
-                                <Button
-                                    onClick={handleMarkAsPickedUp}
-                                    disabled={isUpdating}
-                                    variant="default"
-                                >
+                                <Button onClick={handleMarkAsPickedUp} disabled={isUpdating} variant="default">
                                     {isUpdating ? (
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                                     ) : (
@@ -344,10 +296,7 @@ export default function OrderDetail() {
                                 Editar
                             </Button>
 
-                            <Button
-                                onClick={handleDelete}
-                                variant="destructive"
-                            >
+                            <Button onClick={handleDelete} variant="destructive">
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Excluir
                             </Button>
@@ -357,35 +306,18 @@ export default function OrderDetail() {
 
                 {/* Order Status Card */}
                 <Card>
-                    <CardHeader>
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                            <div>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Package className="h-5 w-5" />
-                                    Pedido #{order.number}
-                                </CardTitle>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    Criado em{" "}
-                                    {formatDate(
-                                        order.createdAt,
-                                        "dd 'de' MMMM 'de' yyyy 'às' HH:mm"
-                                    )}
-                                </p>
-                            </div>
-                            <Badge
-                                variant={
-                                    order.isPickedUp ? "default" : "secondary"
-                                }
-                                className={
-                                    order.isPickedUp
-                                        ? "bg-green-100 text-green-800 hover:bg-green-200"
-                                        : ""
-                                }
-                            >
-                                {order.isPickedUp ? "Retirado" : "Pendente"}
-                            </Badge>
-                        </div>
-                    </CardHeader>
+                    <CardHeaderWithIcon icon={Package} title={`Pedido #${order.number}`} />
+                    <div className="px-6 pb-4 flex flex-col sm:flex-row justify-between items-start gap-4">
+                        <p className="text-sm text-muted-foreground">
+                            Criado em {formatDate(order.createdAt, "dd 'de' MMMM 'de' yyyy 'às' HH:mm")}
+                        </p>
+                        <Badge
+                            variant={order.isPickedUp ? "default" : "secondary"}
+                            className={order.isPickedUp ? "bg-green-100 text-green-800 hover:bg-green-200" : ""}
+                        >
+                            {order.isPickedUp ? "Retirado" : "Pendente"}
+                        </Badge>
+                    </div>
                     <CardContent className="space-y-6">
                         {/* Customer Information */}
                         <div>
@@ -402,14 +334,10 @@ export default function OrderDetail() {
                                 </Avatar>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
                                     <div>
-                                        <p className="font-medium">
-                                            {order.customer?.name}
-                                        </p>
+                                        <p className="font-medium">{order.customer?.name}</p>
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                                             <Phone className="h-3 w-3" />
-                                            {formatPhone(
-                                                order.customer?.phone || ""
-                                            )}
+                                            {formatPhone(order.customer?.phone || "")}
                                         </div>
                                         {order.customer?.email && (
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -420,14 +348,10 @@ export default function OrderDetail() {
                                     </div>
                                     {order.customer?.phone2 && (
                                         <div>
-                                            <p className="text-sm font-medium">
-                                                Telefone 2:
-                                            </p>
+                                            <p className="text-sm font-medium">Telefone 2:</p>
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Phone className="h-3 w-3" />
-                                                {formatPhone(
-                                                    order.customer.phone2
-                                                )}
+                                                {formatPhone(order.customer.phone2)}
                                             </div>
                                         </div>
                                     )}
@@ -450,36 +374,24 @@ export default function OrderDetail() {
                                             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                                             <div className="space-y-1 flex-1">
                                                 <p className="font-medium">
-                                                    {order.address.street},{" "}
-                                                    {order.address.number}
+                                                    {order.address.street}, {order.address.number}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {order.address.neighborhood}{" "}
-                                                    - {order.address.city}/
+                                                    {order.address.neighborhood} - {order.address.city}/
                                                     {order.address.state}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    CEP:{" "}
-                                                    {order.address.cep.replace(
-                                                        /(\d{5})(\d{3})/,
-                                                        "$1-$2"
-                                                    )}
+                                                    CEP: {order.address.cep.replace(/(\d{5})(\d{3})/, "$1-$2")}
                                                 </p>
-                                                {order.address
-                                                    .aditionalDetails && (
+                                                {order.address.aditionalDetails && (
                                                     <p className="text-sm text-muted-foreground italic">
-                                                        {
-                                                            order.address
-                                                                .aditionalDetails
-                                                        }
+                                                        {order.address.aditionalDetails}
                                                     </p>
                                                 )}
                                                 {order.address.distance > 0 && (
                                                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                                         <MapPin className="h-3 w-3" />
-                                                        Distância:{" "}
-                                                        {order.address.distance}{" "}
-                                                        km
+                                                        Distância: {order.address.distance} km
                                                     </div>
                                                 )}
                                             </div>
@@ -503,14 +415,9 @@ export default function OrderDetail() {
                                     <div className="flex items-center gap-3 p-3 border rounded-lg">
                                         <Calendar className="h-4 w-4 text-muted-foreground" />
                                         <div>
-                                            <p className="text-sm font-medium">
-                                                Data de Retirada
-                                            </p>
+                                            <p className="text-sm font-medium">Data de Retirada</p>
                                             <p className="text-sm text-muted-foreground">
-                                                {formatDate(
-                                                    order.pickupDate,
-                                                    "dd 'de' MMMM 'de' yyyy"
-                                                )}
+                                                {formatDate(order.pickupDate, "dd 'de' MMMM 'de' yyyy")}
                                             </p>
                                         </div>
                                     </div>
@@ -518,26 +425,17 @@ export default function OrderDetail() {
                                     <div className="flex items-center gap-3 p-3 border rounded-lg">
                                         <MapPin className="h-4 w-4 text-muted-foreground" />
                                         <div>
-                                            <p className="text-sm font-medium">
-                                                Local/Geladeira
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {order.orderLocal}
-                                            </p>
+                                            <p className="text-sm font-medium">Local/Geladeira</p>
+                                            <p className="text-sm text-muted-foreground">{order.orderLocal}</p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-3 p-3 border rounded-lg">
                                         <Clock className="h-4 w-4 text-muted-foreground" />
                                         <div>
-                                            <p className="text-sm font-medium">
-                                                Última Atualização
-                                            </p>
+                                            <p className="text-sm font-medium">Última Atualização</p>
                                             <p className="text-sm text-muted-foreground">
-                                                {formatDate(
-                                                    order.updatedAt,
-                                                    "dd/MM/yyyy 'às' HH:mm"
-                                                )}
+                                                {formatDate(order.updatedAt, "dd/MM/yyyy 'às' HH:mm")}
                                             </p>
                                         </div>
                                     </div>
@@ -549,13 +447,10 @@ export default function OrderDetail() {
                                 <h3 className="font-semibold">Observações</h3>
                                 <div className="p-4 border rounded-lg bg-muted/50 flex-1 flex items-start">
                                     {order.observations ? (
-                                        <p className="text-sm whitespace-pre-wrap">
-                                            {order.observations}
-                                        </p>
+                                        <p className="text-sm whitespace-pre-wrap">{order.observations}</p>
                                     ) : (
                                         <p className="text-sm text-muted-foreground italic">
-                                            Nenhuma observação adicionada a este
-                                            pedido.
+                                            Nenhuma observação adicionada a este pedido.
                                         </p>
                                     )}
                                 </div>
@@ -566,109 +461,77 @@ export default function OrderDetail() {
 
                 {/* Products Section */}
                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <ShoppingCart className="h-5 w-5" />
-                            Produtos do Pedido
-                        </CardTitle>
-                    </CardHeader>
+                    <CardHeaderWithIcon icon={ShoppingCart} title="Produtos do Pedido" />
                     <CardContent>
-                        {Array.isArray(order.products) &&
-                        order.products.length > 0 ? (
+                        {Array.isArray(order.products) && order.products.length > 0 ? (
                             <div className="space-y-6">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>Produto</TableHead>
-                                            <TableHead className="text-right">
-                                                Qtd
-                                            </TableHead>
-                                            <TableHead className="text-right">
-                                                Preço Unit.
-                                            </TableHead>
-                                            <TableHead className="text-right">
-                                                Subtotal
-                                            </TableHead>
+                                            <TableHead className="text-right">Qtd</TableHead>
+                                            <TableHead className="text-right">Preço Unit.</TableHead>
+                                            <TableHead className="text-right">Subtotal</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {order.products.map(
-                                            (product, index) => (
-                                                <React.Fragment
-                                                    key={product.id || index}
-                                                >
-                                                    {/* Produto Principal */}
-                                                    <TableRow>
-                                                        <TableCell className="font-medium">
-                                                            <div className="flex items-center gap-2">
-                                                                <Package className="h-4 w-4 text-primary" />
-                                                                {product.name}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {`${
-                                                                product.unityType ===
-                                                                "UN"
-                                                                    ? product.quantity
-                                                                    : product.quantity /
-                                                                      1000
-                                                            } ${
-                                                                product.unityType
-                                                            }`}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {formatCurrency(
+                                        {order.products.map((product, index) => (
+                                            <React.Fragment key={product.id || index}>
+                                                {/* Produto Principal */}
+                                                <TableRow>
+                                                    <TableCell className="font-medium">
+                                                        <div className="flex items-center gap-2">
+                                                            <Package className="h-4 w-4 text-primary" />
+                                                            {product.name}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {`${
+                                                            product.unityType === "UN"
+                                                                ? product.quantity
+                                                                : product.quantity / 1000
+                                                        } ${product.unityType}`}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {formatCurrency(product.price)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-medium">
+                                                        {formatCurrency(
+                                                            calculateProductSubtotal(
+                                                                product.unityType,
+                                                                product.quantity,
                                                                 product.price
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-medium">
-                                                            {formatCurrency(
-                                                                calculateProductSubtotal(
-                                                                    product.unityType,
-                                                                    product.quantity,
-                                                                    product.price
-                                                                )
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-
-                                                    {/* Subprodutos */}
-                                                    {product.subProducts &&
-                                                        product.subProducts.map(
-                                                            (
-                                                                subProduct,
-                                                                subIndex
-                                                            ) => (
-                                                                <TableRow
-                                                                    key={
-                                                                        subProduct.id ||
-                                                                        `${index}-${subIndex}`
-                                                                    }
-                                                                    className="bg-muted/30"
-                                                                >
-                                                                    <TableCell className="pl-8">
-                                                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                                            <div className="w-2 h-2 bg-primary/50 rounded-full" />
-                                                                            {
-                                                                                subProduct.name
-                                                                            }
-                                                                        </div>
-                                                                    </TableCell>
-                                                                    <TableCell className="text-right text-sm text-muted-foreground">
-                                                                        -
-                                                                    </TableCell>
-                                                                    <TableCell className="text-right text-sm text-muted-foreground">
-                                                                        -
-                                                                    </TableCell>
-                                                                    <TableCell className="text-right text-sm text-muted-foreground">
-                                                                        -
-                                                                    </TableCell>
-                                                                </TableRow>
                                                             )
                                                         )}
-                                                </React.Fragment>
-                                            )
-                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+
+                                                {/* Subprodutos */}
+                                                {product.subProducts &&
+                                                    product.subProducts.map((subProduct, subIndex) => (
+                                                        <TableRow
+                                                            key={subProduct.id || `${index}-${subIndex}`}
+                                                            className="bg-muted/30"
+                                                        >
+                                                            <TableCell className="pl-8">
+                                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                                    <div className="w-2 h-2 bg-primary/50 rounded-full" />
+                                                                    {subProduct.name}
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell className="text-right text-sm text-muted-foreground">
+                                                                -
+                                                            </TableCell>
+                                                            <TableCell className="text-right text-sm text-muted-foreground">
+                                                                -
+                                                            </TableCell>
+                                                            <TableCell className="text-right text-sm text-muted-foreground">
+                                                                -
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                            </React.Fragment>
+                                        ))}
                                     </TableBody>
                                 </Table>
 
@@ -684,9 +547,7 @@ export default function OrderDetail() {
                                                     Total do Pedido
                                                 </p>
                                                 <p className="text-2xl font-bold text-primary">
-                                                    {formatCurrency(
-                                                        calculateOrderTotal()
-                                                    )}
+                                                    {formatCurrency(calculateOrderTotal())}
                                                 </p>
                                             </div>
                                         </div>
@@ -696,9 +557,7 @@ export default function OrderDetail() {
                         ) : (
                             <div className="text-center py-8">
                                 <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                                <p className="text-muted-foreground">
-                                    Nenhum produto adicionado a este pedido.
-                                </p>
+                                <p className="text-muted-foreground">Nenhum produto adicionado a este pedido.</p>
                             </div>
                         )}
                     </CardContent>
