@@ -27,22 +27,23 @@ import { useToast } from "@/hooks/use-toast";
 import { Customer, Address } from "@/domains";
 import { cn, formatPhone, parseNumber } from "@/lib/utils";
 import { customerEndpoints } from "@/repository/customerRepository";
+import { OrderFormData } from "./order-form";
 
 interface OrderCustomerSectionProps {
-    form: UseFormReturn;
+    form: UseFormReturn<OrderFormData>;
     selectedCustomer: Customer | null;
-    onSelectedCustomer: (customer: Customer | null) => void;
+    onSelectedCustomerAction: (customer: Customer | null) => void;
     addresses: Address[];
-    setAddresses: (addresses: Address[]) => void;
+    onAddressesAction: (addresses: Address[]) => void;
     isEditMode: boolean;
 }
 
 export function OrderCustomerSection({
     form,
     selectedCustomer,
-    onSelectedCustomer,
+    onSelectedCustomerAction,
     addresses,
-    setAddresses,
+    onAddressesAction,
     isEditMode,
 }: OrderCustomerSectionProps) {
     const { fetch } = useFetchClient();
@@ -55,7 +56,7 @@ export function OrderCustomerSection({
     // Carregar endereços do cliente quando selecionado
     useEffect(() => {
         if (!customerId) {
-            setAddresses([]);
+            onAddressesAction([]);
             return;
         }
 
@@ -66,7 +67,7 @@ export function OrderCustomerSection({
                     const data = await fetch<{ customer: Customer; addresses: Address[] }>(
                         customerEndpoints.get(customerId)
                     );
-                    setAddresses(data?.addresses || []);
+                    onAddressesAction(data?.addresses || []);
 
                     // Selecionar endereço padrão automaticamente apenas se não houver addressId definido
                     const currentAddressId = form.getValues("addressId");
@@ -90,11 +91,11 @@ export function OrderCustomerSection({
                 const data = await fetch<{ customer: Customer; addresses: Address[] }>(
                     customerEndpoints.get(customerId)
                 );
-                setAddresses(data?.addresses || []);
+                onAddressesAction(data?.addresses || []);
 
                 // Só atualiza selectedCustomer se ainda não estiver definido
                 if (!selectedCustomer) {
-                    onSelectedCustomer(data?.customer || null);
+                    onSelectedCustomerAction(data?.customer || null);
                 }
 
                 // Selecionar endereço padrão automaticamente apenas se não houver addressId definido
@@ -111,7 +112,7 @@ export function OrderCustomerSection({
         };
 
         loadCustomerData();
-    }, [customerId, fetch, form, selectedCustomer, setAddresses, onSelectedCustomer]);
+    }, [customerId, fetch, form, selectedCustomer, onAddressesAction, onSelectedCustomerAction]);
 
     // Inicializar telefone quando o customer selecionado mudar
     useEffect(() => {
@@ -143,13 +144,13 @@ export function OrderCustomerSection({
                 form.clearErrors("customerId");
 
                 // Depois atualiza o selectedCustomer
-                onSelectedCustomer(customer);
+                onSelectedCustomerAction(customer);
 
                 // Carregar endereços do cliente encontrado
                 const customerData = await fetch<{ customer: Customer; addresses: Address[] }>(
                     customerEndpoints.get(customer.id || "")
                 );
-                setAddresses(customerData?.addresses || []);
+                onAddressesAction(customerData?.addresses || []);
 
                 // Selecionar endereço padrão automaticamente
                 const defaultAddress = customerData?.addresses?.find((addr) => addr.isDefault);
@@ -162,9 +163,9 @@ export function OrderCustomerSection({
                     description: "Cliente encontrado!",
                 });
             } else {
-                onSelectedCustomer(null);
+                onSelectedCustomerAction(null);
                 form.setValue("customerId", "");
-                setAddresses([]);
+                onAddressesAction([]);
                 form.setError("customerId", {
                     type: "manual",
                     message: "Cliente não encontrado com este telefone",
@@ -176,9 +177,9 @@ export function OrderCustomerSection({
             }
         } catch (error) {
             console.error("Erro ao buscar cliente:", error);
-            onSelectedCustomer(null);
+            onSelectedCustomerAction(null);
             form.setValue("customerId", "");
-            setAddresses([]);
+            onAddressesAction([]);
             form.setError("customerId", {
                 type: "manual",
                 message: "Erro ao buscar cliente",

@@ -38,7 +38,7 @@ const orderFormSchema = z.object({
         .min(1, "Adicione pelo menos um produto"),
 });
 
-type OrderFormData = z.infer<typeof orderFormSchema>;
+export type OrderFormData = z.infer<typeof orderFormSchema>;
 
 interface OrderFormProps {
     orderId?: string;
@@ -160,9 +160,9 @@ export function OrderForm({ orderId, initialData }: OrderFormProps) {
                 <OrderCustomerSection
                     form={form}
                     selectedCustomer={selectedCustomer}
-                    onSelectedCustomer={setSelectedCustomer}
+                    onSelectedCustomerAction={setSelectedCustomer}
                     addresses={addresses}
-                    setAddresses={setAddresses}
+                    onAddressesAction={setAddresses}
                     isEditMode={isEditMode}
                 />
 
