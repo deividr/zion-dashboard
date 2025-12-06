@@ -29,13 +29,12 @@ import { cn, formatPhone, parseNumber } from "@/lib/utils";
 import { customerEndpoints } from "@/repository/customerRepository";
 
 interface OrderCustomerSectionProps {
-    form: UseFormReturn<any>;
+    form: UseFormReturn;
     selectedCustomer: Customer | null;
     onSelectedCustomer: (customer: Customer | null) => void;
     addresses: Address[];
     setAddresses: (addresses: Address[]) => void;
     isEditMode: boolean;
-    initialData?: any;
 }
 
 export function OrderCustomerSection({
@@ -45,7 +44,6 @@ export function OrderCustomerSection({
     addresses,
     setAddresses,
     isEditMode,
-    initialData,
 }: OrderCustomerSectionProps) {
     const { fetch } = useFetchClient();
     const { toast } = useToast();
@@ -94,8 +92,8 @@ export function OrderCustomerSection({
                 );
                 setAddresses(data?.addresses || []);
 
-                // Só atualiza selectedCustomer se não vier do initialData e se ainda não estiver definido
-                if (!initialData?.customer && !selectedCustomer) {
+                // Só atualiza selectedCustomer se ainda não estiver definido
+                if (!selectedCustomer) {
                     onSelectedCustomer(data?.customer || null);
                 }
 
@@ -113,14 +111,14 @@ export function OrderCustomerSection({
         };
 
         loadCustomerData();
-    }, [customerId, fetch, form, initialData, selectedCustomer, setAddresses, onSelectedCustomer]);
+    }, [customerId, fetch, form, selectedCustomer, setAddresses, onSelectedCustomer]);
 
-    // Inicializar telefone quando houver initialData
+    // Inicializar telefone quando o customer selecionado mudar
     useEffect(() => {
-        if (initialData?.customer) {
-            setCustomerPhone(initialData.customer.phone || "");
+        if (selectedCustomer?.phone) {
+            setCustomerPhone(selectedCustomer.phone);
         }
-    }, [initialData]);
+    }, [selectedCustomer]);
 
     // Função para buscar cliente por telefone
     const handleSearchCustomerByPhone = async (phone: string) => {

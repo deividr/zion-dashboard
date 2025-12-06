@@ -164,7 +164,6 @@ export function OrderForm({ orderId, initialData }: OrderFormProps) {
                     addresses={addresses}
                     setAddresses={setAddresses}
                     isEditMode={isEditMode}
-                    initialData={initialData}
                 />
 
                 <OrderDetailsSection form={form} />
