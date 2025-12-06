@@ -1,5 +1,5 @@
 # Use uma imagem base adequada para seu projeto
-FROM node:23-alpine AS base
+FROM node:24-alpine AS base
 
 # Define o diretório de trabalho
 WORKDIR /app
