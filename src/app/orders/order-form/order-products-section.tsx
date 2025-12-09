@@ -1,17 +1,16 @@
 "use client";
 
-import React, { useCallback, startTransition } from "react";
-import { UseFormReturn, useFieldArray } from "react-hook-form";
-import { ShoppingCart, Plus, Trash2, DollarSign, Package } from "lucide-react";
+import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
+import { Combobox } from "@/components/combobox";
 import {
+    Button,
     Card,
     CardContent,
+    FormControl,
     FormField,
     FormItem,
-    FormControl,
     FormMessage,
     Input,
-    Button,
     Separator,
     Table,
     TableBody,
@@ -20,9 +19,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui";
-import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
-import { Combobox } from "@/components/combobox";
 import { Product } from "@/domains";
+import { DollarSign, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { startTransition, useCallback } from "react";
+import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { OrderFormData } from ".";
 
 interface OrderProductsSectionProps {
     form: UseFormReturn<OrderFormData>;
@@ -198,7 +199,9 @@ export function OrderProductsSection({ form, products }: OrderProductsSectionPro
                                                                         className="w-20 text-right"
                                                                         {...field}
                                                                         onChange={(e) =>
-                                                                            field.onChange(parseFloat(e.target.value) || 0)
+                                                                            field.onChange(
+                                                                                parseFloat(e.target.value) || 0
+                                                                            )
                                                                         }
                                                                     />
                                                                     <span className="text-sm text-muted-foreground">

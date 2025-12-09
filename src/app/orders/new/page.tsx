@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useHeaderStore } from "@/stores/header-store";
-import { OrderForm } from "./order-form";
+import { OrderForm } from "../order-form";
 
 export default function NewOrder() {
     const setTitle = useHeaderStore((state) => state.setTitle);
@@ -13,4 +13,3 @@ export default function NewOrder() {
 
     return <OrderForm />;
 }
-

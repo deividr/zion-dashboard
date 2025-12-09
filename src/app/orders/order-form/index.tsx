@@ -41,11 +41,10 @@ const orderFormSchema = z.object({
 export type OrderFormData = z.infer<typeof orderFormSchema>;
 
 interface OrderFormProps {
-    orderId?: string;
     initialData?: Order;
 }
 
-export function OrderForm({ orderId, initialData }: OrderFormProps) {
+export function OrderForm({ initialData }: OrderFormProps) {
     const { fetch } = useFetchClient();
     const { toast } = useToast();
     const router = useRouter();
@@ -53,7 +52,7 @@ export function OrderForm({ orderId, initialData }: OrderFormProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-    const isEditMode = !!orderId;
+    const isEditMode = !!initialData?.id;
 
     const form = useForm<OrderFormData>({
         resolver: zodResolver(orderFormSchema),
@@ -109,8 +108,8 @@ export function OrderForm({ orderId, initialData }: OrderFormProps) {
                 })),
             };
 
-            const endpoint = orderId ? orderEndpoints.update(orderId) : orderEndpoints.create();
-            const method = orderId ? "PUT" : "POST";
+            const endpoint = initialData?.id ? orderEndpoints.update(initialData?.id) : orderEndpoints.create();
+            const method = initialData?.id ? "PUT" : "POST";
 
             const result = await fetch<{ id: string }>(endpoint, {
                 method,
@@ -119,7 +118,7 @@ export function OrderForm({ orderId, initialData }: OrderFormProps) {
 
             toast({
                 variant: "success",
-                description: `Pedido ${orderId ? "atualizado" : "criado"} com sucesso!`,
+                description: `Pedido ${initialData?.id ? "atualizado" : "criado"} com sucesso!`,
             });
 
             if (result?.id) {
@@ -163,7 +162,7 @@ export function OrderForm({ orderId, initialData }: OrderFormProps) {
                         ) : (
                             <>
                                 <Package className="mr-2 h-4 w-4" />
-                                {orderId ? "Atualizar Pedido" : "Criar Pedido"}
+                                {initialData?.id ? "Atualizar Pedido" : "Criar Pedido"}
                             </>
                         )}
                     </Button>

@@ -1,32 +1,31 @@
 "use client";
 
-import React from "react";
-import { UseFormReturn } from "react-hook-form";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Calendar, MapPin } from "lucide-react";
+import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
 import {
+    Button,
     Card,
     CardContent,
+    FormControl,
     FormField,
     FormItem,
     FormLabel,
-    FormControl,
     FormMessage,
     Input,
-    Textarea,
-    Button,
     Popover,
     PopoverContent,
     PopoverTrigger,
+    Textarea,
 } from "@/components/ui";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
-import { Package } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Calendar, MapPin, Package } from "lucide-react";
+import { UseFormReturn } from "react-hook-form";
+import { OrderFormData } from ".";
 
 interface OrderDetailsSectionProps {
-    form: UseFormReturn<any>;
+    form: UseFormReturn<OrderFormData>;
 }
 
 export function OrderDetailsSection({ form }: OrderDetailsSectionProps) {

@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { User, Phone, MapPin, Loader2 } from "lucide-react";
+import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
 import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
     Card,
     CardContent,
+    FormControl,
     FormField,
     FormItem,
     FormLabel,
-    FormControl,
     FormMessage,
     Input,
     Select,
@@ -17,17 +18,16 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
 } from "@/components/ui";
-import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
-import { useFetchClient } from "@/lib/fetch-client";
+import { Address, Customer } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
-import { Customer, Address } from "@/domains";
+import { useFetchClient } from "@/lib/fetch-client";
 import { cn, formatPhone, parseNumber } from "@/lib/utils";
 import { customerEndpoints } from "@/repository/customerRepository";
-import { OrderFormData } from "./order-form";
+import { Loader2, MapPin, Phone, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import { OrderFormData } from ".";
 
 interface OrderCustomerSectionProps {
     form: UseFormReturn<OrderFormData>;
