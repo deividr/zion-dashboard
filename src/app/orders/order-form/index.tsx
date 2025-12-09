@@ -16,13 +16,12 @@ import { OrderCustomerSection } from "./order-customer-section";
 import { OrderDetailsSection } from "./order-details-section";
 import { OrderProductsSection } from "./order-products-section";
 
-// Schema de validação do formulário
 const orderFormSchema = z.object({
     customerId: z.string().uuid("Selecione um cliente"),
     pickupDate: z.date({
         required_error: "Selecione a data de retirada",
     }),
-    orderLocal: z.string().min(1, "Informe o local/geladeira"),
+    orderLocal: z.string().optional(),
     observations: z.string().optional(),
     addressId: z.string().optional(),
     products: z
@@ -31,7 +30,7 @@ const orderFormSchema = z.object({
                 productId: z.string().uuid(),
                 name: z.string(),
                 unityType: z.string(),
-                quantity: z.number().min(1, "Quantidade deve ser maior que 0"),
+                quantity: z.number().min(0.001, "Quantidade deve ser maior que 0"),
                 price: z.number().min(1, "Preço deve ser maior que 0"),
             })
         )
