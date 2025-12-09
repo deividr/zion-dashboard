@@ -95,6 +95,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
             setIsLoading(true);
 
             const orderData = {
+                id: initialData?.id,
                 customerId: data.customerId,
                 pickupDate: data.pickupDate.toISOString(),
                 orderLocal: data.orderLocal,
