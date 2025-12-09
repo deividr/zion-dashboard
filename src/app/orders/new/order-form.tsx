@@ -58,44 +58,22 @@ export function OrderForm({ orderId, initialData }: OrderFormProps) {
     const form = useForm<OrderFormData>({
         resolver: zodResolver(orderFormSchema),
         defaultValues: {
-            customerId: "",
+            customerId: initialData?.customer?.id ?? "",
             pickupDate: new Date(),
-            orderLocal: "",
-            observations: "",
-            addressId: "",
-            products: [],
+            orderLocal: initialData?.orderLocal ?? "",
+            observations: initialData?.observations ?? "",
+            addressId: initialData?.address?.id ?? "",
+            products:
+                initialData?.products?.map((p) => ({
+                    productId: p.productId,
+                    name: p.name,
+                    unityType: p.unityType,
+                    quantity: p.unityType === "UN" ? p.quantity : p.quantity / 1000,
+                    price: p.price,
+                })) ?? [],
         },
     });
 
-    // Carregar dados iniciais quando estiver editando
-    useEffect(() => {
-        if (initialData) {
-            const pickupDate =
-                typeof initialData.pickupDate === "string" ? new Date(initialData.pickupDate) : initialData.pickupDate;
-
-            const customer = initialData.customer as Customer;
-
-            form.reset({
-                customerId: customer.id,
-                pickupDate: pickupDate,
-                orderLocal: initialData.orderLocal || "",
-                observations: initialData.observations || "",
-                addressId: initialData.address?.id || "",
-                products:
-                    initialData.products?.map((p) => ({
-                        productId: p.productId,
-                        name: p.name,
-                        unityType: p.unityType,
-                        quantity: p.unityType === "UN" ? p.quantity : p.quantity / 1000,
-                        price: p.price,
-                    })) || [],
-            });
-
-            setSelectedCustomer(customer);
-        }
-    }, [initialData, form]);
-
-    // Carregar produtos
     useEffect(() => {
         const loadProducts = async () => {
             try {

@@ -25,7 +25,7 @@ import { Combobox } from "@/components/combobox";
 import { Product } from "@/domains";
 
 interface OrderProductsSectionProps {
-    form: UseFormReturn<any>;
+    form: UseFormReturn<OrderFormData>;
     products: Product[];
 }
 
