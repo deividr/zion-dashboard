@@ -1,5 +1,6 @@
 "use client";
 
+import { ProductCard } from "@/components/product-card";
 import { Button, Form } from "@/components/ui";
 import { Address, Customer, Order, Product } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
@@ -133,6 +134,16 @@ export function OrderForm({ initialData }: OrderFormProps) {
 
     return (
         <Form {...form}>
+            {products?.map((p, index) => {
+                return (
+                    <ProductCard
+                        key={index}
+                        product={p}
+                        imageUrl="https://img.cybercook.com.br/receitas/731/lasanha-3.jpeg"
+                        subProducts={products.slice(1, 5).map((p) => ({ id: p.id as string, name: p.name }))}
+                    />
+                );
+            })}
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <OrderCustomerSection
                     form={form}

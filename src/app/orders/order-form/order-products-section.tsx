@@ -24,6 +24,7 @@ import { DollarSign, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { startTransition, useCallback } from "react";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { OrderFormData } from ".";
+import { formatCurrency } from "@/lib/utils";
 
 interface OrderProductsSectionProps {
     form: UseFormReturn<OrderFormData>;
@@ -119,14 +120,6 @@ export function OrderProductsSection({ form, products }: OrderProductsSectionPro
             }
             return total;
         }, 0);
-    };
-
-    // Formatar valor monetário
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        }).format(value / 100);
     };
 
     return (
