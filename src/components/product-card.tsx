@@ -2,10 +2,11 @@
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Product, UnityType } from "@/domains/product"; // Importando Product e UnityType
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Product } from "@/domains/product";
 import { formatCurrency } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
@@ -24,6 +25,9 @@ interface ProductCardProps {
     onSubProductChange?: (productId: string, subProductId: string, isChecked: boolean) => void;
     onAddToCart?: (product: Product, quantity: number, selectedSubProducts: string[]) => void;
 }
+
+const PRESET_QUANTITIES = [0.25, 0.5, 1.0, 1.5, 2.0];
+
 export function ProductCard({
     product,
     imageUrl,
@@ -37,7 +41,7 @@ export function ProductCard({
 
     const handleQuantityChange = (amount: number) => {
         let newQuantity = quantity;
-        if (product.unityType === UnityType.UN) {
+        if (product.unityType === "UN") {
             newQuantity = Math.max(1, quantity + amount);
         } else {
             newQuantity = Math.max(0.25, parseFloat((quantity + amount).toFixed(3)));
@@ -57,7 +61,15 @@ export function ProductCard({
         onSubProductChange?.(product.id || "", subProductId, isChecked);
     };
 
-    const formattedQuantity = product.unityType === UnityType.UN ? quantity : quantity.toFixed(3);
+    const handlePresetChange = (value: string) => {
+        if (value) {
+            const newQuantity = parseFloat(value);
+            setQuantity(newQuantity);
+            onQuantityChange?.(product.id || "", newQuantity);
+        }
+    };
+
+    const formattedQuantity = product.unityType === "UN" ? quantity : quantity.toFixed(3);
 
     return (
         <Card className="w-full max-w-xs overflow-hidden">
@@ -67,13 +79,6 @@ export function ProductCard({
                 </div>
                 <div className="p-4">
                     <CardTitle className="text-lg font-semibold">{product.name}</CardTitle>
-                    <CardDescription className="text-sm text-muted-foreground">
-                        {product.unityType === UnityType.UN
-                            ? "Unidade(s)"
-                            : product.unityType === UnityType.KG
-                              ? "Quilograma(s)"
-                              : "Litro(s)"}
-                    </CardDescription>
                 </div>
             </CardHeader>
             <CardContent className="p-4 pt-0">
@@ -83,11 +88,10 @@ export function ProductCard({
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => handleQuantityChange(product.unityType === UnityType.UN ? -1 : -0.25)}
+                            onClick={() => handleQuantityChange(product.unityType === "UN" ? -1 : -0.25)}
                             disabled={
-                                (product.unityType === UnityType.UN && quantity <= 1) ||
-                                ((product.unityType === UnityType.KG || product.unityType === UnityType.LT) &&
-                                    quantity <= 0.25)
+                                (product.unityType === "UN" && quantity <= 1) ||
+                                ((product.unityType === "KG" || product.unityType === "LT") && quantity <= 0.25)
                             }
                         >
                             <Minus className="h-4 w-4" />
@@ -98,12 +102,28 @@ export function ProductCard({
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => handleQuantityChange(product.unityType === UnityType.UN ? 1 : 0.25)}
+                            onClick={() => handleQuantityChange(product.unityType === "UN" ? 1 : 0.25)}
                         >
                             <Plus className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>
+
+                {(product.unityType === "KG" || product.unityType === "LT") && (
+                    <ToggleGroup
+                        type="single"
+                        variant="outline"
+                        className="w-full justify-between mt-4"
+                        value={quantity.toString()}
+                        onValueChange={handlePresetChange}
+                    >
+                        {PRESET_QUANTITIES.map((preset) => (
+                            <ToggleGroupItem key={preset} value={preset.toString()} className="px-2 text-xs h-8">
+                                {preset.toFixed(3)}
+                            </ToggleGroupItem>
+                        ))}
+                    </ToggleGroup>
+                )}
 
                 {subProducts && subProducts.length > 0 && (
                     <Accordion type="single" collapsible className="w-full mt-4">
