@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Product } from "@/domains/product";
 import { formatCurrency } from "@/lib/utils";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 
@@ -19,7 +19,7 @@ interface SubProduct {
 
 interface ProductCardProps {
     product: Product;
-    imageUrl: string;
+    imageUrl?: string;
     subProducts?: SubProduct[];
     onQuantityChange?: (productId: string, quantity: number) => void;
     onSubProductChange?: (productId: string, subProductId: string, isChecked: boolean) => void;
@@ -75,7 +75,19 @@ export function ProductCard({
         <Card className="w-full max-w-xs overflow-hidden">
             <CardHeader className="p-0">
                 <div className="relative h-40 w-full">
-                    <Image src={imageUrl} alt={product.name} layout="fill" objectFit="cover" className="rounded-t-lg" />
+                    {imageUrl && imageUrl.trim() !== "" ? (
+                        <Image
+                            src={imageUrl}
+                            alt={product.name}
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-t-lg"
+                        />
+                    ) : (
+                        <div className="flex h-full w-full items-center justify-center rounded-t-lg bg-muted">
+                            <ImageIcon className="h-16 w-16 text-muted-foreground" />
+                        </div>
+                    )}
                 </div>
                 <div className="p-4">
                     <CardTitle className="text-lg font-semibold">{product.name}</CardTitle>

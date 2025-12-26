@@ -31,7 +31,7 @@ const orderFormSchema = z.object({
                 productId: z.string().uuid(),
                 name: z.string(),
                 unityType: z.string(),
-                quantity: z.number().min(0.001, "Quantidade deve ser maior que 0"),
+                quantity: z.number().min(0.25, "Quantidade deve ser maior que 0"),
                 price: z.number().min(1, "Preço deve ser maior que 0"),
             })
         )
@@ -132,18 +132,19 @@ export function OrderForm({ initialData }: OrderFormProps) {
         }
     };
 
+    // {products?.map((p, index) => {
+    //     return (
+    //         <ProductCard
+    //             key={index}
+    //             product={p}
+    //             imageUrl="" // https://img.cybercook.com.br/receitas/731/lasanha-3.jpeg"
+    //             subProducts={products.slice(1, 5).map((p) => ({ id: p.id as string, name: p.name }))}
+    //         />
+    //     );
+    // })}
+
     return (
         <Form {...form}>
-            {products?.map((p, index) => {
-                return (
-                    <ProductCard
-                        key={index}
-                        product={p}
-                        imageUrl="https://img.cybercook.com.br/receitas/731/lasanha-3.jpeg"
-                        subProducts={products.slice(1, 5).map((p) => ({ id: p.id as string, name: p.name }))}
-                    />
-                );
-            })}
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <OrderCustomerSection
                     form={form}
