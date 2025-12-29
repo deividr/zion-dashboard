@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
     /* config options here */
     output: "standalone", // to reduce build size
     images: {
-        domains: ["img.cybercook.com.br"],
+        domains: ["zion-assets.t3.storage.dev"],
     },
 };
 

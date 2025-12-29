@@ -6,4 +6,5 @@ export const productEndpoints = {
     create: () => `${API_URL}/products`,
     update: (id: string) => `${API_URL}/products/${id}`,
     delete: (id: string) => `${API_URL}/products/${id}`,
+    preSignedUrl: () => `${API_URL}/pre-signed-url`,
 };

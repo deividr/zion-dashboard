@@ -25,18 +25,25 @@ import { formatCurrency, parseNumber } from "@/lib/utils";
 import { categoryEndpoints } from "@/repository/categoryRepository";
 import { productEndpoints } from "@/repository/productRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Pencil, Plus, Trash2, Package, DollarSign, Ruler, Tag } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, Plus, Trash2, Package, DollarSign, Ruler, Tag, Upload } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useAuth } from "@clerk/nextjs";
+import { compressImage, isValidImageFile, isValidFileSize } from "@/lib/image-compression";
+import { uploadImageToBucket } from "@/lib/pre-signed-upload";
 
 export default function ProductDetail() {
     const { fetch } = useFetchClient();
+    const { getToken } = useAuth();
     const router = useRouter();
     const { id } = useParams();
     const [product, setProduct] = useState<Product | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [uploadingImage, setUploadingImage] = useState<boolean>(false);
+    const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const { toast } = useToast();
 
     const form = useForm<Product>({
@@ -47,6 +54,7 @@ export default function ProductDetail() {
             name: "",
             unityType: "KG",
             categoryId: "",
+            imageUrl: "",
         },
     });
 
@@ -58,6 +66,7 @@ export default function ProductDetail() {
                 unityType: "KG",
                 name: "",
                 categoryId: "",
+                imageUrl: "",
             });
             return;
         }
@@ -70,6 +79,7 @@ export default function ProductDetail() {
                 name: data?.name,
                 unityType: data?.unityType,
                 categoryId: data?.categoryId,
+                imageUrl: data?.imageUrl,
             });
             setProduct(data);
         };
@@ -91,6 +101,7 @@ export default function ProductDetail() {
             name: values.name,
             unityType: values.unityType,
             categoryId: values.categoryId,
+            imageUrl: values.imageUrl,
         };
 
         const url = product?.id === "new" ? productEndpoints.create() : productEndpoints.update(id as string);
@@ -131,6 +142,100 @@ export default function ProductDetail() {
         router.back();
     };
 
+    const handleAvatarClick = () => {
+        if (product?.id === "new") {
+            toast({
+                variant: "destructive",
+                description: "Salve o produto antes de fazer upload da imagem",
+            });
+            return;
+        }
+        fileInputRef.current?.click();
+    };
+
+    const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Validar tipo de arquivo
+        if (!isValidImageFile(file)) {
+            toast({
+                variant: "destructive",
+                description: "Por favor, selecione um arquivo de imagem",
+            });
+            return;
+        }
+
+        // Validar tamanho antes da compressão (máximo 10MB)
+        if (!isValidFileSize(file, 10)) {
+            toast({
+                variant: "destructive",
+                description: "A imagem deve ter no máximo 10MB",
+            });
+            return;
+        }
+
+        // Criar preview local imediatamente
+        const localPreviewUrl = URL.createObjectURL(file);
+        setPreviewImageUrl(localPreviewUrl);
+
+        // Iniciar processo de upload (o preview será limpo dentro do handleImageUpload)
+        await handleImageUpload(file, localPreviewUrl);
+    };
+
+    const handleImageUpload = async (file: File, previewUrl?: string) => {
+        if (!product?.id || product.id === "new") {
+            toast({
+                variant: "destructive",
+                description: "Salve o produto antes de fazer upload da imagem",
+            });
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                setPreviewImageUrl(null);
+            }
+            return;
+        }
+
+        setUploadingImage(true);
+
+        try {
+            // 1. Comprimir imagem
+            const compressedFile = await compressImage(file);
+
+            // 2. Fazer upload para o bucket
+            const publicUrl = await uploadImageToBucket(compressedFile, async () => await getToken());
+
+            // 3. Atualizar estado do produto e formulário
+            const updatedProduct = { ...product, imageUrl: publicUrl };
+            setProduct(updatedProduct);
+            form.setValue("imageUrl", publicUrl, { shouldDirty: true });
+
+            // 4. Limpar preview local após sucesso
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+            }
+            setPreviewImageUrl(null);
+
+            toast({
+                variant: "success",
+                description: "Imagem enviada com sucesso!",
+            });
+        } catch (error) {
+            console.error("Erro ao fazer upload da imagem:", error);
+            toast({
+                variant: "destructive",
+                description: error instanceof Error ? error.message : "Erro ao fazer upload da imagem",
+            });
+            // Manter preview em caso de erro para tentar novamente
+        } finally {
+            setUploadingImage(false);
+            // Limpar o input para permitir selecionar o mesmo arquivo novamente
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+        }
+    };
+
     if (!product) return <div>Loading...</div>;
 
     const currentName = form.watch("name");
@@ -150,12 +255,39 @@ export default function ProductDetail() {
                     <Card>
                         <CardHeaderWithIcon icon={Package} title="Dados do Produto" />
                         <CardContent className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                            <Avatar className="h-16 w-16">
-                                <AvatarImage src="" />
-                                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
-                                    {productInitials}
-                                </AvatarFallback>
-                            </Avatar>
+                            <div className="relative">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                    disabled={uploadingImage || product?.id === "new"}
+                                />
+                                <Avatar
+                                    className={`h-16 w-16 transition-opacity ${
+                                        uploadingImage ? "opacity-50 cursor-wait" : product?.id !== "new" ? "cursor-pointer hover:opacity-80" : ""
+                                    }`}
+                                    onClick={handleAvatarClick}
+                                >
+                                    <AvatarImage
+                                        src={previewImageUrl || product.imageUrl}
+                                        alt={product.name}
+                                    />
+                                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                                        {uploadingImage ? (
+                                            <Loader2 className="h-6 w-6 animate-spin" />
+                                        ) : (
+                                            productInitials
+                                        )}
+                                    </AvatarFallback>
+                                </Avatar>
+                                {!uploadingImage && product?.id !== "new" && (
+                                    <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 shadow-md">
+                                        <Upload className="h-3 w-3" />
+                                    </div>
+                                )}
+                            </div>
                             <div className="flex-1 w-full grid md:grid-cols-2 gap-6">
                                 <FormField
                                     control={form.control}
