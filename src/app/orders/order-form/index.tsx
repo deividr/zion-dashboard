@@ -159,11 +159,14 @@ export function OrderForm({ initialData }: OrderFormProps) {
             {products?.map((p, index) => {
                 // Só passa subprodutos se o produto for do tipo Massas
                 const shouldShowSubProducts = isMassasProduct(p);
+                // Prioriza carregamento das primeiras 3 imagens (LCP optimization)
+                const isPriority = index < 3 && p.imageUrl;
                 return (
                     <ProductCard
                         key={index}
                         product={p}
                         imageUrl={p.imageUrl}
+                        priority={isPriority}
                         subProducts={shouldShowSubProducts ? subProducts : undefined}
                     />
                 );

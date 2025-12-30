@@ -21,6 +21,7 @@ interface ProductCardProps {
     product: Product;
     imageUrl?: string;
     subProducts?: SubProduct[];
+    priority?: boolean;
     onQuantityChange?: (productId: string, quantity: number) => void;
     onSubProductChange?: (productId: string, subProductId: string, isChecked: boolean) => void;
     onAddToCart?: (product: Product, quantity: number, selectedSubProducts: string[]) => void;
@@ -32,6 +33,7 @@ export function ProductCard({
     product,
     imageUrl,
     subProducts,
+    priority = false,
     onQuantityChange,
     onSubProductChange,
     onAddToCart,
@@ -79,9 +81,10 @@ export function ProductCard({
                         <Image
                             src={imageUrl}
                             alt={product.name}
-                            layout="fill"
-                            objectFit="cover"
-                            className="rounded-t-lg"
+                            fill
+                            priority={priority}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="rounded-t-lg object-cover"
                         />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center rounded-t-lg bg-muted">
