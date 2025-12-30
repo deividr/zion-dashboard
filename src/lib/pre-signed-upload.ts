@@ -74,8 +74,6 @@ export async function uploadToBucket(preSignedUrl: string, file: File): Promise<
             mode: "cors",
         });
 
-        console.log(response);
-
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Erro ao fazer upload: ${response.status} ${response.statusText}. ${errorText}`);

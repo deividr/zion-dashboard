@@ -2,7 +2,7 @@
 
 import { ProductCard } from "@/components/product-card";
 import { Button, Form } from "@/components/ui";
-import { Address, Customer, Order, Product } from "@/domains";
+import { Address, Category, Customer, Order, Product } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { orderEndpoints } from "@/repository/orderRepository";
@@ -10,12 +10,13 @@ import { productEndpoints } from "@/repository/productRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2, Package } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { OrderCustomerSection } from "./order-customer-section";
 import { OrderDetailsSection } from "./order-details-section";
 import { OrderProductsSection } from "./order-products-section";
+import { categoryEndpoints } from "@/repository/categoryRepository";
 
 const orderFormSchema = z.object({
     customerId: z.string().uuid("Selecione um cliente"),
@@ -52,6 +53,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const [categories, setCategories] = useState<Category[]>();
     const isEditMode = !!initialData?.id;
 
     const form = useForm<OrderFormData>({
@@ -90,7 +92,27 @@ export function OrderForm({ initialData }: OrderFormProps) {
         loadProducts();
     }, [fetch, toast]);
 
-    // Submit do formulário
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const dataCategories = await fetch<Category[]>(categoryEndpoints.list());
+            setCategories(dataCategories || []);
+        };
+        fetchCategories();
+    }, [fetch, setCategories]);
+
+    const subProducts = useMemo(() => {
+        const molhos = categories?.find((c) => c.name === "Molhos" || c.name === "Molho");
+        return products.filter((p) => p.categoryId === molhos?.id).map((p) => ({ id: p.id as string, name: p.name }));
+    }, [products, categories]);
+
+    const isMassasProduct = useCallback(
+        (product: Product) => {
+            const massasCategory = categories?.find((c) => c.name === "Massas" || c.name === "Massa");
+            return product.categoryId === massasCategory?.id;
+        },
+        [categories]
+    );
+
     const onSubmit = async (data: OrderFormData) => {
         try {
             setIsLoading(true);
@@ -135,17 +157,18 @@ export function OrderForm({ initialData }: OrderFormProps) {
     return (
         <Form {...form}>
             {products?.map((p, index) => {
+                // Só passa subprodutos se o produto for do tipo Massas
+                const shouldShowSubProducts = isMassasProduct(p);
                 return (
                     <ProductCard
                         key={index}
                         product={p}
                         imageUrl={p.imageUrl}
-                        subProducts={products.slice(1, 5).map((p) => ({ id: p.id as string, name: p.name }))}
+                        subProducts={shouldShowSubProducts ? subProducts : undefined}
                     />
                 );
             })}
-
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="">
                 <OrderCustomerSection
                     form={form}
                     selectedCustomer={selectedCustomer}

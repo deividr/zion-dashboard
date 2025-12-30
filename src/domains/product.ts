@@ -9,12 +9,12 @@ export const UnityType = {
 export const productSchema = z.object({
     id: z.string().uuid().optional(),
     value: z.number().int().min(1, { message: "Valor deve ser maior que 0" }),
-    name: z.string().min(5, { message: "Nome deve ter no mínimo 5 caracteres" }),
+    name: z.string().min(4, { message: "Nome deve ter no mínimo 5 caracteres" }),
     unityType: z.enum(Object.keys(UnityType) as [string, string], {
         message: "Tipo de unidade inválido",
     }),
     categoryId: z.string().uuid(),
-    imageUrl: z.string().optional(),
+    imageUrl: z.preprocess((val) => (val === "" || val === null ? undefined : val), z.string().optional()),
 });
 
 export type Product = z.infer<typeof productSchema>;

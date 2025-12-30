@@ -25,7 +25,7 @@ import { formatCurrency, parseNumber } from "@/lib/utils";
 import { categoryEndpoints } from "@/repository/categoryRepository";
 import { productEndpoints } from "@/repository/productRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Pencil, Plus, Trash2, Package, DollarSign, Ruler, Tag, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, Plus, Trash2, Package, DollarSign, Ruler, Tag, Upload, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -54,7 +54,6 @@ export default function ProductDetail() {
             name: "",
             unityType: "KG",
             categoryId: "",
-            imageUrl: "",
         },
     });
 
@@ -66,7 +65,6 @@ export default function ProductDetail() {
                 unityType: "KG",
                 name: "",
                 categoryId: "",
-                imageUrl: "",
             });
             return;
         }
@@ -101,7 +99,7 @@ export default function ProductDetail() {
             name: values.name,
             unityType: values.unityType,
             categoryId: values.categoryId,
-            imageUrl: values.imageUrl,
+            imageUrl: values.imageUrl || undefined,
         };
 
         const url = product?.id === "new" ? productEndpoints.create() : productEndpoints.update(id as string);
@@ -236,6 +234,28 @@ export default function ProductDetail() {
         }
     };
 
+    const handleRemoveImage = async () => {
+        if (!product?.id || product.id === "new") {
+            return;
+        }
+
+        // Limpar preview se houver
+        if (previewImageUrl) {
+            URL.revokeObjectURL(previewImageUrl);
+            setPreviewImageUrl(null);
+        }
+
+        // Atualizar estado do produto e formulário
+        const updatedProduct = { ...product, imageUrl: undefined };
+        setProduct(updatedProduct);
+        form.setValue("imageUrl", undefined, { shouldDirty: true });
+
+        toast({
+            variant: "success",
+            description: "Imagem removida com sucesso!",
+        });
+    };
+
     if (!product) return <div>Loading...</div>;
 
     const currentName = form.watch("name");
@@ -266,14 +286,15 @@ export default function ProductDetail() {
                                 />
                                 <Avatar
                                     className={`h-16 w-16 transition-opacity ${
-                                        uploadingImage ? "opacity-50 cursor-wait" : product?.id !== "new" ? "cursor-pointer hover:opacity-80" : ""
+                                        uploadingImage
+                                            ? "opacity-50 cursor-wait"
+                                            : product?.id !== "new"
+                                              ? "cursor-pointer hover:opacity-80"
+                                              : ""
                                     }`}
                                     onClick={handleAvatarClick}
                                 >
-                                    <AvatarImage
-                                        src={previewImageUrl || product.imageUrl}
-                                        alt={product.name}
-                                    />
+                                    <AvatarImage src={previewImageUrl || product.imageUrl} alt={product.name} />
                                     <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
                                         {uploadingImage ? (
                                             <Loader2 className="h-6 w-6 animate-spin" />
@@ -282,10 +303,36 @@ export default function ProductDetail() {
                                         )}
                                     </AvatarFallback>
                                 </Avatar>
-                                {!uploadingImage && product?.id !== "new" && (
-                                    <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 shadow-md">
-                                        <Upload className="h-3 w-3" />
-                                    </div>
+                                {product?.id !== "new" && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            if (uploadingImage) return;
+                                            if (previewImageUrl || product.imageUrl) {
+                                                e.stopPropagation();
+                                                handleRemoveImage();
+                                            } else {
+                                                handleAvatarClick();
+                                            }
+                                        }}
+                                        disabled={uploadingImage}
+                                        className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 shadow-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-wait"
+                                        title={
+                                            uploadingImage
+                                                ? "Processando imagem..."
+                                                : previewImageUrl || product.imageUrl
+                                                  ? "Remover imagem"
+                                                  : "Fazer upload de imagem"
+                                        }
+                                    >
+                                        {uploadingImage ? (
+                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                        ) : previewImageUrl || product.imageUrl ? (
+                                            <X className="h-3 w-3" />
+                                        ) : (
+                                            <Upload className="h-3 w-3" />
+                                        )}
+                                    </button>
                                 )}
                             </div>
                             <div className="flex-1 w-full grid md:grid-cols-2 gap-6">
