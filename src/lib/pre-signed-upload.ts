@@ -123,7 +123,6 @@ export async function uploadImageToBucket(file: File, getToken: () => Promise<st
             "URL pública não retornada pelo backend. Verifique se o endpoint /pre-signed-url retorna 'publicUrl'."
         );
     }
-    console.log(publicUrl);
 
     return publicUrl;
 }

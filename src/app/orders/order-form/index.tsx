@@ -139,7 +139,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
                     <ProductCard
                         key={index}
                         product={p}
-                        imageUrl="https://zion-assets.t3.storage.dev/lasanha-3-min.jpeg"
+                        imageUrl={p.imageUrl}
                         subProducts={products.slice(1, 5).map((p) => ({ id: p.id as string, name: p.name }))}
                     />
                 );
