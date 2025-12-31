@@ -1,22 +1,20 @@
 "use client";
 
-import { ProductCard } from "@/components/product-card";
-import { Button, Form } from "@/components/ui";
 import { Address, Category, Customer, Order, Product } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { orderEndpoints } from "@/repository/orderRepository";
 import { productEndpoints } from "@/repository/productRepository";
+import { categoryEndpoints } from "@/repository/categoryRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Package } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { OrderCustomerSection } from "./order-customer-section";
-import { OrderDetailsSection } from "./order-details-section";
-import { OrderProductsSection } from "./order-products-section";
-import { categoryEndpoints } from "@/repository/categoryRepository";
+import { OrderMenuSection } from "./order-menu-section";
+import { OrderSummarySection } from "./order-summary-section";
+import { Form } from "@/components/ui";
 
 const orderFormSchema = z.object({
     customerId: z.string().uuid("Selecione um cliente"),
@@ -34,6 +32,7 @@ const orderFormSchema = z.object({
                 unityType: z.string(),
                 quantity: z.number().min(0.25, "Quantidade deve ser maior que 0"),
                 price: z.number().min(1, "Preço deve ser maior que 0"),
+                subProducts: z.array(z.string()).optional(),
             })
         )
         .min(1, "Adicione pelo menos um produto"),
@@ -53,7 +52,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-    const [categories, setCategories] = useState<Category[]>();
+    const [categories, setCategories] = useState<Category[]>([]);
     const isEditMode = !!initialData?.id;
 
     const form = useForm<OrderFormData>({
@@ -71,6 +70,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
                     unityType: p.unityType,
                     quantity: p.unityType === "UN" ? p.quantity : p.quantity / 1000,
                     price: p.price,
+                    subProducts: p.subProducts?.map((sp) => sp.productId) ?? [],
                 })) ?? [],
         },
     });
@@ -98,7 +98,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
             setCategories(dataCategories || []);
         };
         fetchCategories();
-    }, [fetch, setCategories]);
+    }, [fetch]);
 
     const subProducts = useMemo(() => {
         const molhos = categories?.find((c) => c.name === "Molhos" || c.name === "Molho");
@@ -128,6 +128,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
                     productId: p.productId,
                     quantity: p.unityType === "UN" ? p.quantity : p.quantity * 1000,
                     price: p.price,
+                    subProducts: p.subProducts || [],
                 })),
             };
 
@@ -156,54 +157,29 @@ export function OrderForm({ initialData }: OrderFormProps) {
 
     return (
         <Form {...form}>
-            {products?.map((p, index) => {
-                // Só passa subprodutos se o produto for do tipo Massas
-                const shouldShowSubProducts = isMassasProduct(p);
-                // Prioriza carregamento das primeiras 3 imagens (LCP optimization)
-                const isPriority = index < 3 && p.imageUrl;
-                return (
-                    <ProductCard
-                        key={index}
-                        product={p}
-                        imageUrl={p.imageUrl}
-                        priority={isPriority}
-                        subProducts={shouldShowSubProducts ? subProducts : undefined}
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] gap-4 h-full">
+                    {/* Coluna Esquerda: Identificação do Cliente */}
+                    <OrderCustomerSection
+                        form={form}
+                        selectedCustomer={selectedCustomer}
+                        onSelectedCustomerAction={setSelectedCustomer}
+                        addresses={addresses}
+                        onAddressesAction={setAddresses}
+                        isEditMode={isEditMode}
                     />
-                );
-            })}
-            <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                <OrderCustomerSection
-                    form={form}
-                    selectedCustomer={selectedCustomer}
-                    onSelectedCustomerAction={setSelectedCustomer}
-                    addresses={addresses}
-                    onAddressesAction={setAddresses}
-                    isEditMode={isEditMode}
-                />
 
-                <OrderDetailsSection form={form} />
+                    {/* Coluna Central: Cardápio */}
+                    <OrderMenuSection
+                        form={form}
+                        products={products}
+                        categories={categories}
+                        subProducts={subProducts}
+                        isMassasProduct={isMassasProduct}
+                    />
 
-                <OrderProductsSection form={form} products={products} />
-
-                {/* Form Actions */}
-                <div className="flex justify-end gap-4">
-                    <Button type="button" variant="ghost" onClick={() => router.back()} disabled={isLoading}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Voltar
-                    </Button>
-                    <Button type="submit" disabled={isLoading || !form.formState.isValid}>
-                        {isLoading ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Salvando...
-                            </>
-                        ) : (
-                            <>
-                                <Package className="mr-2 h-4 w-4" />
-                                {initialData?.id ? "Atualizar Pedido" : "Criar Pedido"}
-                            </>
-                        )}
-                    </Button>
+                    {/* Coluna Direita: Resumo do Pedido */}
+                    <OrderSummarySection form={form} products={products} addresses={addresses} isLoading={isLoading} />
                 </div>
             </form>
         </Form>
