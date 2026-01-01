@@ -1,29 +1,30 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage, Card, CardContent } from "@/components/ui";
 import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
+import { Avatar, AvatarFallback, AvatarImage, Card, CardContent } from "@/components/ui";
 import {
-    AlertDialogHeader,
-    AlertDialogFooter,
     AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogCancel,
     AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Customer, customerSchema } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { formatPhone, parseNumber } from "@/lib/utils";
+import { customerEndpoints } from "@/repository/customerRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Pencil, Plus, Trash2, User, Mail, Phone } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, Pencil, Phone, Plus, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -46,6 +47,56 @@ export function CustomerForm({ customer, children, returnToOrder = false, phoneF
     const { toast } = useToast();
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
+    const [checkingPhone, setCheckingPhone] = useState<{ phone: boolean; phone2: boolean }>({
+        phone: false,
+        phone2: false,
+    });
+
+    const isNewCustomer = useMemo<boolean>(() => {
+        return !customer?.id || customer.id === "" || customer.id === "new";
+    }, [customer]);
+
+    const checkPhoneExists = async (phone: string, fieldName: "phone" | "phone2") => {
+        const cleanPhone = parseNumber(phone);
+
+        if (!cleanPhone || cleanPhone.length < 10) {
+            formCustomer.clearErrors(fieldName);
+            return;
+        }
+
+        const originalPhone = fieldName === "phone" ? customer?.phone : customer?.phone2;
+        const phoneChanged = originalPhone !== cleanPhone;
+
+        if (!isNewCustomer && !phoneChanged) {
+            formCustomer.clearErrors(fieldName);
+            return;
+        }
+
+        setCheckingPhone((prev) => ({ ...prev, [fieldName]: true }));
+
+        try {
+            const data = await fetch<{ customers: Customer[] }>(customerEndpoints.findByPhone(cleanPhone));
+            const existingCustomer = data?.customers?.[0];
+
+            if (existingCustomer) {
+                const isDifferentCustomer = !customer?.id || existingCustomer.id !== customer.id;
+                if (isDifferentCustomer) {
+                    formCustomer.setError(fieldName, {
+                        type: "manual",
+                        message: `Já existe um cliente cadastrado com este telefone: ${existingCustomer.name}`,
+                    });
+                } else {
+                    formCustomer.clearErrors(fieldName);
+                }
+            } else {
+                formCustomer.clearErrors(fieldName);
+            }
+        } catch (error) {
+            console.error("Erro ao verificar telefone:", error);
+        } finally {
+            setCheckingPhone((prev) => ({ ...prev, [fieldName]: false }));
+        }
+    };
 
     const formCustomer = useForm<z.infer<typeof customerSchema>>({
         resolver: zodResolver(customerSchema),
@@ -184,14 +235,28 @@ export function CustomerForm({ customer, children, returnToOrder = false, phoneF
                                                 Telefone *
                                             </FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    value={formatPhone(field.value)}
-                                                    onChange={(e) => {
-                                                        const rawValue = parseNumber(e.target.value);
-                                                        field.onChange(rawValue);
-                                                    }}
-                                                />
+                                                <div className="relative">
+                                                    <Input
+                                                        {...field}
+                                                        value={formatPhone(field.value)}
+                                                        onChange={(e) => {
+                                                            const rawValue = parseNumber(e.target.value);
+                                                            field.onChange(rawValue);
+                                                            // Limpa erro ao digitar
+                                                            if (formCustomer.formState.errors.phone) {
+                                                                formCustomer.clearErrors("phone");
+                                                            }
+                                                        }}
+                                                        onBlur={async (e) => {
+                                                            field.onBlur();
+                                                            await checkPhoneExists(e.target.value, "phone");
+                                                        }}
+                                                        disabled={checkingPhone.phone}
+                                                    />
+                                                    {checkingPhone.phone && (
+                                                        <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+                                                    )}
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -207,14 +272,29 @@ export function CustomerForm({ customer, children, returnToOrder = false, phoneF
                                                 Telefone 2
                                             </FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    value={formatPhone(field.value)}
-                                                    onChange={(e) => {
-                                                        const rawValue = parseNumber(e.target.value);
-                                                        field.onChange(rawValue);
-                                                    }}
-                                                />
+                                                <div className="relative">
+                                                    <Input
+                                                        {...field}
+                                                        value={formatPhone(field.value)}
+                                                        onChange={(e) => {
+                                                            const rawValue = parseNumber(e.target.value);
+                                                            field.onChange(rawValue);
+                                                            if (formCustomer.formState.errors.phone2) {
+                                                                formCustomer.clearErrors("phone2");
+                                                            }
+                                                        }}
+                                                        onBlur={async (e) => {
+                                                            field.onBlur();
+                                                            if (e.target.value) {
+                                                                await checkPhoneExists(e.target.value, "phone2");
+                                                            }
+                                                        }}
+                                                        disabled={checkingPhone.phone2}
+                                                    />
+                                                    {checkingPhone.phone2 && (
+                                                        <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+                                                    )}
+                                                </div>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
