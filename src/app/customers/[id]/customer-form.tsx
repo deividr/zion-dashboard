@@ -34,7 +34,14 @@ const defaultValues: Customer = {
     phone2: "",
 };
 
-export function CustomerForm({ customer, children }: { customer: Customer; children: React.ReactNode }) {
+interface CustomerFormProps {
+    customer: Customer;
+    children: React.ReactNode;
+    returnToOrder?: boolean;
+    phoneFromQuery?: string;
+}
+
+export function CustomerForm({ customer, children, returnToOrder = false, phoneFromQuery = "" }: CustomerFormProps) {
     const { fetch } = useFetchClient();
     const { toast } = useToast();
     const router = useRouter();
@@ -46,18 +53,14 @@ export function CustomerForm({ customer, children }: { customer: Customer; child
     });
 
     useEffect(() => {
-        if (customer?.id) {
-            formCustomer.reset({
-                id: customer.id,
-                name: customer.name,
-                email: customer.email || "",
-                phone: customer.phone || "",
-                phone2: customer.phone2 || "",
-            });
-        } else {
-            formCustomer.reset(defaultValues);
-        }
-    }, [customer, formCustomer]);
+        formCustomer.reset({
+            id: customer?.id,
+            name: customer?.name || "",
+            email: customer?.email || "",
+            phone: phoneFromQuery || customer?.phone || "",
+            phone2: customer?.phone2 || "",
+        });
+    }, [customer, formCustomer, phoneFromQuery]);
 
     const handleSubmit = async (values: z.infer<typeof customerSchema>) => {
         const customerUpdated: Customer = {
@@ -82,7 +85,7 @@ export function CustomerForm({ customer, children }: { customer: Customer; child
         if (customer?.id) {
             formCustomer.reset(customerUpdated);
         } else {
-            router.replace(`/customers/${newCustomer?.id}`);
+            router.replace(`/customers/${newCustomer?.id}?returnToOrder=true&phone=${newCustomer?.phone}`);
         }
 
         toast({
@@ -93,6 +96,7 @@ export function CustomerForm({ customer, children }: { customer: Customer; child
 
     const handleDelete = async () => {
         setLoading(true);
+
         await fetch(`${process.env.NEXT_PUBLIC_HOST_API}/customers/${customer.id}`, {
             method: "DELETE",
         });
@@ -101,6 +105,15 @@ export function CustomerForm({ customer, children }: { customer: Customer; child
             variant: "success",
             description: "Cliente excluído com sucesso",
         });
+
+        router.back();
+    };
+
+    const handleBack = async () => {
+        if (returnToOrder && phoneFromQuery) {
+            router.push(`/orders/new?phone=${phoneFromQuery}&returnToOrder=true`);
+            return;
+        }
 
         router.back();
     };
@@ -216,12 +229,11 @@ export function CustomerForm({ customer, children }: { customer: Customer; child
             {customer.id && children}
 
             <div className="flex justify-end gap-4">
-                <Button variant="ghost" type="button" onClick={() => router.back()}>
+                <Button variant="ghost" type="button" onClick={handleBack}>
                     <ArrowLeft />
                     Voltar
                 </Button>
                 <Button
-                    variant="secondary"
                     type="submit"
                     form="customer-form"
                     disabled={[formCustomer.formState.isSubmitting, !formCustomer.formState.isDirty].includes(true)}

@@ -1,21 +1,24 @@
 "use client";
 
-import { Address, Customer } from "@/domains";
-import { useHeaderStore } from "@/stores/header-store";
-import { useFetchClient } from "@/lib/fetch-client";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { CustomerForm } from "./customer-form";
-import { AddressSection } from "./address-section";
-import { Card, CardContent } from "@/components/ui";
-import { MapPin } from "lucide-react";
 import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
+import { Card, CardContent } from "@/components/ui";
+import { Address, Customer } from "@/domains";
+import { useFetchClient } from "@/lib/fetch-client";
+import { useHeaderStore } from "@/stores/header-store";
+import { MapPin } from "lucide-react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { AddressSection } from "./address-section";
+import { CustomerForm } from "./customer-form";
 
 export default function CustomerEdit() {
     const { fetch } = useFetchClient();
     const { id } = useParams();
+    const searchParams = useSearchParams();
+    const phoneFromQuery = searchParams.get("phone") || "";
+    const returnToOrder = searchParams.get("returnToOrder") === "true";
     const [customer, setCustomer] = useState<Customer | null>({
-        id: "new",
+        id: "",
         name: "",
         email: "",
         phone: "",
@@ -38,7 +41,7 @@ export default function CustomerEdit() {
             setAddresses(result?.addresses ?? []);
         };
 
-        if (id && id !== "new") {
+        if (id && id !== "new" && id !== "") {
             fetchCustomer();
         }
     }, [id, fetch]);
@@ -46,7 +49,7 @@ export default function CustomerEdit() {
     if (!customer) return <div>Loading...</div>;
 
     return (
-        <CustomerForm customer={customer}>
+        <CustomerForm customer={customer} returnToOrder={returnToOrder} phoneFromQuery={phoneFromQuery}>
             <Card>
                 <CardHeaderWithIcon icon={MapPin} title="Endereços do Cliente" />
                 <CardContent>

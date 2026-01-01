@@ -11,25 +11,25 @@ Sistema completo de gestão comercial desenvolvido para a LaBuonapasta, uma empr
 
 O Zion Dashboard é uma solução completa de ERP/CRM focada no ramo alimentício, oferecendo:
 
--   **Gestão de Clientes**: Cadastro completo com múltiplos endereços e validação de CEP
--   **Catálogo de Produtos**: Controle de produtos, categorias e unidades de medida
--   **Sistema de Pedidos**: Gerenciamento completo do ciclo de pedidos com tracking
--   **Logística**: Cálculo automático de distância e controle de entrega
--   **Dashboard Analítico**: Métricas e relatórios em tempo real
--   **Autenticação Segura**: Sistema de login integrado com Clerk
+- **Gestão de Clientes**: Cadastro completo com múltiplos endereços e validação de CEP
+- **Catálogo de Produtos**: Controle de produtos, categorias e unidades de medida
+- **Sistema de Pedidos**: Gerenciamento completo do ciclo de pedidos com tracking
+- **Logística**: Cálculo automático de distância e controle de entrega
+- **Dashboard Analítico**: Métricas e relatórios em tempo real
+- **Autenticação Segura**: Sistema de login integrado com Clerk
 
 ## 🏗️ Arquitetura Técnica
 
 ### Stack Principal
 
--   **Frontend**: Next.js 15 com App Router
--   **UI Framework**: React 18 + TypeScript
--   **Styling**: Tailwind CSS + shadcn/ui components
--   **State Management**: Zustand para estado global
--   **Formulários**: React Hook Form + Zod para validação
--   **Autenticação**: Clerk (OAuth, JWT)
--   **Tabelas**: TanStack Table com paginação
--   **Containerização**: Docker + Docker Compose
+- **Frontend**: Next.js 15 com App Router
+- **UI Framework**: React 18 + TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **State Management**: Zustand para estado global
+- **Formulários**: React Hook Form + Zod para validação
+- **Autenticação**: Clerk (OAuth, JWT)
+- **Tabelas**: TanStack Table com paginação
+- **Containerização**: Docker + Docker Compose
 
 ### Estrutura de Domínios
 
@@ -44,18 +44,18 @@ src/domains/
 
 ### Componentes Principais
 
--   **DataTable**: Tabelas reutilizáveis com filtros
--   **Forms**: Formulários inteligentes com validação
--   **Sidebar**: Navegação responsiva
--   **AddressForm**: Formulário com busca automática por CEP
+- **DataTable**: Tabelas reutilizáveis com filtros
+- **Forms**: Formulários inteligentes com validação
+- **Sidebar**: Navegação responsiva
+- **AddressForm**: Formulário com busca automática por CEP
 
 ## 🚀 Setup e Desenvolvimento
 
 ### Pré-requisitos
 
--   Node.js 18+
--   pnpm (recomendado)
--   Docker (opcional)
+- Node.js 18+
+- pnpm (recomendado)
+- Docker (opcional)
 
 ### Instalação Local
 
@@ -95,44 +95,44 @@ pnpm start
 
 ### ✅ Sistema de Clientes
 
--   [x] CRUD completo de clientes
--   [x] Gestão de múltiplos endereços por cliente
--   [x] Validação automática de CEP via API
--   [x] Cálculo de distância da loja
--   [x] Máscara para telefones e CEP
--   [x] Validação de endereço padrão único
+- [x] CRUD completo de clientes
+- [x] Gestão de múltiplos endereços por cliente
+- [x] Validação automática de CEP via API
+- [x] Cálculo de distância da loja
+- [x] Máscara para telefones e CEP
+- [x] Validação de endereço padrão único
 
 ### ✅ Gestão de Produtos
 
--   [x] Cadastro de produtos com categorias
--   [x] Controle de unidades (UN, KG, LT)
--   [x] Sistema de categorias
--   [x] Validação de preços e quantidades
--   [x] Interface responsiva
+- [x] Cadastro de produtos com categorias
+- [x] Controle de unidades (UN, KG, LT)
+- [x] Sistema de categorias
+- [x] Validação de preços e quantidades
+- [x] Interface responsiva
 
 ### ✅ Sistema de Pedidos
 
--   [x] Listagem com filtros avançados
--   [x] Filtro por data de pickup
--   [x] Busca por cliente/produto
--   [x] Visualização detalhada de pedidos
--   [x] Controle de status (entregue/pendente)
+- [x] Listagem com filtros avançados
+- [x] Filtro por data de pickup
+- [x] Busca por cliente/produto
+- [x] Visualização detalhada de pedidos
+- [x] Controle de status (entregue/pendente)
 
 ### ✅ Interface e UX
 
--   [x] Design system com shadcn/ui
--   [x] Sidebar responsiva e colapsível
--   [x] Tema consistente e moderno
--   [x] Toasts para feedback
--   [x] Loading states
--   [x] Navegação breadcrumb dinâmica
+- [x] Design system com shadcn/ui
+- [x] Sidebar responsiva e colapsível
+- [x] Tema consistente e moderno
+- [x] Toasts para feedback
+- [x] Loading states
+- [x] Navegação breadcrumb dinâmica
 
 ### ✅ Autenticação e Segurança
 
--   [x] Login seguro com Clerk
--   [x] Proteção de rotas
--   [x] Gerenciamento de sessão
--   [x] Validação de formulários
+- [x] Login seguro com Clerk
+- [x] Proteção de rotas
+- [x] Gerenciamento de sessão
+- [x] Validação de formulários
 
 ## 🎨 Screenshots
 
@@ -190,71 +190,71 @@ docker run -p 3000:3000 zion-dashboard
 
 ### 🔥 Urgente
 
--   [ ] **Os endereços não estão sendo salvos** - Investigar problema na função `onSubmitAddress` no `address-section.tsx`
--   [ ] Validar se o customer.id está sendo passado corretamente para a API
+- [ ] **Os endereços não estão sendo salvos** - Investigar problema na função `onSubmitAddress` no `address-section.tsx`
+- [ ] Validar se o customer.id está sendo passado corretamente para a API
 
 ### 🎯 Funcionalidades Core
 
--   [ ] **Melhorar UX de Endereços**
-    -   [ ] Loading indicator ao pesquisar endereço por CEP
-    -   [ ] Validação: impedir endereços duplicados no mesmo CEP para o mesmo cliente
-    -   [ ] Confirmação visual quando endereço for salvo com sucesso
--   [ ] **Sistema de Pedidos**
-    -   [ ] Implementar criação de novos pedidos (página `/orders/new`)
-    -   [ ] Melhorar filtros e busca na listagem de pedidos
-    -   [ ] Adicionar status de entrega/pickup nos pedidos
--   [ ] **Dashboard Principal**
-    -   [ ] Implementar homepage com métricas e widgets
-    -   [ ] Gráficos de vendas por período
-    -   [ ] Resumo de pedidos pendentes
+- [ ] **Melhorar UX de Endereços**
+  - [ ] Loading indicator ao pesquisar endereço por CEP
+  - [ ] Validação: impedir endereços duplicados no mesmo CEP para o mesmo cliente
+  - [ ] Confirmação visual quando endereço for salvo com sucesso
+- [ ] **Sistema de Pedidos**
+  - [ ] Implementar criação de novos pedidos (página `/orders/new`)
+  - [ ] Melhorar filtros e busca na listagem de pedidos
+  - [ ] Adicionar status de entrega/pickup nos pedidos
+- [ ] **Dashboard Principal**
+  - [ ] Implementar homepage com métricas e widgets
+  - [ ] Gráficos de vendas por período
+  - [ ] Resumo de pedidos pendentes
 
 ### 🔧 Melhorias Técnicas
 
--   [ ] **Performance**
-    -   [ ] Implementar paginação server-side nas listagens
-    -   [ ] Otimizar queries e carregamento de dados
-    -   [ ] Adicionar cache para dados estáticos (categorias, etc.)
--   [ ] **UX/UI**
+- [ ] **Performance**
+  - [ ] Implementar paginação server-side nas listagens
+  - [ ] Otimizar queries e carregamento de dados, usando o TanStack
+  - [ ] Adicionar cache para dados estáticos (categorias, etc.)
+- [ ] **UX/UI**
 
-    -   [ ] Implementar skeleton loading em todas as páginas
-    -   [ ] Melhorar responsividade mobile
-    -   [ ] Adicionar dark mode
-    -   [ ] Implementar breadcrumbs dinâmicos
+  - [ ] Implementar skeleton loading em todas as páginas
+  - [ ] Melhorar responsividade mobile
+  - [ ] Adicionar dark mode
+  - [ ] Implementar breadcrumbs dinâmicos
 
--   [ ] **Validações e Segurança**
-    -   [ ] Validação de formulários mais robusta
-    -   [ ] Tratamento de erro global
-    -   [ ] Logs de auditoria para ações críticas
+- [ ] **Validações e Segurança**
+  - [ ] Validação de formulários mais robusta
+  - [ ] Tratamento de erro global
+  - [ ] Logs de auditoria para ações críticas
 
 ### 📱 Funcionalidades Futuras
 
--   [ ] **Relatórios**
-    -   [ ] Relatório de vendas por período
-    -   [ ] Relatório de clientes mais ativos
-    -   [ ] Análise de produtos mais vendidos
--   [ ] **Integração**
-    -   [ ] API de correios para frete automático
-    -   [ ] Integração com WhatsApp para notificações
-    -   [ ] Sistema de backup automático
+- [ ] **Relatórios**
+  - [ ] Relatório de vendas por período
+  - [ ] Relatório de clientes mais ativos
+  - [ ] Análise de produtos mais vendidos
+- [ ] **Integração**
+  - [ ] API de correios para frete automático
+  - [ ] Integração com WhatsApp para notificações
+  - [ ] Sistema de backup automático
 
 ### ✅ Concluído
 
--   [x] Criar categoria de produtos
--   [x] Select field para categoria do produto
--   [x] Select field para unidade de produto
--   [x] Máscara para CEP
--   [x] Busca automática de endereço por CEP
--   [x] Validação: apenas um endereço default por cliente
--   [x] Sistema de autenticação com Clerk
--   [x] CRUD completo de clientes
--   [x] CRUD completo de produtos
--   [x] Listagem e detalhes de pedidos
+- [x] Criar categoria de produtos
+- [x] Select field para categoria do produto
+- [x] Select field para unidade de produto
+- [x] Máscara para CEP
+- [x] Busca automática de endereço por CEP
+- [x] Validação: apenas um endereço default por cliente
+- [x] Sistema de autenticação com Clerk
+- [x] CRUD completo de clientes
+- [x] CRUD completo de produtos
+- [x] Listagem e detalhes de pedidos
 
 ---
 
 **Legenda:**
 
--   🔥 Urgente: Bugs críticos que afetam funcionalidade principal
--   🎯 Core: Funcionalidades essenciais para o negócio
--   🔧 Melhorias: Otimizações e melhorias de experiência
--   📱 Futuras: Funcionalidades planejadas para próximas versões
+- 🔥 Urgente: Bugs críticos que afetam funcionalidade principal
+- 🎯 Core: Funcionalidades essenciais para o negócio
+- 🔧 Melhorias: Otimizações e melhorias de experiência
+- 📱 Futuras: Funcionalidades planejadas para próximas versões

@@ -26,7 +26,7 @@ import { useFetchClient } from "@/lib/fetch-client";
 import { cn, formatPhone, parseNumber } from "@/lib/utils";
 import { customerEndpoints } from "@/repository/customerRepository";
 import { Loader2, MapPin, Phone, Plus, Search, User } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { OrderFormData } from ".";
@@ -51,9 +51,12 @@ export function OrderCustomerSection({
     const { fetch } = useFetchClient();
     const { toast } = useToast();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const phoneFromUrl = searchParams.get("phone");
     const [customerPhone, setCustomerPhone] = useState("");
     const [isSearchingCustomer, setIsSearchingCustomer] = useState(false);
     const [customerNotFound, setCustomerNotFound] = useState(false);
+    const [hasSearchedFromUrl, setHasSearchedFromUrl] = useState(false);
 
     const customerId = form.watch("customerId");
 
@@ -196,8 +199,24 @@ export function OrderCustomerSection({
     // Função para criar novo cliente
     const handleCreateNewCustomer = () => {
         const cleanPhone = parseNumber(customerPhone);
-        router.push(`/customers/new?phone=${cleanPhone}`);
+        router.push(`/customers/new?phone=${cleanPhone}&returnToOrder=true`);
     };
+
+    // Buscar cliente automaticamente quando voltar da criação com telefone na URL
+    useEffect(() => {
+        if (phoneFromUrl && !isEditMode && !hasSearchedFromUrl && !selectedCustomer) {
+            const cleanPhone = parseNumber(phoneFromUrl);
+            setCustomerPhone(cleanPhone);
+            setHasSearchedFromUrl(true);
+            // Buscar cliente automaticamente
+            handleSearchCustomerByPhone(cleanPhone);
+            // Limpar o query parameter da URL após um pequeno delay
+            setTimeout(() => {
+                router.replace("/orders/new", { scroll: false });
+            }, 500);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [phoneFromUrl, isEditMode, hasSearchedFromUrl, selectedCustomer]);
 
     const customerInitials =
         selectedCustomer?.name

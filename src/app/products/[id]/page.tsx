@@ -448,7 +448,6 @@ export default function ProductDetail() {
                     Voltar
                 </Button>
                 <Button
-                    variant="secondary"
                     type="submit"
                     form="product-form"
                     disabled={[form.formState.isSubmitting, !form.formState.isDirty].includes(true)}
