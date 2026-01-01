@@ -1,7 +1,7 @@
 "use client";
 
 import { CardHeaderWithIcon } from "@/components/card-header-with-icon";
-import { Avatar, AvatarFallback, AvatarImage, Card, CardContent } from "@/components/ui";
+import { Avatar, AvatarFallback, AvatarImage, Card, CardContent, CardFooter } from "@/components/ui";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,7 +22,7 @@ import { useFetchClient } from "@/lib/fetch-client";
 import { formatPhone, parseNumber } from "@/lib/utils";
 import { customerEndpoints } from "@/repository/customerRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Mail, Pencil, Phone, Plus, Trash2, User } from "lucide-react";
+import { ArrowLeft, CalendarFoldIcon, Loader2, Mail, Pencil, Phone, Plus, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -302,61 +302,69 @@ export function CustomerForm({ customer, children, returnToOrder = false, phoneF
                                 />
                             </div>
                         </CardContent>
+                        <CardFooter className="mt-5">
+                            <div className="flex justify-end gap-4 w-full">
+                                <Button variant="ghost" type="button" onClick={handleBack}>
+                                    <ArrowLeft />
+                                    Voltar
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    form="customer-form"
+                                    disabled={[
+                                        formCustomer.formState.isSubmitting,
+                                        !formCustomer.formState.isDirty,
+                                    ].includes(true)}
+                                >
+                                    {formCustomer.formState.isSubmitting ? (
+                                        <Loader2 className="animate-spin" />
+                                    ) : customer.id ? (
+                                        <Pencil />
+                                    ) : (
+                                        <Plus />
+                                    )}
+                                    {customer.id ? "Salvar" : "Adicionar"}
+                                </Button>
+                                {customer.id && (
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" type="button" disabled={loading}>
+                                                <Trash2 />
+                                                Excluir
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Tem certeza que quer excluir esse cliente?
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Essa ação não pode ser desfeita.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction asChild>
+                                                    <Button
+                                                        variant="destructive"
+                                                        type="button"
+                                                        onClick={handleDelete}
+                                                        disabled={loading}
+                                                    >
+                                                        Continuar
+                                                    </Button>
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                )}
+                            </div>
+                        </CardFooter>
                     </Card>
                 </form>
             </Form>
 
             {customer.id && children}
-
-            <div className="flex justify-end gap-4">
-                <Button variant="ghost" type="button" onClick={handleBack}>
-                    <ArrowLeft />
-                    Voltar
-                </Button>
-                <Button
-                    type="submit"
-                    form="customer-form"
-                    disabled={[formCustomer.formState.isSubmitting, !formCustomer.formState.isDirty].includes(true)}
-                >
-                    {formCustomer.formState.isSubmitting ? (
-                        <Loader2 className="animate-spin" />
-                    ) : customer.id ? (
-                        <Pencil />
-                    ) : (
-                        <Plus />
-                    )}
-                    {customer.id ? "Salvar" : "Adicionar"}
-                </Button>
-                {customer.id && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive" type="button" disabled={loading}>
-                                <Trash2 />
-                                Excluir
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Tem certeza que quer excluir esse cliente?</AlertDialogTitle>
-                                <AlertDialogDescription>Essa ação não pode ser desfeita.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction asChild>
-                                    <Button
-                                        variant="destructive"
-                                        type="button"
-                                        onClick={handleDelete}
-                                        disabled={loading}
-                                    >
-                                        Continuar
-                                    </Button>
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
-            </div>
         </div>
     );
 }

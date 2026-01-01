@@ -11,7 +11,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage, Card, CardContent } from "@/components/ui";
+import { Avatar, AvatarFallback, AvatarImage, Card, CardContent, CardFooter } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -438,59 +438,64 @@ export default function ProductDetail() {
                                 />
                             </div>
                         </CardContent>
+                        <CardFooter className="mt-5">
+                            <div className="flex justify-end gap-4 w-full">
+                                <Button variant="ghost" type="button" onClick={() => router.back()}>
+                                    <ArrowLeft />
+                                    Voltar
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    form="product-form"
+                                    disabled={[form.formState.isSubmitting, !form.formState.isDirty].includes(true)}
+                                >
+                                    {form.formState.isSubmitting ? (
+                                        <Loader2 className="animate-spin" />
+                                    ) : product?.id === "new" ? (
+                                        <Plus />
+                                    ) : (
+                                        <Pencil />
+                                    )}
+                                    {product?.id === "new" ? "Adicionar" : "Salvar"}
+                                </Button>
+                                {product.id !== "new" && (
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" type="button" disabled={loading}>
+                                                <Trash2 />
+                                                Excluir
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Tem certeza que quer excluir esse produto?
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Essa ação não pode ser desfeita.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction asChild>
+                                                    <Button
+                                                        variant="destructive"
+                                                        type="button"
+                                                        onClick={handleDelete}
+                                                        disabled={loading}
+                                                    >
+                                                        Continuar
+                                                    </Button>
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                )}
+                            </div>
+                        </CardFooter>
                     </Card>
                 </form>
             </Form>
-
-            <div className="flex justify-end gap-4">
-                <Button variant="ghost" type="button" onClick={() => router.back()}>
-                    <ArrowLeft />
-                    Voltar
-                </Button>
-                <Button
-                    type="submit"
-                    form="product-form"
-                    disabled={[form.formState.isSubmitting, !form.formState.isDirty].includes(true)}
-                >
-                    {form.formState.isSubmitting ? (
-                        <Loader2 className="animate-spin" />
-                    ) : product?.id === "new" ? (
-                        <Plus />
-                    ) : (
-                        <Pencil />
-                    )}
-                    {product?.id === "new" ? "Adicionar" : "Salvar"}
-                </Button>
-                {product.id !== "new" && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive" type="button" disabled={loading}>
-                                <Trash2 />
-                                Excluir
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Tem certeza que quer excluir esse produto?</AlertDialogTitle>
-                                <AlertDialogDescription>Essa ação não pode ser desfeita.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction asChild>
-                                    <Button
-                                        variant="destructive"
-                                        type="button"
-                                        onClick={handleDelete}
-                                        disabled={loading}
-                                    >
-                                        Continuar
-                                    </Button>
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
-            </div>
         </div>
     );
 }
