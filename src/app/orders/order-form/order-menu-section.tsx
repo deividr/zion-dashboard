@@ -2,7 +2,7 @@
 
 import { ProductCard } from "@/components/product-card";
 import { Card, CardContent, Input, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
-import { Category, Product } from "@/domains";
+import { Category, OrderSubproduct, Product } from "@/domains";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -12,11 +12,17 @@ interface OrderMenuSectionProps {
     form: UseFormReturn<OrderFormData>;
     products: Product[];
     categories: Category[];
-    subProducts: { id: string; name: string }[];
-    isMassasProduct: (product: Product) => boolean;
+    subProducts: OrderSubproduct[];
+    isMassasProductAction: (product: Product) => boolean;
 }
 
-export function OrderMenuSection({ form, products, categories, subProducts, isMassasProduct }: OrderMenuSectionProps) {
+export function OrderMenuSection({
+    form,
+    products,
+    categories,
+    subProducts,
+    isMassasProductAction,
+}: OrderMenuSectionProps) {
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
@@ -91,7 +97,9 @@ export function OrderMenuSection({ form, products, categories, subProducts, isMa
                 unityType: product.unityType,
                 quantity,
                 price: product.value,
-                subProducts: selectedSubProducts,
+                subProducts: selectedSubProducts.map((p) => ({
+                    productId: p,
+                })),
             },
         ]);
     };
@@ -136,7 +144,7 @@ export function OrderMenuSection({ form, products, categories, subProducts, isMa
                                         </h3>
                                         <div className="space-y-3">
                                             {categoryProducts.map((product, index) => {
-                                                const shouldShowSubProducts = isMassasProduct(product);
+                                                const shouldShowSubProducts = isMassasProductAction(product);
                                                 const isPriority = index < 2 && !!product.imageUrl;
                                                 return (
                                                     <ProductCard
@@ -156,7 +164,7 @@ export function OrderMenuSection({ form, products, categories, subProducts, isMa
                                 // Mostrar produtos da categoria selecionada
                                 <div className="space-y-3">
                                     {filteredProducts.map((product, index) => {
-                                        const shouldShowSubProducts = isMassasProduct(product);
+                                        const shouldShowSubProducts = isMassasProductAction(product);
                                         const isPriority = index < 2 && !!product.imageUrl;
                                         return (
                                             <ProductCard

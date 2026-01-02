@@ -4,10 +4,8 @@ import { UnityType } from "./product";
 import { addressSchema } from "./address";
 
 export const orderSubproductSchema = z.object({
-    id: z.string().uuid().optional(),
-    orderId: z.string().uuid(),
     productId: z.string().uuid(),
-    name: z.string(),
+    name: z.string().optional(),
 });
 
 export type OrderSubproduct = z.infer<typeof orderSubproductSchema>;

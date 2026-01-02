@@ -25,9 +25,10 @@ interface OrderSummarySectionProps {
     products: Product[];
     addresses: Address[];
     isLoading: boolean;
+    isEditingMode: boolean;
 }
 
-export function OrderSummarySection({ form, products, addresses, isLoading }: OrderSummarySectionProps) {
+export function OrderSummarySection({ form, products, addresses, isLoading, isEditingMode }: OrderSummarySectionProps) {
     const cartItems = form.watch("products") || [];
     const selectedAddressId = form.watch("addressId");
 
@@ -228,7 +229,7 @@ export function OrderSummarySection({ form, products, addresses, isLoading }: Or
                     ) : (
                         <>
                             <ShoppingCart className="mr-2 h-4 w-4" />
-                            Finalizar Pedido
+                            {`${isEditingMode ? "Atualizar" : "Finalizar"} Pedido`}
                         </>
                     )}
                 </Button>

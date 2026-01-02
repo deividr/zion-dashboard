@@ -32,7 +32,7 @@ const orderFormSchema = z.object({
                 unityType: z.string(),
                 quantity: z.number().min(0.25, "Quantidade deve ser maior que 0"),
                 price: z.number().min(1, "Preço deve ser maior que 0"),
-                subProducts: z.array(z.string()).optional(),
+                subProducts: z.array(z.object({ productId: z.string().uuid() })).optional(),
             })
         )
         .min(1, "Adicione pelo menos um produto"),
@@ -70,7 +70,7 @@ export function OrderForm({ initialData }: OrderFormProps) {
                     unityType: p.unityType,
                     quantity: p.unityType === "UN" ? p.quantity : p.quantity / 1000,
                     price: p.price,
-                    subProducts: p.subProducts?.map((sp) => sp.productId) ?? [],
+                    subProducts: p.subProducts ?? [],
                 })) ?? [],
         },
     });
@@ -102,7 +102,9 @@ export function OrderForm({ initialData }: OrderFormProps) {
 
     const subProducts = useMemo(() => {
         const molhos = categories?.find((c) => c.name === "Molhos" || c.name === "Molho");
-        return products.filter((p) => p.categoryId === molhos?.id).map((p) => ({ id: p.id as string, name: p.name }));
+        return products
+            .filter((p) => p.categoryId === molhos?.id)
+            .map((p) => ({ productId: p.id as string, name: p.name }));
     }, [products, categories]);
 
     const isMassasProduct = useCallback(
@@ -125,10 +127,8 @@ export function OrderForm({ initialData }: OrderFormProps) {
                 observations: data.observations || "",
                 addressId: data.addressId || null,
                 products: data.products.map((p) => ({
-                    productId: p.productId,
+                    ...p,
                     quantity: p.unityType === "UN" ? p.quantity : p.quantity * 1000,
-                    price: p.price,
-                    subProducts: p.subProducts || [],
                 })),
             };
 
@@ -175,11 +175,17 @@ export function OrderForm({ initialData }: OrderFormProps) {
                         products={products}
                         categories={categories}
                         subProducts={subProducts}
-                        isMassasProduct={isMassasProduct}
+                        isMassasProductAction={isMassasProduct}
                     />
 
                     {/* Coluna Direita: Resumo do Pedido */}
-                    <OrderSummarySection form={form} products={products} addresses={addresses} isLoading={isLoading} />
+                    <OrderSummarySection
+                        form={form}
+                        products={products}
+                        addresses={addresses}
+                        isLoading={isLoading}
+                        isEditingMode
+                    />
                 </div>
             </form>
         </Form>

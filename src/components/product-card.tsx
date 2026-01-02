@@ -6,21 +6,17 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { OrderSubproduct } from "@/domains";
 import { Product } from "@/domains/product";
 import { formatCurrency } from "@/lib/utils";
 import { Minus, Plus, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 
-interface SubProduct {
-    id: string;
-    name: string;
-}
-
 interface ProductCardProps {
     product: Product;
     imageUrl?: string;
-    subProducts?: SubProduct[];
+    subProducts?: OrderSubproduct[];
     priority?: boolean;
     onQuantityChange?: (productId: string, quantity: number) => void;
     onSubProductChange?: (productId: string, subProductId: string, isChecked: boolean) => void;
@@ -184,15 +180,15 @@ export function ProductCard({
                                 <AccordionContent className="pb-0">
                                     <div className="grid gap-2">
                                         {subProducts.map((sub) => (
-                                            <div key={sub.id} className="flex items-center gap-2">
+                                            <div key={sub.productId} className="flex items-center gap-2">
                                                 <Checkbox
-                                                    id={`sub-${sub.id}`}
-                                                    checked={selectedSubProducts.has(sub.id)}
+                                                    id={`sub-${sub.productId}`}
+                                                    checked={selectedSubProducts.has(sub.productId)}
                                                     onCheckedChange={(checked) =>
-                                                        handleSubProductToggle(sub.id, !!checked)
+                                                        handleSubProductToggle(sub.productId, !!checked)
                                                     }
                                                 />
-                                                <Label htmlFor={`sub-${sub.id}`} className="text-sm font-normal">
+                                                <Label htmlFor={`sub-${sub.productId}`} className="text-sm font-normal">
                                                     {sub.name}
                                                 </Label>
                                             </div>
