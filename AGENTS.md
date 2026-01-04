@@ -23,19 +23,19 @@ Este documento serve como guia completo para desenvolvedores humanos e IA que tr
 
 O **Zion Dashboard** é um sistema ERP/CRM completo para gestão comercial no ramo alimentício, especificamente desenvolvido para a LaBuonapasta. O sistema gerencia:
 
--   **Clientes**: CRUD completo com múltiplos endereços e validação de CEP
--   **Produtos**: Catálogo com categorias e unidades de medida
--   **Pedidos**: Sistema completo de pedidos com tracking
--   **Logística**: Cálculo de distância e controle de entrega
+- **Clientes**: CRUD completo com múltiplos endereços e validação de CEP
+- **Produtos**: Catálogo com categorias e unidades de medida
+- **Pedidos**: Sistema completo de pedidos com tracking
+- **Logística**: Cálculo de distância e controle de entrega
 
 ### Características Principais
 
--   Interface moderna e responsiva
--   Autenticação segura com Clerk
--   Validação robusta de formulários
--   Sistema de notificações (toasts)
--   Navegação por breadcrumbs dinâmicos
--   Tabelas interativas com paginação
+- Interface moderna e responsiva
+- Autenticação segura com Clerk
+- Validação robusta de formulários
+- Sistema de notificações (toasts)
+- Navegação por breadcrumbs dinâmicos
+- Tabelas interativas com paginação
 
 ---
 
@@ -356,29 +356,29 @@ const onSubmit = async (data: Entity) => {
 
 ### 🚫 NUNCA FAÇA
 
--   ❌ **Cores hardcoded**: `bg-blue-500`, `text-red-600`
--   ❌ **Modificar componentes UI**: Alterar arquivos em `src/components/ui/`
--   ❌ **Criar componentes UI customizados**: Use shadcn/ui
--   ❌ **Ignorar validação**: Todo formulário deve ter schema Zod
--   ❌ **Requisições não autenticadas**: Use sempre `useFetchClient`
--   ❌ **Estados locais desnecessários**: Use Zustand para estado global
+- ❌ **Cores hardcoded**: `bg-blue-500`, `text-red-600`
+- ❌ **Modificar componentes UI**: Alterar arquivos em `src/components/ui/`
+- ❌ **Criar componentes UI customizados**: Use shadcn/ui
+- ❌ **Ignorar validação**: Todo formulário deve ter schema Zod
+- ❌ **Requisições não autenticadas**: Use sempre `useFetchClient`
+- ❌ **Estados locais desnecessários**: Use Zustand para estado global
 
 ### ✅ SEMPRE FAÇA
 
--   ✅ **Use variáveis CSS**: `hsl(var(--primary))`
--   ✅ **Valide formulários**: React Hook Form + Zod
--   ✅ **Implemente loading states**: Para melhor UX
--   ✅ **Mantenha consistência**: Siga os padrões existentes
--   ✅ **Use TypeScript**: Tipagem estrita em tudo
--   ✅ **Teste responsividade**: Mobile-first approach
+- ✅ **Use variáveis CSS**: `hsl(var(--primary))`
+- ✅ **Valide formulários**: React Hook Form + Zod
+- ✅ **Implemente loading states**: Para melhor UX
+- ✅ **Mantenha consistência**: Siga os padrões existentes
+- ✅ **Use TypeScript**: Tipagem estrita em tudo
+- ✅ **Teste responsividade**: Mobile-first approach
 
 ### 🎨 Design System
 
--   **Espaçamento**: Use `gap-10` entre seções, `p-6` em cards
--   **Bordas**: `rounded-xl` para cards, `rounded-md` para inputs
--   **Sombras**: `shadow` para elevação sutil
--   **Hover**: `hover:bg-primary/90` para botões
--   **Focus**: Estados automáticos via componentes base
+- **Espaçamento**: Use `gap-10` entre seções, `p-6` em cards
+- **Bordas**: `rounded-xl` para cards, `rounded-md` para inputs
+- **Sombras**: `shadow` para elevação sutil
+- **Hover**: `hover:bg-primary/90` para botões
+- **Focus**: Estados automáticos via componentes base
 
 ---
 
@@ -439,12 +439,12 @@ npm run build-analyze   # Analisar bundle
 
 ### Documentação
 
--   [Next.js App Router](https://nextjs.org/docs)
--   [shadcn/ui Components](https://ui.shadcn.com)
--   [React Hook Form](https://react-hook-form.com)
--   [Zod Validation](https://zod.dev)
--   [Clerk Authentication](https://clerk.com/docs)
--   [TanStack Table](https://tanstack.com/table)
+- [Next.js App Router](https://nextjs.org/docs)
+- [shadcn/ui Components](https://ui.shadcn.com)
+- [React Hook Form](https://react-hook-form.com)
+- [Zod Validation](https://zod.dev)
+- [Clerk Authentication](https://clerk.com/docs)
+- [TanStack Table](https://tanstack.com/table)
 
 ### Comandos Úteis
 

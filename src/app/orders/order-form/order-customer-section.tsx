@@ -328,11 +328,11 @@ export function OrderCustomerSection({
                                     <MapPin className="h-4 w-4" />
                                     Endereço de Entrega
                                 </FormLabel>
-                                <Select 
+                                <Select
                                     onValueChange={(value) => {
                                         // Permite limpar a seleção (valor vazio)
                                         field.onChange(value === "none" ? "" : value);
-                                    }} 
+                                    }}
                                     value={field.value || "none"}
                                 >
                                     <FormControl>
@@ -348,14 +348,18 @@ export function OrderCustomerSection({
                                             addresses.map((address) => (
                                                 <SelectItem key={address.id} value={address.id || ""}>
                                                     <div className="text-xs">
-                                                        <p className="font-medium">{address.street}, {address.number}</p>
+                                                        <p className="font-medium">
+                                                            {address.street}, {address.number}
+                                                        </p>
                                                         <p className="text-muted-foreground">{address.neighborhood}</p>
                                                     </div>
                                                 </SelectItem>
                                             ))
                                         ) : (
                                             <SelectItem value="no-address" disabled>
-                                                <span className="text-muted-foreground">Nenhum endereço cadastrado</span>
+                                                <span className="text-muted-foreground">
+                                                    Nenhum endereço cadastrado
+                                                </span>
                                             </SelectItem>
                                         )}
                                     </SelectContent>

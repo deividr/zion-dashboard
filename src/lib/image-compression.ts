@@ -20,10 +20,7 @@ const defaultOptions: CompressionOptions = {
  * @param options Opções de compressão (opcional)
  * @returns Promise<File> Arquivo comprimido
  */
-export async function compressImage(
-    file: File,
-    options?: CompressionOptions
-): Promise<File> {
+export async function compressImage(file: File, options?: CompressionOptions): Promise<File> {
     const compressionOptions = {
         ...defaultOptions,
         ...options,

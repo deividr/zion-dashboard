@@ -8,4 +8,3 @@ export const orderEndpoints = {
     delete: (id: string) => `${API_URL}/orders/${id}`,
     pickup: (id: string) => `${API_URL}/orders/${id}/pickup`,
 };
-

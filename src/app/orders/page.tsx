@@ -26,9 +26,7 @@ export default function Orders() {
     const [pickupStart, setPickupStart] = useState<Date | undefined>(
         pickupStartParam ? new Date(pickupStartParam) : undefined
     );
-    const [pickupEnd, setPickupEnd] = useState<Date | undefined>(
-        pickupEndParam ? new Date(pickupEndParam) : undefined
-    );
+    const [pickupEnd, setPickupEnd] = useState<Date | undefined>(pickupEndParam ? new Date(pickupEndParam) : undefined);
     const [totalPage, setTotalPage] = useState(0);
     const [orders, setOrders] = useState<Order[]>([]);
     const { fetch } = useFetchClient();
@@ -99,10 +97,7 @@ export default function Orders() {
     return (
         <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4 md:flex-row md:gap-10">
-                <Button
-                    onClick={() => router.push("orders/new")}
-                    className="md:order-3"
-                >
+                <Button onClick={() => router.push("orders/new")} className="md:order-3">
                     <Plus /> Novo Pedido
                 </Button>
                 <div className="grow md:order-1">
@@ -117,19 +112,11 @@ export default function Orders() {
                     />
                 </div>
                 <div className="md:order-2">
-                    <Calendar23
-                        range={{ from: pickupStart, to: pickupEnd }}
-                        onSelect={handleChangePickup}
-                    />
+                    <Calendar23 range={{ from: pickupStart, to: pickupEnd }} onSelect={handleChangePickup} />
                 </div>
             </div>
             <DataTable columns={columns} data={orders} isLoading={isLoading} />
-            <FullPagination
-                page={page}
-                pageSize={10}
-                totalCount={totalPage}
-                onChangePageAction={handleChangePage}
-            />
+            <FullPagination page={page} pageSize={10} totalCount={totalPage} onChangePageAction={handleChangePage} />
         </div>
     );
 }

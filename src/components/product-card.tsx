@@ -23,7 +23,13 @@ interface ProductCardProps {
     onAddToCart?: (product: Product, quantity: number, selectedSubProducts: string[]) => void;
 }
 
-const PRESET_QUANTITIES = [0.25, 0.5, 1.0, 1.5, 2.0];
+const PRESET_QUANTITIES = [
+    { value: 0.25, key: "250g" },
+    { value: 0.5, key: "500g" },
+    { value: 1.0, key: "1kg" },
+    { value: 1.5, key: "1.5kg" },
+    { value: 2.0, key: "2kg" },
+];
 const INITIAL_QUANTITY = 1.0;
 
 export function ProductCard({
@@ -153,11 +159,11 @@ export function ProductCard({
                             >
                                 {PRESET_QUANTITIES.map((preset) => (
                                     <ToggleGroupItem
-                                        key={preset}
-                                        value={preset.toString()}
+                                        key={preset.key}
+                                        value={preset.value.toString()}
                                         className="px-2 text-xs h-8"
                                     >
-                                        {preset.toFixed(3)}
+                                        {preset.key}
                                     </ToggleGroupItem>
                                 ))}
                             </ToggleGroup>

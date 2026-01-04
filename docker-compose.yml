@@ -1,16 +1,16 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.develop
-    volumes:
-      - .:/app
-    ports:
-      - "3001:3000"
-    environment:
-      - NODE_ENV=development
-    networks:
-      - zion-network
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile.develop
+        volumes:
+            - .:/app
+        ports:
+            - "3001:3000"
+        environment:
+            - NODE_ENV=development
+        networks:
+            - zion-network
 
 networks:
-  zion-network:
+    zion-network:
