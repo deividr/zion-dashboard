@@ -84,8 +84,8 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                         cartItems.map((item, index) => {
                             // Buscar nomes dos subprodutos
                             const subProductNames = item.subProducts
-                                ?.map((subId) => {
-                                    const product = products.find((p) => p.id === subId);
+                                ?.map((subProduct) => {
+                                    const product = products.find((p) => p.id === subProduct.productId);
                                     return product?.name;
                                 })
                                 .filter(Boolean);
