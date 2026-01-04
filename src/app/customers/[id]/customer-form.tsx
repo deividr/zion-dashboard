@@ -22,7 +22,7 @@ import { useFetchClient } from "@/lib/fetch-client";
 import { formatPhone, parseNumber } from "@/lib/utils";
 import { customerEndpoints } from "@/repository/customerRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, CalendarFoldIcon, Loader2, Mail, Pencil, Phone, Plus, Trash2, User } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, Pencil, Phone, Plus, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
