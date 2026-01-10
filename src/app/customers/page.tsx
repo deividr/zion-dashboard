@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Customer } from "@/domains/customer";
 import { useFetchClient } from "@/lib/fetch-client";
 import { useHeaderStore } from "@/stores/header-store";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { columns } from "./columns";
@@ -55,10 +55,16 @@ export default function Customers() {
         router.replace(`?${query.toString()}`);
     };
 
+    const handleClearSearch = () => {
+        setPage(1);
+        setSearch("");
+        buildLink(1, "");
+    };
+
     return (
         <div className="flex flex-col gap-10">
             <div className="flex gap-10">
-                <div className="grow">
+                <div className="grow relative">
                     <Input
                         placeholder="Pesquisar por cliente..."
                         icon={Search}
@@ -68,7 +74,19 @@ export default function Customers() {
                             setSearch(e.target.value);
                             buildLink(1, e.target.value);
                         }}
+                        className={search ? "pr-10" : ""}
                     />
+                    {search && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-muted"
+                            onClick={handleClearSearch}
+                        >
+                            <X className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    )}
                 </div>
                 <Button onClick={() => router.push("customers/new")}>
                     <Plus /> Novo Cliente

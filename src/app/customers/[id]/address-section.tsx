@@ -33,6 +33,10 @@ export function AddressSection({ initialAddresses, customer }: AddressSectionPro
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
     const [addressToDelete, setAddressToDelete] = useState<number | null>(null);
 
+    useEffect(() => {
+        setAddresses(initialAddresses ?? []);
+    }, [initialAddresses]);
+
     // Escuta o evento personalizado para adicionar endereço
     useEffect(() => {
         const handleAddAddress = () => {
@@ -189,6 +193,14 @@ export function AddressSection({ initialAddresses, customer }: AddressSectionPro
                             </div>
                         </div>
                     ))}
+                    
+                    {/* Botão para adicionar mais endereços */}
+                    <div className="pt-2">
+                        <Button onClick={handleAddAddress} variant="outline" className="w-full">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Adicionar Outro Endereço
+                        </Button>
+                    </div>
                 </div>
             )}
 
