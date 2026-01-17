@@ -35,8 +35,9 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
     // Calcular subtotal
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    // Taxa de entrega (exemplo fixo, pode ser calculada dinamicamente)
-    const deliveryFee = selectedAddressId ? 0 : 0; // R$ 5,00 se tiver endereço
+    // Taxa de entrega baseada na distância (R$ 5,00 por KM)
+    const selectedAddress = addresses.find((addr) => addr.id === selectedAddressId);
+    const deliveryFee = selectedAddress ? Math.round(selectedAddress.distance * 500) || 500 : 0;
 
     // Total
     const total = subtotal + deliveryFee;
@@ -57,8 +58,6 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
         const updated = cartItems.filter((_, i) => i !== index);
         form.setValue("products", updated);
     };
-
-    const selectedAddress = addresses.find((addr) => addr.id === selectedAddressId);
 
     return (
         <Card className="h-[calc(100vh-200px)] flex flex-col">
