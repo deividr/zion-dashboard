@@ -11,6 +11,7 @@ import { Plus, Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { columns } from "./columns";
+import { customerEndpoints } from "@/repository/customerRepository";
 
 export default function Customers() {
     const router = useRouter();
@@ -33,7 +34,7 @@ export default function Customers() {
             const data = await fetch<{
                 customers: Customer[];
                 pagination: { total: number };
-            }>(`${process.env.NEXT_PUBLIC_HOST_API}/customers?limit=10&page=${page}&name=${search}`);
+            }>(customerEndpoints.list(page, search));
             setCustomers(data?.customers || []);
             setTotalPage(data?.pagination.total || 0);
             setLoading(false);
