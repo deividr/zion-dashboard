@@ -196,45 +196,46 @@ docker run -p 3000:3000 zion-dashboard
 ### 🎯 Funcionalidades Core
 
 - [ ] **Melhorar UX de Endereços**
-    - [ ] Loading indicator ao pesquisar endereço por CEP
-    - [ ] Validação: impedir endereços duplicados no mesmo CEP para o mesmo cliente
-    - [ ] Confirmação visual quando endereço for salvo com sucesso
+  - [ ] Loading indicator ao pesquisar endereço por CEP
+  - [ ] Validação: impedir endereços duplicados no mesmo CEP para o mesmo cliente
+  - [ ] Confirmação visual quando endereço for salvo com sucesso
 - [ ] **Sistema de Pedidos**
-    - [ ] Implementar criação de novos pedidos (página `/orders/new`)
-    - [ ] Melhorar filtros e busca na listagem de pedidos
-    - [ ] Adicionar status de entrega/pickup nos pedidos
+  - [ ] Implementar criação de novos pedidos (página `/orders/new`)
+  - [ ] Melhorar filtros e busca na listagem de pedidos
+  - [ ] Adicionar status de entrega/pickup nos pedidos
 - [ ] **Dashboard Principal**
-    - [ ] Implementar homepage com métricas e widgets
-    - [ ] Gráficos de vendas por período
-    - [ ] Resumo de pedidos pendentes
+  - [ ] Implementar homepage com métricas e widgets
+  - [ ] Gráficos de vendas por período
+  - [ ] Resumo de pedidos pendentes
 
 ### 🔧 Melhorias Técnicas
 
 - [ ] **Performance**
-    - [ ] Implementar paginação server-side nas listagens
-    - [ ] Otimizar queries e carregamento de dados, usando o TanStack
-    - [ ] Adicionar cache para dados estáticos (categorias, etc.)
+  - [ ] Implementar paginação server-side nas listagens
+  - [ ] Otimizar queries e carregamento de dados, usando o TanStack
+  - [ ] Adicionar cache para dados estáticos (categorias, etc.)
 - [ ] **UX/UI**
-    - [ ] Implementar skeleton loading em todas as páginas
-    - [ ] Melhorar responsividade mobile
-    - [ ] Adicionar dark mode
-    - [ ] Implementar breadcrumbs dinâmicos
+
+  - [ ] Implementar skeleton loading em todas as páginas
+  - [ ] Melhorar responsividade mobile
+  - [ ] Adicionar dark mode
+  - [ ] Implementar breadcrumbs dinâmicos
 
 - [ ] **Validações e Segurança**
-    - [ ] Validação de formulários mais robusta
-    - [ ] Tratamento de erro global
-    - [ ] Logs de auditoria para ações críticas
+  - [ ] Validação de formulários mais robusta
+  - [ ] Tratamento de erro global
+  - [ ] Logs de auditoria para ações críticas
 
 ### 📱 Funcionalidades Futuras
 
 - [ ] **Relatórios**
-    - [ ] Relatório de vendas por período
-    - [ ] Relatório de clientes mais ativos
-    - [ ] Análise de produtos mais vendidos
+  - [ ] Relatório de vendas por período
+  - [ ] Relatório de clientes mais ativos
+  - [ ] Análise de produtos mais vendidos
 - [ ] **Integração**
-    - [ ] API de correios para frete automático
-    - [ ] Integração com WhatsApp para notificações
-    - [ ] Sistema de backup automático
+  - [ ] API de correios para frete automático
+  - [ ] Integração com WhatsApp para notificações
+  - [ ] Sistema de backup automático
 
 ### ✅ Concluído
 
