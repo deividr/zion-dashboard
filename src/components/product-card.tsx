@@ -9,7 +9,6 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { OrderSubproduct } from "@/domains";
 import { Product } from "@/domains/product";
 import { formatCurrency, parseNumber } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus, Pencil, ImageIcon } from "lucide-react";
 import Image from "next/image";
