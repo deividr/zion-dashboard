@@ -85,7 +85,7 @@ export function OrderMenuSection({
     }, [filteredProducts, categories]);
 
     // Adicionar produto ao carrinho
-    const handleAddToCart = (product: Product, quantity: number, selectedSubProducts: string[]) => {
+    const handleAddToCart = (product: Product, quantity: number, selectedSubProducts: string[], price: number) => {
         const currentProducts = form.getValues("products") || [];
 
         // Adicionar novo produto sempre (permite múltiplas variações do mesmo produto)
@@ -96,7 +96,8 @@ export function OrderMenuSection({
                 name: product.name,
                 unityType: product.unityType,
                 quantity,
-                price: product.value,
+                price,
+                isVariablePrice: product.isVariablePrice,
                 subProducts: selectedSubProducts.map((p) => ({
                     productId: p,
                 })),

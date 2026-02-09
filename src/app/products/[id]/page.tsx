@@ -25,6 +25,7 @@ import { formatCurrency, parseNumber } from "@/lib/utils";
 import { categoryEndpoints } from "@/repository/categoryRepository";
 import { productEndpoints } from "@/repository/productRepository";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Switch } from "@/components/ui";
 import { ArrowLeft, Loader2, Pencil, Plus, Trash2, Package, DollarSign, Ruler, Tag, Upload, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
@@ -54,6 +55,7 @@ export default function ProductDetail() {
             name: "",
             unityType: "KG",
             categoryId: "",
+            isVariablePrice: false,
         },
     });
 
@@ -65,6 +67,7 @@ export default function ProductDetail() {
                 unityType: "KG",
                 name: "",
                 categoryId: "",
+                isVariablePrice: false,
             });
             return;
         }
@@ -78,6 +81,7 @@ export default function ProductDetail() {
                 unityType: data?.unityType,
                 categoryId: data?.categoryId,
                 imageUrl: data?.imageUrl,
+                isVariablePrice: data?.isVariablePrice ?? false,
             });
             setProduct(data);
         };
@@ -100,6 +104,7 @@ export default function ProductDetail() {
             unityType: values.unityType,
             categoryId: values.categoryId,
             imageUrl: values.imageUrl || undefined,
+            isVariablePrice: values.isVariablePrice ?? false,
         };
 
         const url = product?.id === "new" ? productEndpoints.create() : productEndpoints.update(id as string);
@@ -114,7 +119,7 @@ export default function ProductDetail() {
         setProduct(productUpdated);
 
         if (product?.id === "new") {
-            form.reset({ value: 0, name: "", unityType: "KG" });
+            form.reset({ value: 0, name: "", unityType: "KG", isVariablePrice: false });
         } else {
             form.reset({ ...productUpdated, value: productUpdated.value });
         }
@@ -433,6 +438,29 @@ export default function ProductDetail() {
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="isVariablePrice"
+                                    render={({ field }) => (
+                                        <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                                            <div className="space-y-0.5">
+                                                <FormLabel className="flex items-center gap-2">
+                                                    <DollarSign className="h-4 w-4" />
+                                                    Preço variável
+                                                </FormLabel>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Permite alterar o valor no momento da venda
+                                                </p>
+                                            </div>
+                                            <FormControl>
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
                                         </FormItem>
                                     )}
                                 />

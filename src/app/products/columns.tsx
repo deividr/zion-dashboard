@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui";
 import { Category } from "@/domains";
 import { Product, UnityType } from "@/domains/product";
 import { ColumnDef } from "@tanstack/react-table";
@@ -24,6 +25,18 @@ export const columns = (categories: Category[]): ColumnDef<Product>[] => [
             const category = categories.find((c) => c.id === row.original.categoryId);
             if (!category) return null;
             return <div className="text-left">{category.name}</div>;
+        },
+    },
+    {
+        accessorKey: "isVariablePrice",
+        header: "Preço",
+        cell: ({ row }) => {
+            const isVariable = row.getValue("isVariablePrice");
+            return isVariable ? (
+                <Badge variant="secondary">Variável</Badge>
+            ) : (
+                <span className="text-muted-foreground text-sm">Fixo</span>
+            );
         },
     },
     {

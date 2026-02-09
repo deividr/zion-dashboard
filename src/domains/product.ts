@@ -15,6 +15,7 @@ export const productSchema = z.object({
     }),
     categoryId: z.string().uuid(),
     imageUrl: z.preprocess((val) => (val === "" || val === null ? undefined : val), z.string().optional()),
+    isVariablePrice: z.boolean().default(false),
 });
 
 export type Product = z.infer<typeof productSchema>;

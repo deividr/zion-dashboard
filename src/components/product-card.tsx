@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { OrderSubproduct } from "@/domains";
 import { Product } from "@/domains/product";
-import { formatCurrency } from "@/lib/utils";
-import { Minus, Plus, ImageIcon } from "lucide-react";
+import { formatCurrency, parseNumber } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Minus, Plus, Pencil, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 
@@ -20,7 +22,7 @@ interface ProductCardProps {
     priority?: boolean;
     onQuantityChange?: (productId: string, quantity: number) => void;
     onSubProductChange?: (productId: string, subProductId: string, isChecked: boolean) => void;
-    onAddToCart?: (product: Product, quantity: number, selectedSubProducts: string[]) => void;
+    onAddToCart?: (product: Product, quantity: number, selectedSubProducts: string[], price: number) => void;
 }
 
 const PRESET_QUANTITIES = [
@@ -42,15 +44,17 @@ export function ProductCard({
     onAddToCart,
 }: ProductCardProps) {
     const [quantity, setQuantity] = React.useState<number>(INITIAL_QUANTITY);
+    const [price, setPrice] = React.useState<number>(product.value);
     const [selectedSubProducts, setSelectedSubProducts] = React.useState<Set<string>>(new Set());
     const [accordionValue, setAccordionValue] = React.useState<string>("");
 
     // Resetar quando o produto mudar
     React.useEffect(() => {
         setQuantity(INITIAL_QUANTITY);
+        setPrice(product.value);
         setSelectedSubProducts(new Set());
         setAccordionValue("");
-    }, [product.id]);
+    }, [product.id, product.value]);
 
     const handleQuantityChange = (amount: number) => {
         let newQuantity = quantity;
@@ -112,9 +116,26 @@ export function ProductCard({
                     <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                             <CardTitle className="text-base font-semibold truncate">{product.name}</CardTitle>
-                            <span className="text-lg font-bold text-primary">
-                                {formatCurrency(product.value * quantity)}
-                            </span>
+                            {product.isVariablePrice ? (
+                                <div className="flex items-center gap-1 mt-1">
+                                    <Pencil className="h-3 w-3 text-muted-foreground" />
+                                    <Input
+                                        inputMode="numeric"
+                                        className="h-7 w-28 text-sm font-bold text-primary px-1"
+                                        value={formatCurrency(price.toString())}
+                                        onChange={(e) => {
+                                            const rawValue = parseInt(parseNumber(e.target.value));
+                                            if (!isNaN(rawValue) && rawValue > 0) {
+                                                setPrice(rawValue);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <span className="text-lg font-bold text-primary">
+                                    {formatCurrency(product.value * quantity)}
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -211,10 +232,11 @@ export function ProductCard({
                         className="w-full mt-auto"
                         onClick={() => {
                             // Adicionar ao carrinho
-                            onAddToCart?.(product, quantity, Array.from(selectedSubProducts));
+                            onAddToCart?.(product, quantity, Array.from(selectedSubProducts), price);
 
                             // Resetar configurações para o estado original
                             setQuantity(INITIAL_QUANTITY);
+                            setPrice(product.value);
                             setSelectedSubProducts(new Set());
                             setAccordionValue("");
                         }}

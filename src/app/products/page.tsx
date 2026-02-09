@@ -29,7 +29,6 @@ export default function Products() {
     const setTitle = useHeaderStore((state) => state.setTitle);
 
     useEffect(() => {
-        console.log("Effect 1");
         setTitle(["Produtos"]);
     }, [setTitle]);
 
@@ -42,7 +41,6 @@ export default function Products() {
     }, [setCategories, fetch]);
 
     useEffect(() => {
-        console.log("Effect 2");
         setLoading(true);
         const fetchProducts = async () => {
             const dataProducts = await fetch<{
@@ -56,7 +54,6 @@ export default function Products() {
     }, [fetch]);
 
     useEffect(() => {
-        console.log("Effect 3");
         const startIndex = (page - 1) * PAGE_SIZE;
         const endIndex = startIndex + PAGE_SIZE;
         const filterProducts = allProducts.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));

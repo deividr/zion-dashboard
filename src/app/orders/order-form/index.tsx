@@ -32,6 +32,7 @@ const orderFormSchema = z.object({
                 unityType: z.string(),
                 quantity: z.number().min(0.25, "Quantidade deve ser maior que 0"),
                 price: z.number().min(1, "Preço deve ser maior que 0"),
+                isVariablePrice: z.boolean().optional(),
                 subProducts: z.array(z.object({ productId: z.string().uuid() })).optional(),
             })
         )
@@ -92,6 +93,24 @@ export function OrderForm({ initialData }: OrderFormProps) {
         loadProducts();
     }, [fetch, toast]);
 
+    // Atualizar isVariablePrice nos produtos do pedido ao carregar catálogo (modo edição)
+    useEffect(() => {
+        if (!initialData?.products || products.length === 0) return;
+
+        const currentProducts = form.getValues("products");
+        if (currentProducts.length === 0) return;
+
+        const updatedProducts = currentProducts.map((p) => {
+            const catalogProduct = products.find((prod) => prod.id === p.productId);
+            return {
+                ...p,
+                isVariablePrice: catalogProduct?.isVariablePrice ?? false,
+            };
+        });
+
+        form.setValue("products", updatedProducts);
+    }, [products, initialData, form]);
+
     useEffect(() => {
         const fetchCategories = async () => {
             const dataCategories = await fetch<Category[]>(categoryEndpoints.list());
@@ -127,8 +146,12 @@ export function OrderForm({ initialData }: OrderFormProps) {
                 observations: data.observations || "",
                 addressId: data.addressId || null,
                 products: data.products.map((p) => ({
-                    ...p,
+                    productId: p.productId,
+                    name: p.name,
+                    unityType: p.unityType,
                     quantity: p.unityType === "UN" ? p.quantity : p.quantity * 1000,
+                    price: p.price,
+                    subProducts: p.subProducts,
                 })),
             };
 
