@@ -51,13 +51,13 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
 
         const updated = [...cartItems];
         updated[index] = { ...item, quantity: newQuantity };
-        form.setValue("products", updated);
+        form.setValue("products", updated, { shouldDirty: true });
     };
 
     // Remover item
     const handleRemoveItem = (index: number) => {
         const updated = cartItems.filter((_, i) => i !== index);
-        form.setValue("products", updated);
+        form.setValue("products", updated, { shouldDirty: true });
     };
 
     return (
@@ -228,7 +228,7 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
 
                 {/* Botão Finalizar */}
                 {!isReadOnly && (
-                    <Button type="submit" className="w-full" size="lg" disabled={isLoading || cartItems.length === 0}>
+                    <Button type="submit" className="w-full" size="lg" disabled={isLoading || cartItems.length === 0 || (isEditingMode && !form.formState.isDirty)}>
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

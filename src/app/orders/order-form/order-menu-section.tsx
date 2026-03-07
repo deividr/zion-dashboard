@@ -102,7 +102,7 @@ export function OrderMenuSection({
                     productId: p,
                 })),
             },
-        ]);
+        ], { shouldDirty: true });
     };
 
     return (

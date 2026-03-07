@@ -170,7 +170,9 @@ export function OrderForm({ initialData }: OrderFormProps) {
                 description: `Pedido ${initialData?.id ? "atualizado" : "criado"} com sucesso!`,
             });
 
-            if (result?.id) {
+            if (initialData?.id) {
+                form.reset(data);
+            } else if (result?.id) {
                 router.push(`/orders/${result.id}`);
             }
         } catch (error) {
