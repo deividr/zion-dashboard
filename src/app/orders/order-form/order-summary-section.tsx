@@ -15,7 +15,7 @@ import {
     Textarea,
 } from "@/components/ui";
 import { Address, Product } from "@/domains";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { Loader2, Minus, Plus, ShoppingCart, Trash2, Truck } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { OrderFormData } from ".";
@@ -26,9 +26,10 @@ interface OrderSummarySectionProps {
     addresses: Address[];
     isLoading: boolean;
     isEditingMode: boolean;
+    isReadOnly?: boolean;
 }
 
-export function OrderSummarySection({ form, products, addresses, isLoading, isEditingMode }: OrderSummarySectionProps) {
+export function OrderSummarySection({ form, products, addresses, isLoading, isEditingMode, isReadOnly = false }: OrderSummarySectionProps) {
     const cartItems = form.watch("products") || [];
     const selectedAddressId = form.watch("addressId");
 
@@ -104,50 +105,56 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                                                     {formatCurrency(item.price)}
                                                 </p>
                                             </div>
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-6 w-6"
-                                                onClick={() => handleRemoveItem(index)}
-                                            >
-                                                <Trash2 className="h-3 w-3 text-destructive" />
-                                            </Button>
+                                            {!isReadOnly && (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={() => handleRemoveItem(index)}
+                                                >
+                                                    <Trash2 className="h-3 w-3 text-destructive" />
+                                                </Button>
+                                            )}
                                         </div>
 
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-1">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="h-6 w-6"
-                                                    onClick={() =>
-                                                        handleQuantityChange(
-                                                            index,
-                                                            item.unityType === "UN" ? -1 : -0.25
-                                                        )
-                                                    }
-                                                >
-                                                    <Minus className="h-3 w-3" />
-                                                </Button>
+                                                {!isReadOnly && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-6 w-6"
+                                                        onClick={() =>
+                                                            handleQuantityChange(
+                                                                index,
+                                                                item.unityType === "UN" ? -1 : -0.25
+                                                            )
+                                                        }
+                                                    >
+                                                        <Minus className="h-3 w-3" />
+                                                    </Button>
+                                                )}
 
                                                 <span className="text-xs font-medium min-w-[50px] text-center">
                                                     {item.unityType === "UN" ? item.quantity : item.quantity.toFixed(2)}{" "}
                                                     {item.unityType.toLowerCase()}
                                                 </span>
 
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="h-6 w-6"
-                                                    onClick={() =>
-                                                        handleQuantityChange(index, item.unityType === "UN" ? 1 : 0.25)
-                                                    }
-                                                >
-                                                    <Plus className="h-3 w-3" />
-                                                </Button>
+                                                {!isReadOnly && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-6 w-6"
+                                                        onClick={() =>
+                                                            handleQuantityChange(index, item.unityType === "UN" ? 1 : 0.25)
+                                                        }
+                                                    >
+                                                        <Plus className="h-3 w-3" />
+                                                    </Button>
+                                                )}
                                             </div>
 
                                             <span className="text-sm font-semibold">
@@ -172,7 +179,8 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                                 <Textarea
                                     {...field}
                                     placeholder="Ex: Sem cebola, capricha na maionese..."
-                                    className="min-h-[60px] text-sm resize-none"
+                                    className={cn("min-h-[60px] text-sm resize-none", isReadOnly && "bg-muted cursor-not-allowed")}
+                                    disabled={isReadOnly}
                                 />
                             </FormControl>
                         </FormItem>
@@ -219,19 +227,21 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                 </div>
 
                 {/* Botão Finalizar */}
-                <Button type="submit" className="w-full" size="lg" disabled={isLoading || cartItems.length === 0}>
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Finalizando...
-                        </>
-                    ) : (
-                        <>
-                            <ShoppingCart className="mr-2 h-4 w-4" />
-                            {`${isEditingMode ? "Atualizar" : "Finalizar"} Pedido`}
-                        </>
-                    )}
-                </Button>
+                {!isReadOnly && (
+                    <Button type="submit" className="w-full" size="lg" disabled={isLoading || cartItems.length === 0}>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Finalizando...
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingCart className="mr-2 h-4 w-4" />
+                                {`${isEditingMode ? "Atualizar" : "Finalizar"} Pedido`}
+                            </>
+                        )}
+                    </Button>
+                )}
             </CardContent>
         </Card>
     );

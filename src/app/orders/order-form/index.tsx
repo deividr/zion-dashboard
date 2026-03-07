@@ -15,6 +15,7 @@ import { OrderCustomerSection } from "./order-customer-section";
 import { OrderMenuSection } from "./order-menu-section";
 import { OrderSummarySection } from "./order-summary-section";
 import { Form } from "@/components/ui";
+import { AlertTriangle } from "lucide-react";
 
 const orderFormSchema = z.object({
     customerId: z.string().uuid("Selecione um cliente"),
@@ -55,12 +56,13 @@ export function OrderForm({ initialData }: OrderFormProps) {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const isEditMode = !!initialData?.id;
+    const isReadOnly = !!initialData?.isPickedUp;
 
     const form = useForm<OrderFormData>({
         resolver: zodResolver(orderFormSchema),
         defaultValues: {
             customerId: initialData?.customer?.id ?? "",
-            pickupDate: new Date(),
+            pickupDate: initialData?.pickupDate ? new Date(initialData.pickupDate) : new Date(),
             orderLocal: initialData?.orderLocal ?? "",
             observations: initialData?.observations ?? "",
             addressId: initialData?.address?.id ?? "",
@@ -181,7 +183,15 @@ export function OrderForm({ initialData }: OrderFormProps) {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] gap-4 h-full">
+                {isReadOnly && (
+                    <div className="flex items-center gap-3 p-4 mb-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800">
+                        <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+                        <p className="text-sm font-medium">
+                            Este pedido já foi entregue e não pode ser editado.
+                        </p>
+                    </div>
+                )}
+                <div className={`grid grid-cols-1 ${isReadOnly ? "lg:grid-cols-[1fr_1fr]" : "lg:grid-cols-[1fr_2fr_1fr]"} gap-4 h-full`}>
                     {/* Coluna Esquerda: Identificação do Cliente */}
                     <OrderCustomerSection
                         form={form}
@@ -190,16 +200,19 @@ export function OrderForm({ initialData }: OrderFormProps) {
                         addresses={addresses}
                         onAddressesAction={setAddresses}
                         isEditMode={isEditMode}
+                        isReadOnly={isReadOnly}
                     />
 
                     {/* Coluna Central: Cardápio */}
-                    <OrderMenuSection
-                        form={form}
-                        products={products}
-                        categories={categories}
-                        subProducts={subProducts}
-                        isMassasProductAction={isMassasProduct}
-                    />
+                    {!isReadOnly && (
+                        <OrderMenuSection
+                            form={form}
+                            products={products}
+                            categories={categories}
+                            subProducts={subProducts}
+                            isMassasProductAction={isMassasProduct}
+                        />
+                    )}
 
                     {/* Coluna Direita: Resumo do Pedido */}
                     <OrderSummarySection
@@ -207,7 +220,8 @@ export function OrderForm({ initialData }: OrderFormProps) {
                         products={products}
                         addresses={addresses}
                         isLoading={isLoading}
-                        isEditingMode
+                        isEditingMode={isEditMode}
+                        isReadOnly={isReadOnly}
                     />
                 </div>
             </form>

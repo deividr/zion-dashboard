@@ -6,6 +6,7 @@ import {
     AvatarFallback,
     AvatarImage,
     Button,
+    Calendar,
     Card,
     CardContent,
     FormControl,
@@ -14,6 +15,9 @@ import {
     FormLabel,
     FormMessage,
     Input,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
     Select,
     SelectContent,
     SelectItem,
@@ -25,7 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFetchClient } from "@/lib/fetch-client";
 import { cn, formatPhone, parseNumber } from "@/lib/utils";
 import { customerEndpoints } from "@/repository/customerRepository";
-import { Loader2, MapPin, Phone, Plus, Search, User } from "lucide-react";
+import { CalendarIcon, Loader2, MapPin, Phone, Plus, Search, User } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -38,6 +42,7 @@ interface OrderCustomerSectionProps {
     addresses: Address[];
     onAddressesAction: (addresses: Address[]) => void;
     isEditMode: boolean;
+    isReadOnly?: boolean;
 }
 
 export function OrderCustomerSection({
@@ -47,6 +52,7 @@ export function OrderCustomerSection({
     addresses,
     onAddressesAction,
     isEditMode,
+    isReadOnly = false,
 }: OrderCustomerSectionProps) {
     const { fetch } = useFetchClient();
     const { toast } = useToast();
@@ -276,9 +282,9 @@ export function OrderCustomerSection({
                                                     }
                                                 }}
                                                 placeholder="(00) 00000-0000"
-                                                disabled={isEditMode || isSearchingCustomer}
-                                                readOnly={isEditMode}
-                                                className={cn(isEditMode && "bg-muted cursor-not-allowed")}
+                                                disabled={isEditMode || isReadOnly || isSearchingCustomer}
+                                                readOnly={isEditMode || isReadOnly}
+                                                className={cn((isEditMode || isReadOnly) && "bg-muted cursor-not-allowed")}
                                             />
                                         </div>
                                         <Button
@@ -286,11 +292,11 @@ export function OrderCustomerSection({
                                             variant="outline"
                                             size="icon"
                                             onClick={() => {
-                                                if (!isEditMode && customerPhone) {
+                                                if (!isEditMode && !isReadOnly && customerPhone) {
                                                     handleSearchCustomerByPhone(customerPhone);
                                                 }
                                             }}
-                                            disabled={isEditMode || isSearchingCustomer || !customerPhone}
+                                            disabled={isEditMode || isReadOnly || isSearchingCustomer || !customerPhone}
                                         >
                                             {isSearchingCustomer ? (
                                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -334,6 +340,7 @@ export function OrderCustomerSection({
                                         field.onChange(value === "none" ? "" : value);
                                     }}
                                     value={field.value || "none"}
+                                    disabled={isReadOnly}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -369,6 +376,49 @@ export function OrderCustomerSection({
                         )}
                     />
                 )}
+
+                {/* Data de Retirada */}
+                <FormField
+                    control={form.control}
+                    name="pickupDate"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="flex items-center gap-2 text-sm">
+                                <CalendarIcon className="h-4 w-4" />
+                                Data de Retirada
+                            </FormLabel>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            disabled={isReadOnly}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal",
+                                                !field.value && "text-muted-foreground",
+                                                isReadOnly && "bg-muted cursor-not-allowed"
+                                            )}
+                                        >
+                                            {field.value
+                                                ? field.value.toLocaleDateString("pt-BR")
+                                                : "Selecione a data"}
+                                        </Button>
+                                    </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={(date) => date && field.onChange(date)}
+                                        captionLayout="dropdown"
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
                 {!selectedCustomer && (
                     <div className="text-center py-8 text-muted-foreground">
