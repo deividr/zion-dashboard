@@ -124,7 +124,7 @@ export function ProductCard({
                                         value={formatCurrency(price.toString())}
                                         onChange={(e) => {
                                             const rawValue = parseInt(parseNumber(e.target.value));
-                                            if (!isNaN(rawValue) && rawValue > 0) {
+                                            if (!isNaN(rawValue) && rawValue >= 0) {
                                                 setPrice(rawValue);
                                             }
                                         }}
