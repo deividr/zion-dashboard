@@ -7,6 +7,7 @@ import { useFetchClient } from "@/lib/fetch-client";
 import { Order } from "@/domains";
 import { orderEndpoints } from "@/repository/orderRepository";
 import { OrderForm } from "../order-form";
+import { PrintOrderButton } from "@/components/printer/print-order-button";
 import { Loader2 } from "lucide-react";
 
 export default function EditOrder() {
@@ -56,5 +57,12 @@ export default function EditOrder() {
         );
     }
 
-    return <OrderForm initialData={order} />;
+    return (
+        <div className="flex flex-col gap-4">
+            <div className="flex justify-end">
+                <PrintOrderButton order={order} />
+            </div>
+            <OrderForm initialData={order} />
+        </div>
+    );
 }
