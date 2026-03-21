@@ -3,12 +3,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { usePrinterStore } from "@/stores/printer-store";
 import { createReceipt } from "@/lib/esc-pos";
-
-declare global {
-  interface Window {
-    qz: QZTray;
-  }
-}
+// @ts-expect-error qz-tray não possui tipos TypeScript
+import qzModule from "qz-tray";
+const qz = qzModule as QZTray;
 
 interface QZTray {
   websocket: {
@@ -23,40 +20,6 @@ interface QZTray {
     create: (printer: string, options?: object) => Promise<object>;
   };
   print: (config: object, data: string[]) => Promise<void>;
-}
-
-let qzLoaded = false;
-
-async function loadQZTray(): Promise<QZTray | null> {
-  if (typeof window === "undefined") return null;
-  if (qzLoaded && window.qz) return window.qz as unknown as QZTray;
-
-  return new Promise((resolve) => {
-    if (document.getElementById("qz-tray-script")) {
-      const checkQz = setInterval(() => {
-        if (window.qz) {
-          clearInterval(checkQz);
-          qzLoaded = true;
-          resolve(window.qz as unknown as QZTray);
-        }
-      }, 100);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.id = "qz-tray-script";
-    script.src = "https://qz.io/download/qz-tray";
-    script.async = true;
-    script.onload = () => {
-      qzLoaded = true;
-      resolve(window.qz as unknown as QZTray);
-    };
-    script.onerror = () => {
-      console.error("Failed to load QZ Tray");
-      resolve(null);
-    };
-    document.head.appendChild(script);
-  });
 }
 
 export interface OrderTicketData {
@@ -79,7 +42,6 @@ export interface OrderTicketData {
 
 export function usePrintTicket() {
   const [isPrinting, setIsPrinting] = useState(false);
-  const [qz, setQz] = useState<QZTray | null>(null);
   const { config, setConnected, setConnecting, setPrinters, setError } =
     usePrinterStore();
   const initialized = useRef(false);
@@ -92,19 +54,10 @@ export function usePrintTicket() {
     setConnecting(true);
 
     try {
-      const qzInstance = await loadQZTray();
-      if (!qzInstance) {
-        setError("Falha ao carregar QZ Tray");
-        setConnecting(false);
-        return;
-      }
-
-      setQz(qzInstance);
-
-      await qzInstance.websocket.connect();
+      await qz.websocket.connect();
       setConnected(true);
 
-      const printers = await qzInstance.printers.find();
+      const printers = await qz.printers.find();
       setPrinters(printers);
     } catch (err) {
       console.error("QZ Tray connection error:", err);
@@ -116,22 +69,18 @@ export function usePrintTicket() {
   }, [setConnected, setConnecting, setPrinters, setError]);
 
   const disconnect = useCallback(async () => {
-    if (qz) {
-      await qz.websocket.disconnect();
-      setConnected(false);
-    }
-  }, [qz, setConnected]);
+    await qz.websocket.disconnect();
+    setConnected(false);
+  }, [setConnected]);
 
   const refreshPrinters = useCallback(async () => {
-    if (qz) {
-      const printers = await qz.printers.find();
-      setPrinters(printers);
-    }
-  }, [qz, setPrinters]);
+    const printers = await qz.printers.find();
+    setPrinters(printers);
+  }, [setPrinters]);
 
   const printTicket = useCallback(
     async (data: OrderTicketData) => {
-      if (!qz || !config.name) {
+      if (!config.name) {
         setError("Impressora não configurada");
         return false;
       }
@@ -171,12 +120,12 @@ export function usePrintTicket() {
         setIsPrinting(false);
       }
     },
-    [qz, config, setError]
+    [config, setError]
   );
 
   const printRaw = useCallback(
     async (commands: string) => {
-      if (!qz || !config.name) {
+      if (!config.name) {
         setError("Impressora não configurada");
         return false;
       }
@@ -200,7 +149,7 @@ export function usePrintTicket() {
         setIsPrinting(false);
       }
     },
-    [qz, config, setError]
+    [config, setError]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

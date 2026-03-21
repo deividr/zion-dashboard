@@ -89,6 +89,9 @@ importers:
       next:
         specifier: 15.0.3
         version: 15.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      qz-tray:
+        specifier: ^2.2.5
+        version: 2.2.5
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -2553,6 +2556,9 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  qz-tray@2.2.5:
+    resolution: {integrity: sha512-ZPdjFLX1K9j+9v49ertN/QABBhPjUQLQSAQLkSWBrkHLpSv7/rTLLx0NcNMAquCq+WV7Ep4Aw00NJOXMQuMXOA==}
 
   react-day-picker@9.9.0:
     resolution: {integrity: sha512-NtkJbuX6cl/VaGNb3sVVhmMA6LSMnL5G3xNL+61IyoZj0mUZFWTg4hmj7PHjIQ8MXN9dHWhUHFoJWG6y60DKSg==}
@@ -5540,6 +5546,8 @@ snapshots:
   punycode@2.3.1: {}
 
   queue-microtask@1.2.3: {}
+
+  qz-tray@2.2.5: {}
 
   react-day-picker@9.9.0(react@18.3.1):
     dependencies:
