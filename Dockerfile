@@ -7,7 +7,7 @@ WORKDIR /app
 # Instala o pnpm globalmente
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Use uma imagem base adequada para seu projeto
 FROM base AS builder
@@ -19,7 +19,7 @@ ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_YmlnLW1hY2F3LTgyLmNsZXJrLmFjY291bn
 COPY pnpm-lock.yaml package.json ./
 
 # Instala as dependências usando pnpm
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 # Copia o restante do código
 COPY . .
