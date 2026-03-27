@@ -20,6 +20,17 @@ interface QZTray {
     create: (printer: string, options?: object) => Promise<object>;
   };
   print: (config: object, data: string[]) => Promise<void>;
+  security: {
+    setCertificatePromise: (
+      fn: (resolve: (cert: string) => void, reject: (err: unknown) => void) => void
+    ) => void;
+    setSignatureAlgorithm: (algorithm: string) => void;
+    setSignaturePromise: (
+      fn: (
+        toSign: string
+      ) => (resolve: (sig: string) => void, reject: (err: unknown) => void) => void
+    ) => void;
+  };
 }
 
 export interface OrderTicketData {
@@ -54,6 +65,26 @@ export function usePrintTicket() {
     setConnecting(true);
 
     try {
+      qz.security.setCertificatePromise((resolve, reject) => {
+        fetch("/certificate.pem")
+          .then((r) => r.text())
+          .then(resolve)
+          .catch(reject);
+      });
+
+      qz.security.setSignatureAlgorithm("SHA512");
+
+      qz.security.setSignaturePromise((toSign) => (resolve, reject) => {
+        fetch("/api/sign-print", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: toSign }),
+        })
+          .then((r) => r.text())
+          .then(resolve)
+          .catch(reject);
+      });
+
       await qz.websocket.connect();
       setConnected(true);
 
