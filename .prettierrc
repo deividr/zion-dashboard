@@ -10,5 +10,6 @@
     "jsxSingleQuote": false,
     "quoteProps": "as-needed",
     "embeddedLanguageFormatting": "auto",
-    "singleAttributePerLine": false
+    "singleAttributePerLine": false,
+    "plugins": ["prettier-plugin-tailwindcss"]
 }
