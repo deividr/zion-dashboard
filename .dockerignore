@@ -24,6 +24,7 @@ build
 # misc
 **/.DS_Store
 **/*.pem
+!public/certificate.pem
 
 # debug
 **/npm-debug.log*
