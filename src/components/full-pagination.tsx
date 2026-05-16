@@ -127,9 +127,9 @@ export function FullPagination({
     };
 
     return (
-        <div className="flex flex-col md:flex-row items-center gap-3 w-full">
+        <div className="flex w-full flex-col items-center gap-3 md:flex-row">
             {pageSizeSelectOptions && (
-                <div className="flex flex-col gap-4 flex-1">
+                <div className="flex flex-1 flex-col gap-4">
                     <SelectRowsPerPage
                         options={pageSizeSelectOptions.pageSizeOptions}
                         setPageSize={navToPageSize}

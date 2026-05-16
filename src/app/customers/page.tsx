@@ -65,7 +65,7 @@ export default function Customers() {
     return (
         <div className="flex flex-col gap-10">
             <div className="flex gap-10">
-                <div className="grow relative">
+                <div className="relative grow">
                     <Input
                         placeholder="Pesquisar por cliente..."
                         icon={Search}
@@ -82,7 +82,7 @@ export default function Customers() {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-muted"
+                            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 hover:bg-muted"
                             onClick={handleClearSearch}
                         >
                             <X className="h-4 w-4 text-muted-foreground" />

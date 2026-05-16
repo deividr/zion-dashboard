@@ -185,14 +185,14 @@ export function CustomerForm({ customer, children, returnToOrder = false, phoneF
                 <form id="customer-form" onSubmit={formCustomer.handleSubmit(handleSubmit)} className="grid gap-5">
                     <Card>
                         <CardHeaderWithIcon icon={User} title="Dados do Cliente" />
-                        <CardContent className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                        <CardContent className="flex flex-col items-center gap-6 md:flex-row md:items-start">
                             <Avatar className="h-16 w-16">
                                 <AvatarImage src="" />
-                                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                                <AvatarFallback className="bg-primary/10 text-lg font-semibold text-primary">
                                     {customerInitials}
                                 </AvatarFallback>
                             </Avatar>
-                            <div className="flex-1 w-full grid md:grid-cols-2 gap-6">
+                            <div className="grid w-full flex-1 gap-6 md:grid-cols-2">
                                 <FormField
                                     control={formCustomer.control}
                                     name="name"
@@ -303,7 +303,7 @@ export function CustomerForm({ customer, children, returnToOrder = false, phoneF
                             </div>
                         </CardContent>
                         <CardFooter className="mt-5">
-                            <div className="flex justify-end gap-4 w-full">
+                            <div className="flex w-full justify-end gap-4">
                                 <Button variant="ghost" type="button" onClick={handleBack}>
                                     <ArrowLeft />
                                     Voltar

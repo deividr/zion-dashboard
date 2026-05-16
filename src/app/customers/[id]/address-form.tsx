@@ -183,9 +183,9 @@ export function AddressForm({
                             <span>Progresso do preenchimento</span>
                             <span>{Math.round(progress)}%</span>
                         </div>
-                        <div className="w-full bg-muted rounded-full h-2">
+                        <div className="h-2 w-full rounded-full bg-muted">
                             <div
-                                className="bg-gradient-to-r from-primary to-primary/70 h-2 rounded-full transition-all duration-500 ease-in-out"
+                                className="h-2 rounded-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-500 ease-in-out"
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
@@ -197,13 +197,13 @@ export function AddressForm({
                         {/* Seção CEP */}
                         <div className="space-y-4">
                             <div className="flex items-center space-x-2">
-                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                                     <span className="text-xs font-medium text-primary">1</span>
                                 </div>
                                 <h3 className="font-medium">Localização</h3>
                             </div>
 
-                            <div className="pl-8 space-y-4">
+                            <div className="space-y-4 pl-8">
                                 <FormField
                                     control={formEditAddress.control}
                                     name="cep"
@@ -249,13 +249,13 @@ export function AddressForm({
                         {/* Seção Endereço */}
                         <div className="space-y-4">
                             <div className="flex items-center space-x-2">
-                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                                     <span className="text-xs font-medium text-primary">2</span>
                                 </div>
                                 <h3 className="font-medium">Dados do Endereço</h3>
                             </div>
 
-                            <div className="pl-8 space-y-4">
+                            <div className="space-y-4 pl-8">
                                 <FormField
                                     control={formEditAddress.control}
                                     name="street"
@@ -359,13 +359,13 @@ export function AddressForm({
                         {/* Seção Configurações */}
                         <div className="space-y-4">
                             <div className="flex items-center space-x-2">
-                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                                     <span className="text-xs font-medium text-primary">3</span>
                                 </div>
                                 <h3 className="font-medium">Configurações</h3>
                             </div>
 
-                            <div className="pl-8 space-y-4">
+                            <div className="space-y-4 pl-8">
                                 <div className="grid grid-cols-2 gap-4">
                                     <FormField
                                         control={formEditAddress.control}
@@ -403,19 +403,19 @@ export function AddressForm({
                                             name="isDefault"
                                             render={({ field }) => (
                                                 <FormItem className="w-full">
-                                                    <div className="flex items-center space-x-3 h-10">
+                                                    <div className="flex h-10 items-center space-x-3">
                                                         <FormControl>
                                                             <input
                                                                 type="checkbox"
                                                                 id="isDefault"
                                                                 checked={field.value ?? false}
                                                                 onChange={field.onChange}
-                                                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2 focus:ring-offset-0"
+                                                                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
                                                             />
                                                         </FormControl>
                                                         <FormLabel
                                                             htmlFor="isDefault"
-                                                            className="flex items-center space-x-2 cursor-pointer text-sm font-medium leading-none"
+                                                            className="flex cursor-pointer items-center space-x-2 text-sm font-medium leading-none"
                                                         >
                                                             <Star className="h-4 w-4 text-amber-500" />
                                                             <span>Endereço principal</span>
@@ -444,7 +444,7 @@ export function AddressForm({
                                 className="flex-1"
                             >
                                 {formEditAddress.formState.isSubmitting && (
-                                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}
                                 {isEditing ? "Atualizar Endereço" : "Salvar Endereço"}
                             </Button>

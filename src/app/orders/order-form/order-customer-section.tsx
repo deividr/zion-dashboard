@@ -232,14 +232,14 @@ export function OrderCustomerSection({
             .toUpperCase() || "?";
 
     return (
-        <Card className="h-[calc(100vh-200px)] flex flex-col">
+        <Card className="flex h-[calc(100vh-200px)] flex-col">
             <CardHeaderWithIcon icon={User} title="Identificação do Cliente" />
-            <CardContent className="space-y-4 flex-1">
+            <CardContent className="flex-1 space-y-4">
                 {/* Avatar e Nome */}
-                <div className="flex flex-col items-center text-center gap-3">
+                <div className="flex flex-col items-center gap-3 text-center">
                     <Avatar className="h-16 w-16">
                         <AvatarImage src="" />
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                        <AvatarFallback className="bg-primary/10 text-lg font-semibold text-primary">
                             {customerInitials}
                         </AvatarFallback>
                     </Avatar>
@@ -284,7 +284,9 @@ export function OrderCustomerSection({
                                                 placeholder="(00) 00000-0000"
                                                 disabled={isEditMode || isReadOnly || isSearchingCustomer}
                                                 readOnly={isEditMode || isReadOnly}
-                                                className={cn((isEditMode || isReadOnly) && "bg-muted cursor-not-allowed")}
+                                                className={cn(
+                                                    (isEditMode || isReadOnly) && "cursor-not-allowed bg-muted"
+                                                )}
                                             />
                                         </div>
                                         <Button
@@ -397,12 +399,10 @@ export function OrderCustomerSection({
                                             className={cn(
                                                 "w-full justify-start text-left font-normal",
                                                 !field.value && "text-muted-foreground",
-                                                isReadOnly && "bg-muted cursor-not-allowed"
+                                                isReadOnly && "cursor-not-allowed bg-muted"
                                             )}
                                         >
-                                            {field.value
-                                                ? field.value.toLocaleDateString("pt-BR")
-                                                : "Selecione a data"}
+                                            {field.value ? field.value.toLocaleDateString("pt-BR") : "Selecione a data"}
                                         </Button>
                                     </FormControl>
                                 </PopoverTrigger>
@@ -421,7 +421,7 @@ export function OrderCustomerSection({
                 />
 
                 {!selectedCustomer && (
-                    <div className="text-center py-8 text-muted-foreground">
+                    <div className="py-8 text-center text-muted-foreground">
                         <p className="text-sm">Digite o telefone do cliente para buscar</p>
                     </div>
                 )}

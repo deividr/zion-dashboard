@@ -186,14 +186,14 @@ export function OrderForm({ initialData }: OrderFormProps) {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 {isReadOnly && (
-                    <div className="flex items-center gap-3 p-4 mb-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800">
+                    <div className="mb-4 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
                         <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-                        <p className="text-sm font-medium">
-                            Este pedido já foi entregue e não pode ser editado.
-                        </p>
+                        <p className="text-sm font-medium">Este pedido já foi entregue e não pode ser editado.</p>
                     </div>
                 )}
-                <div className={`grid grid-cols-1 ${isReadOnly ? "lg:grid-cols-[1fr_1fr]" : "lg:grid-cols-[1fr_2fr_1fr]"} gap-4 h-full`}>
+                <div
+                    className={`grid grid-cols-1 ${isReadOnly ? "lg:grid-cols-[1fr_1fr]" : "lg:grid-cols-[1fr_2fr_1fr]"} h-full gap-4`}
+                >
                     {/* Coluna Esquerda: Identificação do Cliente */}
                     <OrderCustomerSection
                         form={form}

@@ -40,9 +40,9 @@ export default function EditOrder() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-64">
+            <div className="flex h-64 items-center justify-center">
                 <div className="text-center">
-                    <Loader2 className="animate-spin h-8 w-8 text-primary mx-auto mb-4" />
+                    <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
                     <p className="text-muted-foreground">Carregando pedido...</p>
                 </div>
             </div>
@@ -51,7 +51,7 @@ export default function EditOrder() {
 
     if (!order) {
         return (
-            <div className="flex items-center justify-center h-64">
+            <div className="flex h-64 items-center justify-center">
                 <p className="text-muted-foreground">Pedido não encontrado</p>
             </div>
         );

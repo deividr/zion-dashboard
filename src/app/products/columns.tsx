@@ -35,7 +35,7 @@ export const columns = (categories: Category[]): ColumnDef<Product>[] => [
             return isVariable ? (
                 <Badge variant="secondary">Variável</Badge>
             ) : (
-                <span className="text-muted-foreground text-sm">Fixo</span>
+                <span className="text-sm text-muted-foreground">Fixo</span>
             );
         },
     },

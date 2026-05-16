@@ -93,7 +93,7 @@ export function ProductCard({
         <Card className="w-full overflow-hidden">
             <div className="flex gap-4 p-4">
                 {/* Conteúdo à esquerda */}
-                <div className="flex-1 flex gap-3 min-w-0">
+                <div className="flex min-w-0 flex-1 gap-3">
                     {/* Imagem à esquerda */}
                     <div className="relative h-24 w-24 flex-shrink-0">
                         {imageUrl && imageUrl.trim() !== "" ? (
@@ -113,14 +113,14 @@ export function ProductCard({
                     </div>
                     {/* Nome e Preço */}
                     <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                            <CardTitle className="text-base font-semibold truncate">{product.name}</CardTitle>
+                        <div className="min-w-0 flex-1">
+                            <CardTitle className="truncate text-base font-semibold">{product.name}</CardTitle>
                             {product.isVariablePrice ? (
-                                <div className="flex items-center gap-1 mt-1">
+                                <div className="mt-1 flex items-center gap-1">
                                     <Pencil className="h-3 w-3 text-muted-foreground" />
                                     <Input
                                         inputMode="numeric"
-                                        className="h-7 w-28 text-sm font-bold text-primary px-1"
+                                        className="h-7 w-28 px-1 text-sm font-bold text-primary"
                                         value={formatCurrency(price.toString())}
                                         onChange={(e) => {
                                             const rawValue = parseInt(parseNumber(e.target.value));
@@ -140,7 +140,7 @@ export function ProductCard({
                 </div>
 
                 {/* Conteúdo à direita */}
-                <div className="flex-1 flex flex-col gap-3 min-w-0">
+                <div className="flex min-w-0 flex-1 flex-col gap-3">
                     {/* Controles de Quantidade */}
                     <div className="flex flex-col items-end gap-4">
                         <div className="flex items-center gap-2">
@@ -154,7 +154,7 @@ export function ProductCard({
                             >
                                 <Minus className="h-4 w-4" />
                             </Button>
-                            <span className="text-sm font-medium whitespace-nowrap min-w-[80px] text-center">
+                            <span className="min-w-[80px] whitespace-nowrap text-center text-sm font-medium">
                                 {formattedQuantity} {product.unityType.toLowerCase()}
                             </span>
                             <Button
@@ -181,7 +181,7 @@ export function ProductCard({
                                     <ToggleGroupItem
                                         key={preset.key}
                                         value={preset.value.toString()}
-                                        className="px-2 text-xs h-8"
+                                        className="h-8 px-2 text-xs"
                                     >
                                         {preset.key}
                                     </ToggleGroupItem>
@@ -228,7 +228,7 @@ export function ProductCard({
                     {/* Botão Adicionar */}
                     <Button
                         type="button"
-                        className="w-full mt-auto"
+                        className="mt-auto w-full"
                         onClick={() => {
                             // Adicionar ao carrinho
                             onAddToCart?.(product, quantity, Array.from(selectedSubProducts), price);

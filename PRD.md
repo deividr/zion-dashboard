@@ -6,51 +6,57 @@ Produtos agora possuem um campo que indica se o preço é variável. Quando ativ
 
 ## Campo na API
 
-| Propriedade | Valor |
-|---|---|
-| **Nome JSON** | `isVariablePrice` |
-| **Tipo** | `boolean` |
-| **Obrigatório** | Não (default: `false`) |
-| **Valor padrão** | `false` |
+| Propriedade      | Valor                  |
+| ---------------- | ---------------------- |
+| **Nome JSON**    | `isVariablePrice`      |
+| **Tipo**         | `boolean`              |
+| **Obrigatório**  | Não (default: `false`) |
+| **Valor padrão** | `false`                |
 
 ## Endpoints afetados
 
 ### `GET /products` — Listar produtos
+
 Retorna `isVariablePrice` em cada produto da lista.
 
 ### `GET /products/:id` — Detalhe do produto
+
 Retorna `isVariablePrice` no objeto do produto.
 
 ### `POST /products` — Criar produto
+
 Aceita `isVariablePrice` no body. Se omitido, será `false`.
 
 ### `PUT /products/:id` — Atualizar produto
+
 Aceita `isVariablePrice` no body para alterar o valor.
 
 ## Payload de exemplo
 
 **Request (criar/atualizar):**
+
 ```json
 {
-  "name": "Queijo Minas",
-  "value": 4590,
-  "unityType": "kg",
-  "categoryId": "uuid-da-categoria",
-  "imageUrl": "https://storage.exemplo.com/queijo.jpg",
-  "isVariablePrice": true
+    "name": "Queijo Minas",
+    "value": 4590,
+    "unityType": "kg",
+    "categoryId": "uuid-da-categoria",
+    "imageUrl": "https://storage.exemplo.com/queijo.jpg",
+    "isVariablePrice": true
 }
 ```
 
 **Response:**
+
 ```json
 {
-  "id": "uuid-do-produto",
-  "name": "Queijo Minas",
-  "value": 4590,
-  "unityType": "kg",
-  "categoryId": "uuid-da-categoria",
-  "imageUrl": "https://storage.exemplo.com/queijo.jpg",
-  "isVariablePrice": true
+    "id": "uuid-do-produto",
+    "name": "Queijo Minas",
+    "value": 4590,
+    "unityType": "kg",
+    "categoryId": "uuid-da-categoria",
+    "imageUrl": "https://storage.exemplo.com/queijo.jpg",
+    "isVariablePrice": true
 }
 ```
 

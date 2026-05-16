@@ -19,6 +19,7 @@ pnpm commit           # Conventional commit via git-cz
 ```
 
 Add shadcn/ui components:
+
 ```bash
 pnpm dlx shadcn@latest add <component-name>
 ```
@@ -70,6 +71,7 @@ No test framework is configured.
 ## Environment Variables
 
 Required in `.env.local`:
+
 ```
 NEXT_PUBLIC_HOST_API=http://localhost:8000/api
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...

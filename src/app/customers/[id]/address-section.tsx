@@ -123,10 +123,10 @@ export function AddressSection({ initialAddresses, customer }: AddressSectionPro
         <div className="space-y-4">
             {/* Lista de Endereços */}
             {!addresses?.length ? (
-                <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                    <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Nenhum endereço cadastrado</h3>
-                    <p className="text-muted-foreground mb-4">Adicione o primeiro endereço para este cliente.</p>
+                <div className="rounded-lg border-2 border-dashed py-12 text-center">
+                    <MapPin className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                    <h3 className="mb-2 text-lg font-semibold">Nenhum endereço cadastrado</h3>
+                    <p className="mb-4 text-muted-foreground">Adicione o primeiro endereço para este cliente.</p>
                     <Button onClick={handleAddAddress} variant="outline">
                         <Plus className="mr-2 h-4 w-4" />
                         Adicionar Primeiro Endereço
@@ -137,18 +137,18 @@ export function AddressSection({ initialAddresses, customer }: AddressSectionPro
                     {addresses?.map((address, index) => (
                         <div
                             key={address.id || index}
-                            className="p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                            className="rounded-lg border bg-muted/30 p-4 transition-colors hover:bg-muted/50"
                         >
-                            <div className="flex justify-between items-start gap-4">
-                                <div className="flex items-start gap-3 flex-1">
-                                    <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                                    <div className="space-y-2 flex-1">
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="flex flex-1 items-start gap-3">
+                                    <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                                    <div className="flex-1 space-y-2">
                                         <div className="flex items-center gap-2">
                                             <h3 className="font-semibold">
                                                 {address.street}, {address.number}
                                             </h3>
                                             {address.isDefault && (
-                                                <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
+                                                <span className="rounded-full bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
                                                     Principal
                                                 </span>
                                             )}
@@ -165,7 +165,7 @@ export function AddressSection({ initialAddresses, customer }: AddressSectionPro
                                         </p>
 
                                         {address.aditionalDetails && (
-                                            <p className="text-sm text-muted-foreground italic">
+                                            <p className="text-sm italic text-muted-foreground">
                                                 {address.aditionalDetails}
                                             </p>
                                         )}
@@ -193,7 +193,7 @@ export function AddressSection({ initialAddresses, customer }: AddressSectionPro
                             </div>
                         </div>
                     ))}
-                    
+
                     {/* Botão para adicionar mais endereços */}
                     <div className="pt-2">
                         <Button onClick={handleAddAddress} variant="outline" className="w-full">

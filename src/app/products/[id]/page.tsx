@@ -279,7 +279,7 @@ export default function ProductDetail() {
                 <form id="product-form" onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
                     <Card>
                         <CardHeaderWithIcon icon={Package} title="Dados do Produto" />
-                        <CardContent className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                        <CardContent className="flex flex-col items-center gap-6 md:flex-row md:items-start">
                             <div className="relative">
                                 <input
                                     ref={fileInputRef}
@@ -292,7 +292,7 @@ export default function ProductDetail() {
                                 <Avatar
                                     className={`h-16 w-16 transition-opacity ${
                                         uploadingImage
-                                            ? "opacity-50 cursor-wait"
+                                            ? "cursor-wait opacity-50"
                                             : product?.id !== "new"
                                               ? "cursor-pointer hover:opacity-80"
                                               : ""
@@ -300,7 +300,7 @@ export default function ProductDetail() {
                                     onClick={handleAvatarClick}
                                 >
                                     <AvatarImage src={previewImageUrl || product.imageUrl} alt={product.name} />
-                                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                                    <AvatarFallback className="bg-primary/10 text-lg font-semibold text-primary">
                                         {uploadingImage ? (
                                             <Loader2 className="h-6 w-6 animate-spin" />
                                         ) : (
@@ -321,7 +321,7 @@ export default function ProductDetail() {
                                             }
                                         }}
                                         disabled={uploadingImage}
-                                        className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 shadow-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-wait"
+                                        className="absolute -bottom-1 -right-1 rounded-full bg-primary p-1.5 text-primary-foreground shadow-md transition-colors hover:bg-primary/90 disabled:cursor-wait disabled:opacity-50"
                                         title={
                                             uploadingImage
                                                 ? "Processando imagem..."
@@ -340,7 +340,7 @@ export default function ProductDetail() {
                                     </button>
                                 )}
                             </div>
-                            <div className="flex-1 w-full grid md:grid-cols-2 gap-6">
+                            <div className="grid w-full flex-1 gap-6 md:grid-cols-2">
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -456,10 +456,7 @@ export default function ProductDetail() {
                                                 </p>
                                             </div>
                                             <FormControl>
-                                                <Switch
-                                                    checked={field.value}
-                                                    onCheckedChange={field.onChange}
-                                                />
+                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
                                             </FormControl>
                                         </FormItem>
                                     )}
@@ -467,7 +464,7 @@ export default function ProductDetail() {
                             </div>
                         </CardContent>
                         <CardFooter className="mt-5">
-                            <div className="flex justify-end gap-4 w-full">
+                            <div className="flex w-full justify-end gap-4">
                                 <Button variant="ghost" type="button" onClick={() => router.back()}>
                                     <ArrowLeft />
                                     Voltar

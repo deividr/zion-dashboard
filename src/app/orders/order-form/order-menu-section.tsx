@@ -89,28 +89,32 @@ export function OrderMenuSection({
         const currentProducts = form.getValues("products") || [];
 
         // Adicionar novo produto sempre (permite múltiplas variações do mesmo produto)
-        form.setValue("products", [
-            ...currentProducts,
-            {
-                productId: product.id!,
-                name: product.name,
-                unityType: product.unityType,
-                quantity,
-                price,
-                isVariablePrice: product.isVariablePrice,
-                subProducts: selectedSubProducts.map((p) => ({
-                    productId: p,
-                })),
-            },
-        ], { shouldDirty: true });
+        form.setValue(
+            "products",
+            [
+                ...currentProducts,
+                {
+                    productId: product.id!,
+                    name: product.name,
+                    unityType: product.unityType,
+                    quantity,
+                    price,
+                    isVariablePrice: product.isVariablePrice,
+                    subProducts: selectedSubProducts.map((p) => ({
+                        productId: p,
+                    })),
+                },
+            ],
+            { shouldDirty: true }
+        );
     };
 
     return (
-        <Card className="h-[calc(100vh-200px)] flex flex-col overflow-hidden">
-            <CardContent className="p-6 flex flex-col gap-4 h-full overflow-hidden">
+        <Card className="flex h-[calc(100vh-200px)] flex-col overflow-hidden">
+            <CardContent className="flex h-full flex-col gap-4 overflow-hidden p-6">
                 {/* Search */}
                 <div className="relative flex-shrink-0">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Buscar produto..."
                         value={search}
@@ -123,9 +127,9 @@ export function OrderMenuSection({
                 <Tabs
                     value={selectedCategory}
                     onValueChange={setSelectedCategory}
-                    className="flex-1 flex flex-col min-h-0 overflow-hidden"
+                    className="flex min-h-0 flex-1 flex-col overflow-hidden"
                 >
-                    <TabsList className="grid w-full grid-cols-5 gap-2 flex-shrink-0">
+                    <TabsList className="grid w-full flex-shrink-0 grid-cols-5 gap-2">
                         <TabsTrigger value="all">Todos</TabsTrigger>
                         {orderedCategories.map((category) => (
                             <TabsTrigger key={category.id} value={category.id || ""}>
@@ -134,13 +138,13 @@ export function OrderMenuSection({
                         ))}
                     </TabsList>
 
-                    <TabsContent value={selectedCategory} className="flex-1 overflow-y-auto mt-4 pr-2 -mr-2">
+                    <TabsContent value={selectedCategory} className="-mr-2 mt-4 flex-1 overflow-y-auto pr-2">
                         <div className="space-y-4 pr-2">
                             {selectedCategory === "all" ? (
                                 // Mostrar produtos agrupados por categoria
                                 productsByCategory.map(([categoryName, categoryProducts]) => (
                                     <div key={categoryName} className="space-y-3">
-                                        <h3 className="text-lg font-semibold sticky top-0 bg-background py-2 z-10">
+                                        <h3 className="sticky top-0 z-10 bg-background py-2 text-lg font-semibold">
                                             {categoryName}
                                         </h3>
                                         <div className="space-y-3">

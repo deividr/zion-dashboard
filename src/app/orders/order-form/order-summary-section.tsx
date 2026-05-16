@@ -29,7 +29,14 @@ interface OrderSummarySectionProps {
     isReadOnly?: boolean;
 }
 
-export function OrderSummarySection({ form, products, addresses, isLoading, isEditingMode, isReadOnly = false }: OrderSummarySectionProps) {
+export function OrderSummarySection({
+    form,
+    products,
+    addresses,
+    isLoading,
+    isEditingMode,
+    isReadOnly = false,
+}: OrderSummarySectionProps) {
     const cartItems = form.watch("products") || [];
     const selectedAddressId = form.watch("addressId");
 
@@ -61,7 +68,7 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
     };
 
     return (
-        <Card className="h-[calc(100vh-200px)] flex flex-col">
+        <Card className="flex h-[calc(100vh-200px)] flex-col">
             <CardHeader className="p-6 pb-4">
                 <CardTitle className="flex items-center gap-2">
                     <ShoppingCart className="h-5 w-5" />
@@ -72,12 +79,12 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                 </Badge>
             </CardHeader>
 
-            <CardContent className="p-6 pt-0 flex-1 flex flex-col gap-4 overflow-hidden">
+            <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden p-6 pt-0">
                 {/* Lista de Produtos */}
-                <div className="flex-1 overflow-y-auto space-y-3">
+                <div className="flex-1 space-y-3 overflow-y-auto">
                     {cartItems.length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                        <div className="py-8 text-center text-muted-foreground">
+                            <ShoppingCart className="mx-auto mb-2 h-12 w-12 opacity-50" />
                             <p className="text-sm">Nenhum produto adicionado</p>
                         </div>
                     ) : (
@@ -93,15 +100,15 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                             return (
                                 <Card key={`${item.productId}-${index}`} className="shadow-sm">
                                     <CardContent className="p-3">
-                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-medium text-sm truncate">{item.name}</h4>
+                                        <div className="mb-2 flex items-start justify-between gap-2">
+                                            <div className="min-w-0 flex-1">
+                                                <h4 className="truncate text-sm font-medium">{item.name}</h4>
                                                 {subProductNames && subProductNames.length > 0 && (
                                                     <p className="text-xs text-muted-foreground">
                                                         + {subProductNames.join(", ")}
                                                     </p>
                                                 )}
-                                                <p className="text-primary font-semibold text-sm">
+                                                <p className="text-sm font-semibold text-primary">
                                                     {formatCurrency(item.price)}
                                                 </p>
                                             </div>
@@ -137,7 +144,7 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                                                     </Button>
                                                 )}
 
-                                                <span className="text-xs font-medium min-w-[50px] text-center">
+                                                <span className="min-w-[50px] text-center text-xs font-medium">
                                                     {item.unityType === "UN" ? item.quantity : item.quantity.toFixed(2)}{" "}
                                                     {item.unityType.toLowerCase()}
                                                 </span>
@@ -149,7 +156,10 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                                                         size="icon"
                                                         className="h-6 w-6"
                                                         onClick={() =>
-                                                            handleQuantityChange(index, item.unityType === "UN" ? 1 : 0.25)
+                                                            handleQuantityChange(
+                                                                index,
+                                                                item.unityType === "UN" ? 1 : 0.25
+                                                            )
                                                         }
                                                     >
                                                         <Plus className="h-3 w-3" />
@@ -179,7 +189,10 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                                 <Textarea
                                     {...field}
                                     placeholder="Ex: Sem cebola, capricha na maionese..."
-                                    className={cn("min-h-[60px] text-sm resize-none", isReadOnly && "bg-muted cursor-not-allowed")}
+                                    className={cn(
+                                        "min-h-[60px] resize-none text-sm",
+                                        isReadOnly && "cursor-not-allowed bg-muted"
+                                    )}
                                     disabled={isReadOnly}
                                 />
                             </FormControl>
@@ -197,7 +210,7 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                     {addresses.length > 0 && (
                         <>
                             <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground flex items-center gap-1">
+                                <span className="flex items-center gap-1 text-muted-foreground">
                                     <Truck className="h-3 w-3" />
                                     Taxa de entrega
                                 </span>
@@ -207,7 +220,7 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
                             </div>
 
                             {selectedAddress && (
-                                <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                                <div className="rounded bg-muted p-2 text-xs text-muted-foreground">
                                     <p className="font-medium">Entregar em:</p>
                                     <p>
                                         {selectedAddress.street}, {selectedAddress.number} -{" "}
@@ -228,7 +241,12 @@ export function OrderSummarySection({ form, products, addresses, isLoading, isEd
 
                 {/* Botão Finalizar */}
                 {!isReadOnly && (
-                    <Button type="submit" className="w-full" size="lg" disabled={isLoading || cartItems.length === 0 || (isEditingMode && !form.formState.isDirty)}>
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        size="lg"
+                        disabled={isLoading || cartItems.length === 0 || (isEditingMode && !form.formState.isDirty)}
+                    >
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
