@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/hooks/use-toast";
 import { createReceipt } from "@/lib/esc-pos";
 import { usePrinterStore } from "@/stores/printer-store";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -50,6 +51,7 @@ export interface OrderTicketData {
 export function usePrintTicket() {
     const [isPrinting, setIsPrinting] = useState(false);
     const { config, setConnected, setConnecting, setPrinters, setError } = usePrinterStore();
+    const { toast } = useToast();
     const initialized = useRef(false);
 
     const connect = useCallback(async () => {
@@ -85,6 +87,15 @@ export function usePrintTicket() {
 
             const printers = await qz.printers.find();
             setPrinters(printers);
+
+            const savedName = usePrinterStore.getState().config.name;
+            if (savedName && !printers.includes(savedName)) {
+                usePrinterStore.getState().setConfig({ name: "" });
+                toast({
+                    variant: "destructive",
+                    description: `A impressora salva "${savedName}" não foi encontrada. Selecione outra em Configurações.`,
+                });
+            }
         } catch (err) {
             console.error("QZ Tray connection error:", err);
             setError(err instanceof Error ? err.message : "Erro ao conectar");
@@ -92,7 +103,7 @@ export function usePrintTicket() {
         } finally {
             setConnecting(false);
         }
-    }, [setConnected, setConnecting, setPrinters, setError]);
+    }, [setConnected, setConnecting, setPrinters, setError, toast]);
 
     const disconnect = useCallback(async () => {
         await qz.websocket.disconnect();
@@ -102,7 +113,16 @@ export function usePrintTicket() {
     const refreshPrinters = useCallback(async () => {
         const printers = await qz.printers.find();
         setPrinters(printers);
-    }, [setPrinters]);
+
+        const savedName = usePrinterStore.getState().config.name;
+        if (savedName && !printers.includes(savedName)) {
+            usePrinterStore.getState().setConfig({ name: "" });
+            toast({
+                variant: "destructive",
+                description: `A impressora salva "${savedName}" não foi encontrada. Selecione outra em Configurações.`,
+            });
+        }
+    }, [setPrinters, toast]);
 
     const printTicket = useCallback(
         async (data: OrderTicketData) => {
