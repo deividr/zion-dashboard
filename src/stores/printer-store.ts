@@ -48,6 +48,8 @@ export const usePrinterStore = create<PrinterState>()(
         }),
         {
             name: "printer-storage",
+            partialize: (state) => ({ config: state.config }),
+            skipHydration: true,
         }
     )
 );

@@ -60,6 +60,7 @@ export function usePrintTicket() {
 
         initialized.current = true;
         setConnecting(true);
+        setError(null);
 
         try {
             qz.security.setCertificatePromise((resolve, reject) => {
@@ -111,6 +112,7 @@ export function usePrintTicket() {
     }, [setConnected]);
 
     const refreshPrinters = useCallback(async () => {
+        setError(null);
         const printers = await qz.printers.find();
         setPrinters(printers);
 
@@ -122,7 +124,7 @@ export function usePrintTicket() {
                 description: `A impressora salva "${savedName}" não foi encontrada. Selecione outra em Configurações.`,
             });
         }
-    }, [setPrinters, toast]);
+    }, [setPrinters, setError, toast]);
 
     const printTicket = useCallback(
         async (data: OrderTicketData) => {
@@ -200,6 +202,7 @@ export function usePrintTicket() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
+        usePrinterStore.persist.rehydrate();
         connect();
 
         return () => {
