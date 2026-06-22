@@ -72,17 +72,19 @@ Sem servidor no caminho de impressão. Sem WebSocket persistente. **Modelo open-
 
 2. **`src/lib/esc-pos.ts`** — adicionar `toBytesLatin1(str): Uint8Array` que mapeia `str.charCodeAt(i) & 0xFF` para cada byte. **Crítico:** o `toBytes()` atual usa `TextEncoder` (UTF-8), que corromperia bytes > 0x7F (acentos cp850 e comandos como `\xFA`). O latin1 reproduz exatamente como o QZ trata a string crua hoje, então o cupom sai idêntico.
 
-3. **`src/app/settings/printer/page.tsx`** — no card "Teste de Impressão" já existente, adicionar um segundo botão **"Imprimir teste via Web Serial (beta)"**. No clique: `requestPrinterPort()` → seletor do navegador (uma vez) → `printToPort()` com o mesmo ESC/POS de teste atual (`handleTestPrint`). Toast de sucesso/erro + mostra a porta escolhida. Botão desabilitado se `!isWebSerialSupported()`.
+3. **`src/app/settings/printer/page.tsx`** — no card "Teste de Impressão" já existente, adicionar um segundo botão **"Imprimir teste via Web Serial (beta)"**. No clique: `requestPrinterPort()` → seletor do navegador (uma vez) → `printToPort()` com o mesmo ESC/POS de teste atual (`handleTestPrint`). Toast de sucesso/erro + mostra a porta escolhida. Botão desabilitado se `!isWebSerialSupported()`. Esse botão valida uma **página de teste fixa**.
 
-4. **`package.json`** — adicionar `@types/w3c-web-serial` como devDependency (tipagem oficial do W3C; evita `@ts-expect-error`).
+4. **Botão de teste na página da order** — além das configurações, a PoC precisa imprimir um **pedido real** para conferir o resultado completo (itens, acentos, total, corte). Na tela `src/app/orders/[id]/page.tsx`, ao lado do botão atual "Imprimir Cupom" (QZ, intacto), adicionar um botão **"Imprimir via Web Serial (beta)"** (novo componente `src/components/printer/print-order-button-serial.tsx`) que monta o `OrderTicketData` da order, gera o ESC/POS (`createReceipt`) → `toBytesLatin1()` → `printToPort()`. Para evitar duplicação, extrair o mapeamento `Order → OrderTicketData` (hoje dentro do `print-order-button.tsx`) para um helper compartilhado (ex.: `orderToTicketData()` em `src/lib/order-ticket.ts`), usado pelos dois botões.
+
+5. **`package.json`** — adicionar `@types/w3c-web-serial` como devDependency (tipagem oficial do W3C; evita `@ts-expect-error`).
 
 ### Não muda na Fase 1
 
-`usePrintTicket.ts`, `printer-store.ts`, `/api/sign-print`, `certificate.pem`, dependência `qz-tray`, `print-order-button.tsx`. Todo o QZ permanece funcional.
+`usePrintTicket.ts`, `printer-store.ts`, `/api/sign-print`, `certificate.pem`, dependência `qz-tray`, e o botão QZ existente (`print-order-button.tsx`, que só cede o mapeamento para o helper). Todo o QZ permanece funcional — os botões Web Serial são **aditivos e paralelos**.
 
 ### Critério de sucesso da PoC
 
-Imprimir o teste **5–10× seguidas** na Daruma real, sem diálogo recorrente e sem falha intermitente. Se o cupom sair errado/incompleto, ajustar baud rate (testar 9600 → 19200 → 115200) e flow control. Se passar → libera Fase 2. Se não → QZ continua intacto, abortamos sem prejuízo.
+Imprimir, na Daruma real, **5–10× seguidas** sem diálogo recorrente e sem falha intermitente: tanto a página de teste fixa (configurações) quanto **um pedido real** (tela da order), conferindo itens, acentos, total e corte. Se o cupom sair errado/incompleto, ajustar baud rate (testar 9600 → 19200 → 115200) e flow control. Se passar → libera Fase 2. Se não → QZ continua intacto, abortamos sem prejuízo.
 
 ## 5. Fase 2 — Migração completa + remoção do QZ (só se a PoC passar)
 
@@ -112,7 +114,7 @@ Imprimir o teste **5–10× seguidas** na Daruma real, sem diálogo recorrente e
    - Remover o card "Instalação do QZ Tray"; substituir por nota curta de Web Serial ("Use Chrome ou Edge; autorize a impressora uma vez — não precisa instalar nada").
    - Renomear o botão de teste Web Serial "beta" da Fase 1 para "Imprimir teste" (deixa de ser beta — é o fluxo padrão agora).
 
-6. **`src/components/printer/print-order-button.tsx`**: trocar a checagem de `isConnected` por `isAuthorized`; se não autorizada, toast orientando a autorizar em Configurações. Resto do fluxo igual.
+6. **`src/components/printer/print-order-button.tsx`**: com o `usePrintTicket` agora sob Web Serial, vira o **único** botão de impressão da order — trocar a checagem de `isConnected` por `isAuthorized`; se não autorizada, toast orientando a autorizar em Configurações. **Remover o componente temporário `print-order-button-serial.tsx`** da Fase 1 (sua lógica se funde aqui). O helper `orderToTicketData()` permanece. Idem para o botão "beta" das configurações, que volta a ser um único "Imprimir teste".
 
 ### Remoção do QZ (lista exata, verificada no código)
 
