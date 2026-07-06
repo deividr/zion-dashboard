@@ -1,45 +1,47 @@
-const ESC = "\x1B";
-const GS = "\x1D";
-const LF = "\x0A";
+import { Codepage, encodeText, toCodepage } from "./codepage";
+
+const ESC = 0x1b;
+const GS = 0x1d;
+const LF = 0x0a;
 
 export interface EscPosOptions {
     width?: number;
     codepage?: string;
 }
 
+// Comando ESC t n para selecionar a tabela de caracteres na impressora.
+const CODEPAGE_COMMAND: Record<Codepage, number> = {
+    cp437: 0x00,
+    cp850: 0x02,
+    cp860: 0x03,
+    cp1252: 0x10,
+};
+
 export class EscPosEncoder {
-    private commands: string[] = [];
+    private bytes: number[] = [];
     private width: number;
-    private currentCodepage: string;
+    private currentCodepage: Codepage;
 
     constructor(options: EscPosOptions = {}) {
         this.width = options.width || 48;
-        this.currentCodepage = options.codepage || "cp850";
+        this.currentCodepage = toCodepage(options.codepage || "cp850");
+    }
+
+    private raw(...values: number[]): this {
+        for (const value of values) {
+            this.bytes.push(value & 0xff);
+        }
+        return this;
     }
 
     initialize(): this {
-        this.commands.push(ESC + "@");
-        return this;
+        return this.raw(ESC, 0x40);
     }
 
     setCodepage(codepage: string): this {
-        const codepages: Record<string, string> = {
-            cp437: "\x00",
-            cp850: "\x02",
-            cp860: "\x03",
-            cp863: "\x04",
-            cp865: "\x05",
-            cp1252: "\x10",
-            cp866: "\x11",
-            cp852: "\x12",
-            cp858: "\x13",
-            "windows-1252": "\x10",
-        };
-        if (codepages[codepage]) {
-            this.commands.push(ESC + "t" + codepages[codepage]);
-            this.currentCodepage = codepage;
-        }
-        return this;
+        const cp = toCodepage(codepage);
+        this.currentCodepage = cp;
+        return this.raw(ESC, 0x74, CODEPAGE_COMMAND[cp]);
     }
 
     codepage(codepage: string): this {
@@ -47,130 +49,91 @@ export class EscPosEncoder {
     }
 
     text(text: string): this {
-        this.commands.push(text);
-        return this;
+        return this.raw(...encodeText(text, this.currentCodepage));
     }
 
     newline(): this {
-        this.commands.push(LF);
-        return this;
+        return this.raw(LF);
     }
 
     line(text: string): this {
-        this.commands.push(text + LF);
-        return this;
+        return this.text(text).newline();
     }
 
     alignCenter(): this {
-        this.commands.push(ESC + "a" + "\x01");
-        return this;
+        return this.raw(ESC, 0x61, 0x01);
     }
 
     alignLeft(): this {
-        this.commands.push(ESC + "a" + "\x00");
-        return this;
+        return this.raw(ESC, 0x61, 0x00);
     }
 
     alignRight(): this {
-        this.commands.push(ESC + "a" + "\x02");
-        return this;
+        return this.raw(ESC, 0x61, 0x02);
     }
 
     bold(on: boolean = true): this {
-        this.commands.push(ESC + "E" + (on ? "\x01" : "\x00"));
-        return this;
+        return this.raw(ESC, 0x45, on ? 0x01 : 0x00);
     }
 
     underline(on: boolean = true): this {
-        this.commands.push(ESC + "-" + (on ? "\x01" : "\x00"));
-        return this;
+        return this.raw(ESC, 0x2d, on ? 0x01 : 0x00);
     }
 
     doubleHeight(on: boolean = true): this {
-        this.commands.push(ESC + "!" + (on ? "\x10" : "\x00"));
-        return this;
+        return this.raw(ESC, 0x21, on ? 0x10 : 0x00);
     }
 
     doubleWidth(on: boolean = true): this {
-        this.commands.push(ESC + "!" + (on ? "\x20" : "\x00"));
-        return this;
+        return this.raw(ESC, 0x21, on ? 0x20 : 0x00);
     }
 
     big(on: boolean = true): this {
-        this.commands.push(ESC + "!" + (on ? "\x30" : "\x00"));
-        return this;
+        return this.raw(ESC, 0x21, on ? 0x30 : 0x00);
     }
 
     feed(lines: number = 1): this {
         for (let i = 0; i < lines; i++) {
-            this.commands.push(LF);
+            this.raw(LF);
         }
         return this;
     }
 
     cutPartial(): this {
-        this.commands.push(GS + "V" + "\x01");
-        return this;
+        return this.raw(GS, 0x56, 0x01);
     }
 
     cutFull(): this {
-        this.commands.push(GS + "V" + "\x00");
-        return this;
+        return this.raw(GS, 0x56, 0x00);
     }
 
     cut(): this {
         this.feed(3);
-        this.cutPartial();
-        return this;
+        return this.cutPartial();
     }
 
     openCashDrawer(): this {
-        this.commands.push(ESC + "p" + "\x00" + "\x19" + "\xFA");
-        return this;
+        return this.raw(ESC, 0x70, 0x00, 0x19, 0xfa);
     }
 
-    qrcode(data: string, size = 6): this {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        void size;
-        const len = data.length + 3;
+    qrcode(data: string): this {
+        const bytes = encodeText(data, this.currentCodepage);
+        const len = bytes.length + 3;
         const pL = len % 256;
         const pH = Math.floor(len / 256);
-
-        this.commands.push(GS + "k" + "Q" + "\x00" + String.fromCharCode(pL) + String.fromCharCode(pH) + data);
-        return this;
-    }
-
-    barcode(
-        data: string,
-        type: "EAN13" | "EAN8" | "CODE39" | "CODE128" | "ITF" | "CODABAR" = "CODE128",
-        height: number = 50
-    ): this {
-        const types: Record<string, string> = {
-            EAN13: "\x00",
-            EAN8: "\x02",
-            CODE39: "\x04",
-            ITF: "\x05",
-            CODABAR: "\x06",
-            CODE128: "\x00",
-        };
-
-        const barcodeType = type === "CODE128" ? "A" : types[type];
-        const barcodeCmd = type === "CODE128" ? "k" : "f";
-
-        this.commands.push(GS + "h" + String.fromCharCode(height));
-        this.commands.push(GS + "w" + "\x02");
-        this.commands.push(GS + barcodeCmd + barcodeType + data + "\x00");
-
-        return this;
+        return this.raw(GS, 0x6b, 0x51, 0x00, pL, pH, ...bytes);
     }
 
     encode(): string {
-        return this.commands.join("");
+        return this.toHex();
     }
 
     toBytes(): Uint8Array {
-        const encoder = new TextEncoder();
-        return encoder.encode(this.encode());
+        return Uint8Array.from(this.bytes);
+    }
+
+    toHex(): string {
+        return this.bytes.map((b) => b.toString(16).padStart(2, "0")).join("");
     }
 }
 
@@ -195,10 +158,22 @@ export function createReceipt(data: {
     paymentMethod?: string;
     cutPaper?: boolean;
     openDrawer?: boolean;
+    width?: number;
+    codepage?: string;
 }): string {
-    const encoder = new EscPosEncoder({ width: 48 });
+    const width = data.width ?? 48;
+    const codepage = toCodepage(data.codepage || "cp850");
 
-    encoder.initialize().codepage("cp850");
+    // Colunas da tabela de itens dimensionadas pela largura do papel.
+    const valueCol = width >= 48 ? 12 : 8;
+    const qtyCol = width >= 48 ? 8 : 6;
+    const nameCol = width - valueCol - qtyCol;
+    // Largura da coluna esquerda dos totais (label) = tudo menos o valor.
+    const labelCol = width - valueCol;
+
+    const encoder = new EscPosEncoder({ width, codepage });
+
+    encoder.initialize().codepage(codepage);
 
     encoder.alignCenter().big(true).line(data.storeName).big(false);
 
@@ -220,30 +195,31 @@ export function createReceipt(data: {
         encoder.line(`Tel: ${data.customerPhone}`);
     }
 
-    encoder.feed(1).line("-".repeat(48));
+    encoder.feed(1).line("-".repeat(width));
 
-    encoder.line("PRODUTO".padEnd(28) + "QTD".padStart(8) + "VALOR".padStart(12));
+    encoder.line("PRODUTO".padEnd(nameCol) + "QTD".padStart(qtyCol) + "VALOR".padStart(valueCol));
 
-    encoder.line("-".repeat(48));
+    encoder.line("-".repeat(width));
 
     for (const item of data.items) {
-        const name = item.name.length > 26 ? item.name.substring(0, 26) + ".." : item.name;
+        const maxName = nameCol - 2;
+        const name = item.name.length > maxName ? item.name.substring(0, maxName) + ".." : item.name;
         const qty = `${item.quantity}${item.unit}`;
         const price = formatCurrency(item.price);
-        encoder.line(name.padEnd(28) + qty.padStart(8) + price.padStart(12));
+        encoder.line(name.padEnd(nameCol) + qty.padStart(qtyCol) + price.padStart(valueCol));
     }
 
-    encoder.line("-".repeat(48));
+    encoder.line("-".repeat(width));
 
-    encoder.line("SUBTOTAL:".padEnd(36) + formatCurrency(data.subtotal).padStart(12));
+    encoder.line("SUBTOTAL:".padEnd(labelCol) + formatCurrency(data.subtotal).padStart(valueCol));
 
     if (data.deliveryFee && data.deliveryFee > 0) {
-        encoder.line("ENTREGA:".padEnd(36) + formatCurrency(data.deliveryFee).padStart(12));
+        encoder.line("ENTREGA:".padEnd(labelCol) + formatCurrency(data.deliveryFee).padStart(valueCol));
     }
 
     encoder
         .bold(true)
-        .line("TOTAL:".padEnd(36) + formatCurrency(data.total).padStart(12))
+        .line("TOTAL:".padEnd(labelCol) + formatCurrency(data.total).padStart(valueCol))
         .bold(false);
 
     if (data.observations) {
@@ -255,7 +231,7 @@ export function createReceipt(data: {
         encoder.line(`Pagamento: ${data.paymentMethod}`);
     }
 
-    encoder.feed(3).alignCenter().line("Obrigado pela preferencia!");
+    encoder.feed(3).alignCenter().line("Obrigado pela preferência!");
 
     if (data.cutPaper !== false) {
         encoder.cut();
@@ -265,7 +241,7 @@ export function createReceipt(data: {
         encoder.openCashDrawer();
     }
 
-    return encoder.encode();
+    return encoder.toHex();
 }
 
 function formatCurrency(cents: number): string {

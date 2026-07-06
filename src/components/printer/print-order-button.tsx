@@ -41,7 +41,7 @@ export function PrintOrderButton({ order }: PrintOrderButtonProps) {
             items: order.products.map((p) => ({
                 name: p.name,
                 quantity: p.quantity,
-                unit: p.unityType === "UN" ? "un" : "g",
+                unit: p.unityType === "UN" ? "un" : p.unityType === "LT" ? "ml" : "g",
                 price: p.price,
             })),
             subtotal: order.products.reduce((acc, p) => acc + p.price, 0),
@@ -50,6 +50,8 @@ export function PrintOrderButton({ order }: PrintOrderButtonProps) {
                 order.products.reduce((acc, p) => acc + p.price, 0) +
                 (order.address?.distance ? Math.round(order.address.distance * 500) : 0),
             observations: order.observations,
+            // Fixo por ora: o pedido ainda não tem forma de pagamento no backend.
+            // Serve de lembrete para o entregador cobrar na entrega.
             paymentMethod: "Pendente",
         };
 
