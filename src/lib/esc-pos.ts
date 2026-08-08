@@ -244,6 +244,45 @@ export function createReceipt(data: {
     return encoder.toHex();
 }
 
+/**
+ * Converte a saída hexadecimal de `createReceipt()` de volta para bytes.
+ *
+ * O QZ Tray recebe o cupom como hex (`flavor: "hex"`); a Web Serial precisa
+ * dos bytes crus. O hex é uma representação sem perdas dos mesmos bytes, então
+ * o cupom sai idêntico pelos dois caminhos.
+ */
+export function hexToBytes(hex: string): Uint8Array {
+    const clean = hex.trim();
+
+    if (clean.length % 2 !== 0) {
+        throw new Error("String hexadecimal com número ímpar de dígitos");
+    }
+    if (!/^[0-9a-fA-F]*$/.test(clean)) {
+        throw new Error("String hexadecimal contém caracteres inválidos");
+    }
+
+    const bytes = new Uint8Array(clean.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(clean.substring(i * 2, i * 2 + 2), 16);
+    }
+    return bytes;
+}
+
+/**
+ * Converte uma string ESC/POS crua (escrita com escapes `\x..`) em bytes,
+ * um byte por caractere — `charCodeAt & 0xFF`.
+ *
+ * `TextEncoder` não serve aqui: ele emitiria UTF-8 e corromperia tudo acima de
+ * 0x7F, tanto acentos quanto comandos como `\xFA` da gaveta.
+ */
+export function toBytesLatin1(text: string): Uint8Array {
+    const bytes = new Uint8Array(text.length);
+    for (let i = 0; i < text.length; i++) {
+        bytes[i] = text.charCodeAt(i) & 0xff;
+    }
+    return bytes;
+}
+
 function formatCurrency(cents: number): string {
     return (cents / 100).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,

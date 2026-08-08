@@ -2,10 +2,11 @@
 
 import { Printer, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePrintTicket, OrderTicketData } from "@/hooks/usePrintTicket";
+import { usePrintTicket } from "@/hooks/usePrintTicket";
 import { usePrinterStore } from "@/stores/printer-store";
 import { Order } from "@/domains";
 import { useToast } from "@/hooks/use-toast";
+import { orderToTicketData } from "@/lib/order-ticket";
 
 interface PrintOrderButtonProps {
     order: Order;
@@ -33,29 +34,7 @@ export function PrintOrderButton({ order }: PrintOrderButtonProps) {
             return;
         }
 
-        const ticketData: OrderTicketData = {
-            orderNumber: order.number.toString().padStart(4, "0"),
-            date: new Date(order.createdAt).toLocaleString("pt-BR"),
-            customerName: order.customer?.name,
-            customerPhone: order.customer?.phone,
-            items: order.products.map((p) => ({
-                name: p.name,
-                quantity: p.quantity,
-                unit: p.unityType === "UN" ? "un" : p.unityType === "LT" ? "ml" : "g",
-                price: p.price,
-            })),
-            subtotal: order.products.reduce((acc, p) => acc + p.price, 0),
-            deliveryFee: order.address?.distance ? Math.round(order.address.distance * 500) : undefined,
-            total:
-                order.products.reduce((acc, p) => acc + p.price, 0) +
-                (order.address?.distance ? Math.round(order.address.distance * 500) : 0),
-            observations: order.observations,
-            // Fixo por ora: o pedido ainda não tem forma de pagamento no backend.
-            // Serve de lembrete para o entregador cobrar na entrega.
-            paymentMethod: "Pendente",
-        };
-
-        const success = await printTicket(ticketData);
+        const success = await printTicket(orderToTicketData(order));
 
         if (success) {
             toast({

@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePrinterStore } from "@/stores/printer-store";
 import { usePrintTicket } from "@/hooks/usePrintTicket";
+import { useToast } from "@/hooks/use-toast";
+import { toBytesLatin1 } from "@/lib/esc-pos";
+import {
+    BAUD_RATE_OPTIONS,
+    describePort,
+    ensurePrinterPort,
+    getBaudRate,
+    isWebSerialSupported,
+    printToPort,
+    setBaudRate,
+} from "@/lib/web-serial";
 import { PrinterConnector } from "@/components/printer/printer-connector";
 import { OrderTicketPreview } from "@/components/printer/order-ticket-preview";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,27 +22,60 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Printer, FileText, Settings2 } from "lucide-react";
+import { Printer, FileText, Settings2, Usb } from "lucide-react";
 import { useHeaderStore } from "@/stores/header-store";
+
+const TEST_COMMANDS =
+    "\x1B@\x1B\x61\x01" + "=== TESTE DE IMPRESSAO ===" + "\x0A\x0A" + "LaBuonapasta" + "\x0A\x0A\x0A\x1D\x56\x01";
 
 export default function PrinterSettingsPage() {
     const { config, setConfig, printers, isConnected } = usePrinterStore();
     const { connect, refreshPrinters, printRaw, isPrinting } = usePrintTicket();
     const setTitle = useHeaderStore((state) => state.setTitle);
+    const { toast } = useToast();
+
+    const [serialSupported, setSerialSupported] = useState(true);
+    const [baudRate, setBaudRateState] = useState<number>(9600);
+    const [portLabel, setPortLabel] = useState<string | null>(null);
+    const [isSerialPrinting, setIsSerialPrinting] = useState(false);
 
     useEffect(() => {
         setTitle(["Configurações", "Impressora"]);
     }, [setTitle]);
 
-    const handleTestPrint = async () => {
-        const testCommands =
-            "\x1B@\x1B\x61\x01" +
-            "=== TESTE DE IMPRESSAO ===" +
-            "\x0A\x0A" +
-            "LaBuonapasta" +
-            "\x0A\x0A\x0A\x1D\x56\x01";
+    useEffect(() => {
+        // `navigator` e `localStorage` só existem no cliente.
+        setSerialSupported(isWebSerialSupported());
+        setBaudRateState(getBaudRate());
+    }, []);
 
-        await printRaw(testCommands);
+    const handleTestPrint = async () => {
+        await printRaw(TEST_COMMANDS);
+    };
+
+    const handleSerialTestPrint = async () => {
+        setIsSerialPrinting(true);
+
+        try {
+            const port = await ensurePrinterPort();
+            setPortLabel(describePort(port));
+            await printToPort(port, toBytesLatin1(TEST_COMMANDS), { baudRate });
+            toast({ description: "Teste impresso via Web Serial!" });
+        } catch (err) {
+            console.error("Web Serial test print error:", err);
+            toast({
+                variant: "destructive",
+                description: err instanceof Error ? err.message : "Erro ao imprimir via Web Serial",
+            });
+        } finally {
+            setIsSerialPrinting(false);
+        }
+    };
+
+    const handleBaudRateChange = (value: string) => {
+        const parsed = parseInt(value);
+        setBaudRateState(parsed);
+        setBaudRate(parsed);
     };
 
     return (
@@ -158,6 +202,53 @@ export default function PrinterSettingsPage() {
                     <Button onClick={handleTestPrint} disabled={!config.name || isPrinting} className="w-full">
                         {isPrinting ? "Imprimindo..." : "Imprimir Ticket de Teste"}
                     </Button>
+
+                    <div className="space-y-4 rounded-lg border border-dashed p-4">
+                        <div className="flex items-center gap-2">
+                            <Usb className="h-4 w-4" />
+                            <p className="font-medium">Web Serial (beta)</p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                            Imprime direto na porta COM da impressora, sem QZ Tray. Requer Chrome ou Edge. O navegador
+                            pede autorização só na primeira vez.
+                        </p>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="baud-rate">Baud rate</Label>
+                            <Select
+                                value={baudRate.toString()}
+                                onValueChange={handleBaudRateChange}
+                                disabled={!serialSupported}
+                            >
+                                <SelectTrigger id="baud-rate">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {BAUD_RATE_OPTIONS.map((rate) => (
+                                        <SelectItem key={rate} value={rate.toString()}>
+                                            {rate}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            onClick={handleSerialTestPrint}
+                            disabled={!serialSupported || isSerialPrinting}
+                            className="w-full"
+                        >
+                            {isSerialPrinting ? "Imprimindo..." : "Imprimir teste via Web Serial (beta)"}
+                        </Button>
+
+                        {!serialSupported && (
+                            <p className="text-sm text-destructive">
+                                Web Serial indisponível neste navegador. Use Chrome ou Edge, em HTTPS.
+                            </p>
+                        )}
+                        {portLabel && <p className="text-sm text-muted-foreground">Porta autorizada: {portLabel}</p>}
+                    </div>
 
                     <div className="border-t pt-6">
                         <h3 className="mb-4 flex items-center gap-2 font-medium">

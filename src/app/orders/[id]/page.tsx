@@ -8,6 +8,7 @@ import { Order } from "@/domains";
 import { orderEndpoints } from "@/repository/orderRepository";
 import { OrderForm } from "../order-form";
 import { PrintOrderButton } from "@/components/printer/print-order-button";
+import { PrintOrderButtonSerial } from "@/components/printer/print-order-button-serial";
 import { Loader2 } from "lucide-react";
 
 export default function EditOrder() {
@@ -59,8 +60,9 @@ export default function EditOrder() {
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
                 <PrintOrderButton order={order} />
+                <PrintOrderButtonSerial order={order} />
             </div>
             <OrderForm initialData={order} />
         </div>
