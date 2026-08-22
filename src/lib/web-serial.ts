@@ -81,12 +81,32 @@ export function describePort(port: SerialPort): string {
 // repetidos — ou várias cópias em sequência — estourem InvalidStateError.
 let queue: Promise<unknown> = Promise.resolve();
 
+/**
+ * Tempo morto entre `port.open()` resolver e a porta COM realmente transmitir.
+ * Medido em cupom real: os primeiros 42–90 bytes se perdiam, o equivalente a
+ * 44–94 ms a 9600 baud — junto levavam o `ESC @`, a codepage e o cabeçalho.
+ */
+const PORT_SETTLE_MS = 400;
+
+/**
+ * O `ESC @` reinicia a impressora, e durante o reset ela descarta o que chega.
+ * Enviado como bloco próprio, com folga depois, para o cabeçalho não cair nessa
+ * janela.
+ */
+const RESET_SETTLE_MS = 300;
+
+/**
+ * Latência de teardown entre o último byte sair daqui e chegar na impressora.
+ * Sem essa folga, fechar a porta cortava os últimos 33 bytes — que é onde vivem
+ * o `feed(3)` e o `GS V` do corte, daí o cupom ficar preso sob a lâmina.
+ * É latência fixa, não proporcional ao tamanho: margem constante é o modelo certo.
+ */
+const DRAIN_MARGIN_MS = 600;
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /** Envia bytes ESC/POS para a impressora: abre a porta, escreve e fecha. */
-export function printToPort(
-    port: SerialPort,
-    bytes: Uint8Array,
-    options: { baudRate?: number } = {}
-): Promise<void> {
+export function printToPort(port: SerialPort, bytes: Uint8Array, options: { baudRate?: number } = {}): Promise<void> {
     const run = queue.then(
         () => writeToPort(port, bytes, options),
         () => writeToPort(port, bytes, options)
@@ -94,6 +114,11 @@ export function printToPort(
     // A fila nunca rejeita, senão um erro derrubaria as impressões seguintes.
     queue = run.catch(() => undefined);
     return run;
+}
+
+function splitAfterInitialize(bytes: Uint8Array): [Uint8Array] | [Uint8Array, Uint8Array] {
+    const startsWithInitialize = bytes.length > 2 && bytes[0] === 0x1b && bytes[1] === 0x40;
+    return startsWithInitialize ? [bytes.subarray(0, 2), bytes.subarray(2)] : [bytes];
 }
 
 async function writeToPort(
@@ -108,13 +133,19 @@ async function writeToPort(
             throw new Error("Porta serial aberta mas sem canal de escrita");
         }
 
+        await delay(PORT_SETTLE_MS);
+
         const writer = port.writable.getWriter();
         try {
-            await writer.write(bytes);
-            // close() aguarda o stream drenar. Fechar a porta logo após o
-            // write() pode cortar o cupom no meio, porque write() resolve
-            // quando o dado é entregue ao SO, não quando chega na impressora.
+            const chunks = splitAfterInitialize(bytes);
+            for (const [index, chunk] of chunks.entries()) {
+                await writer.write(chunk);
+                if (index === 0 && chunks.length > 1) {
+                    await delay(RESET_SETTLE_MS);
+                }
+            }
             await writer.close();
+            await delay(DRAIN_MARGIN_MS);
         } finally {
             writer.releaseLock();
         }
